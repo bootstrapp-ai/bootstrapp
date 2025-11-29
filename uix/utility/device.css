@@ -1,0 +1,90 @@
+/**
+ * Device Frame Component Styles
+ * Simulates device mockups for examples and demos
+ */
+
+.uix-device {
+  display: inline-flex;
+  justify-content: center;
+  padding: var(--spacing-xl);
+}
+
+/* Device variants */
+.uix-device[device="iphone"]::part(container) {
+  --device-radius: 36px;
+  --screen-radius: 28px;
+  --device-padding: 12px;
+}
+
+.uix-device[device="android"]::part(container) {
+  --device-radius: 24px;
+  --screen-radius: 16px;
+  --device-padding: 8px;
+}
+
+.uix-device[device="ipad"]::part(container) {
+  --device-radius: 18px;
+  --screen-radius: 12px;
+  --device-padding: 16px;
+}
+
+.uix-device[device="desktop"]::part(container) {
+  --device-radius: 8px;
+  --screen-radius: 4px;
+  --device-padding: 24px;
+  --device-bg: #e5e7eb;
+}
+
+/* Responsive scaling */
+@media (max-width: 768px) {
+  .uix-device {
+    --device-scale: 0.8;
+  }
+}
+
+@media (max-width: 480px) {
+  .uix-device {
+    --device-scale: 0.6;
+  }
+}
+
+/* Center alignment helper */
+.uix-device[center] {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+/* Mobile devices: touch scrolling with hidden scrollbars */
+.uix-device[device="iphone"]::part(screen),
+.uix-device[device="android"]::part(screen),
+.uix-device[device="ipad"]::part(screen) {
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+  -webkit-overflow-scrolling: touch; /* iOS momentum scrolling */
+}
+
+/* Hide scrollbar for Chrome, Safari, Opera */
+.uix-device[device="iphone"]::part(screen)::-webkit-scrollbar,
+.uix-device[device="android"]::part(screen)::-webkit-scrollbar,
+.uix-device[device="ipad"]::part(screen)::-webkit-scrollbar {
+  display: none;
+}
+
+/* Desktop: keep normal scrollbars */
+.uix-device[device="desktop"]::part(screen) {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.uix-device::part(screen) {
+  display: flex;
+}
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .uix-device[device="desktop"]::part(container) {
+    --device-bg: #374151;
+  }
+}

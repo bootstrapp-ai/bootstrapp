@@ -1,0 +1,186 @@
+/**
+ * UIX Text Styles
+ */
+
+.uix-text span,
+.uix-text p,
+.uix-text div {
+  margin: 0;
+  color: var(--text-color);
+  font-family: inherit;
+}
+
+/* Size variants */
+.uix-text[size="xs"] span,
+.uix-text[size="xs"] p,
+.uix-text[size="xs"] div {
+  font-size: var(--typography-fontSize-xs, 0.75rem);
+}
+
+.uix-text[size="sm"] span,
+.uix-text[size="sm"] p,
+.uix-text[size="sm"] div {
+  font-size: var(--typography-fontSize-sm, 0.875rem);
+}
+
+.uix-text[size="base"] span,
+.uix-text[size="base"] p,
+.uix-text[size="base"] div {
+  font-size: var(--typography-fontSize-base, 1rem);
+}
+
+.uix-text[size="lg"] span,
+.uix-text[size="lg"] p,
+.uix-text[size="lg"] div {
+  font-size: var(--typography-fontSize-lg, 1.125rem);
+}
+
+.uix-text[size="xl"] span,
+.uix-text[size="xl"] p,
+.uix-text[size="xl"] div {
+  font-size: var(--typography-fontSize-xl, 1.25rem);
+}
+
+.uix-text[size="2xl"] span,
+.uix-text[size="2xl"] p,
+.uix-text[size="2xl"] div {
+  font-size: var(--typography-fontSize-2xl, 1.5rem);
+}
+
+.uix-text[size="3xl"] span,
+.uix-text[size="3xl"] p,
+.uix-text[size="3xl"] div {
+  font-size: var(--typography-fontSize-3xl, 1.875rem);
+}
+
+/* Weight variants */
+.uix-text[weight="normal"] span,
+.uix-text[weight="normal"] p,
+.uix-text[weight="normal"] div {
+  font-weight: var(--typography-fontWeight-normal, 400);
+}
+
+.uix-text[weight="medium"] span,
+.uix-text[weight="medium"] p,
+.uix-text[weight="medium"] div {
+  font-weight: var(--typography-fontWeight-medium, 500);
+}
+
+.uix-text[weight="semibold"] span,
+.uix-text[weight="semibold"] p,
+.uix-text[weight="semibold"] div {
+  font-weight: var(--typography-fontWeight-semibold, 600);
+}
+
+.uix-text[weight="bold"] span,
+.uix-text[weight="bold"] p,
+.uix-text[weight="bold"] div {
+  font-weight: var(--typography-fontWeight-bold, 700);
+}
+
+/* Muted variant */
+.uix-text[muted] span,
+.uix-text[muted] p,
+.uix-text[muted] div {
+  opacity: 0.6;
+}
+
+/* Monospace font */
+.uix-text[mono] span,
+.uix-text[mono] p,
+.uix-text[mono] div {
+  font-family: monospace;
+}
+
+/* Text alignment */
+.uix-text[align="left"] span,
+.uix-text[align="left"] p,
+.uix-text[align="left"] div {
+  text-align: left;
+}
+
+.uix-text[align="center"] span,
+.uix-text[align="center"] p,
+.uix-text[align="center"] div {
+  text-align: center;
+}
+
+.uix-text[align="right"] span,
+.uix-text[align="right"] p,
+.uix-text[align="right"] div {
+  text-align: right;
+}
+
+/* Color variants */
+.uix-text[color="primary"] span,
+.uix-text[color="primary"] p,
+.uix-text[color="primary"] div {
+  color: var(--color-primary);
+}
+
+.uix-text[color="secondary"] span,
+.uix-text[color="secondary"] p,
+.uix-text[color="secondary"] div {
+  color: var(--color-secondary);
+}
+
+.uix-text[color="success"] span,
+.uix-text[color="success"] p,
+.uix-text[color="success"] div {
+  color: var(--color-success);
+}
+
+.uix-text[color="danger"] span,
+.uix-text[color="danger"] p,
+.uix-text[color="danger"] div {
+  color: var(--color-danger);
+}
+
+.uix-text[color="warning"] span,
+.uix-text[color="warning"] p,
+.uix-text[color="warning"] div {
+  color: var(--color-warning);
+}
+
+.uix-text[color="info"] span,
+.uix-text[color="info"] p,
+.uix-text[color="info"] div {
+  color: var(--color-info);
+}
+
+.uix-text[color="muted"] span,
+.uix-text[color="muted"] p,
+.uix-text[color="muted"] div {
+  opacity: 0.6;
+}
+
+.uix-text[color="inverse"] span,
+.uix-text[color="inverse"] p,
+.uix-text[color="inverse"] div {
+  color: var(--color-inverse);
+}
+
+/* Text transform */
+.uix-text[transform="capitalize"] span,
+.uix-text[transform="capitalize"] p,
+.uix-text[transform="capitalize"] div {
+  text-transform: capitalize;
+}
+
+.uix-text[transform="uppercase"] span,
+.uix-text[transform="uppercase"] p,
+.uix-text[transform="uppercase"] div {
+  text-transform: uppercase;
+}
+
+.uix-text[transform="lowercase"] span,
+.uix-text[transform="lowercase"] p,
+.uix-text[transform="lowercase"] div {
+  text-transform: lowercase;
+}
+
+.uix-text[transform="none"] span,
+.uix-text[transform="none"] p,
+.uix-text[transform="none"] div {
+  text-transform: none;
+}

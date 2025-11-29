@@ -1,0 +1,9 @@
+/**
+ * Showcase Sidebar Styles
+ * Clean, minimal design using UIX components
+ */
+
+:where(.uix-showcase) {
+  display: flex;
+  width: 100%;
+}

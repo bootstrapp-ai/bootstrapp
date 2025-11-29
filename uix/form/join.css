@@ -1,0 +1,84 @@
+/**
+ * UIX Join Styles
+ * Groups elements together by joining their borders
+ */
+
+.uix-join {
+  display: inline-flex;
+  --join-border-radius: var(--radius-md, 0.375rem);
+}
+
+/* Horizontal (default) */
+.uix-join {
+  flex-direction: row;
+}
+
+.uix-join > * {
+  margin: 0;
+  flex: 0 0 auto;
+}
+
+/* Remove border radius from middle children */
+.uix-join > *:not(:first-child):not(:last-child) {
+  border-radius: 0;
+}
+
+/* First child - keep left radius */
+.uix-join > *:first-child {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* Last child - keep right radius */
+.uix-join > *:last-child {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+/* Only child - keep all radius */
+.uix-join > *:only-child {
+  border-radius: var(--join-border-radius);
+}
+
+/* Remove borders between adjacent items */
+.uix-join > * + * {
+  margin-left: -1px;
+}
+
+/* Bring focused/hovered items to front */
+.uix-join > *:hover,
+.uix-join > *:focus,
+.uix-join > *:focus-within {
+  position: relative;
+  z-index: 1;
+}
+
+/* Vertical orientation */
+.uix-join[orientation="vertical"] {
+  flex-direction: column;
+}
+
+.uix-join[orientation="vertical"] > * {
+  width: 100%;
+}
+
+.uix-join[orientation="vertical"] > * + * {
+  margin-left: 0;
+  margin-top: -1px;
+}
+
+.uix-join[orientation="vertical"] > *:first-child {
+  border-top-right-radius: var(--join-border-radius);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.uix-join[orientation="vertical"] > *:last-child {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: var(--join-border-radius);
+}
+
+.uix-join[orientation="vertical"] > *:not(:first-child):not(:last-child) {
+  border-radius: 0;
+}

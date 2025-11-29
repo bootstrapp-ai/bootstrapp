@@ -1,0 +1,47 @@
+{
+  "name": "@bootstrapp/uix",
+  "version": "0.1.0",
+  "description": "UI/UX component toolkit built on @bootstrapp/view with ready-to-use components for modern web applications",
+  "main": "./index.js",
+  "module": "./index.js",
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./display/*": "./display/*.js",
+    "./layout/*": "./layout/*.js",
+    "./form/*": "./form/*.js",
+    "./navigation/*": "./navigation/*.js",
+    "./overlay/*": "./overlay/*.js",
+    "./feedback/*": "./feedback/*.js",
+    "./page/*": "./page/*.js",
+    "./app/*": "./app/*.js",
+    "./utility/*": "./utility/*.js",
+    "./theme.css": "./theme.css"
+  },
+  "keywords": [
+    "ui-components",
+    "uix",
+    "web-components",
+    "bootstrapp",
+    "design-system",
+    "component-library",
+    "lit-html",
+    "custom-elements"
+  ],
+  "author": "Alan Leal",
+  "license": "AGPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bootstrapp-ai/bootstrapp.git",
+    "directory": "public/uix"
+  },
+  "homepage": "https://github.com/bootstrapp-ai/bootstrapp#readme",
+  "bugs": {
+    "url": "https://github.com/bootstrapp-ai/bootstrapp/issues"
+  },
+  "dependencies": {
+    "@bootstrapp/view": "^0.1.0",
+    "@bootstrapp/types": "^0.1.0",
+    "lit": "^3.0.0"
+  }
+}

@@ -1,0 +1,174 @@
+/**
+ * UIX Stat Styles
+ * Clean, minimal stat component - DaisyUI inspired
+ */
+
+/* Base stat */
+.uix-stat {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--spacing-md, 0.75rem);
+  padding: var(--spacing-lg, 1rem);
+  position: relative;
+}
+
+/* Figure container */
+uix-stat::part(figure) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  order: 1; /* Default: figure on right */
+}
+
+uix-stat::part(figure):empty {
+  display: none;
+}
+
+/* Body container */
+uix-stat::part(body) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs, 0.25rem);
+  flex: 1;
+  min-width: 0;
+}
+
+/* Title */
+uix-stat::part(title) {
+  font-size: var(--typography-fontSize-sm, 0.875rem);
+  font-weight: var(--typography-fontWeight-normal, 400);
+  color: var(--text-color);
+  opacity: 0.7;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Value - the hero element */
+uix-stat::part(value) {
+  font-size: var(--typography-fontSize-3xl, 1.875rem);
+  font-weight: var(--typography-fontWeight-extrabold, 800);
+  color: var(--text-color);
+  line-height: var(--typography-lineHeight-tight, 1.2);
+  white-space: nowrap;
+}
+
+/* Description */
+uix-stat::part(desc) {
+  font-size: var(--typography-fontSize-sm, 0.875rem);
+  color: var(--text-color);
+  opacity: 0.6;
+}
+
+uix-stat::part(desc):empty {
+  display: none;
+}
+
+/* =============================================
+   Size Variants
+   ============================================= */
+
+uix-stat[size="sm"]::part(value) {
+  font-size: var(--typography-fontSize-xl, 1.25rem);
+}
+
+uix-stat[size="sm"]::part(title),
+uix-stat[size="sm"]::part(desc) {
+  font-size: var(--typography-fontSize-xs, 0.75rem);
+}
+
+uix-stat[size="lg"]::part(value) {
+  font-size: var(--typography-fontSize-5xl, 3rem);
+}
+
+uix-stat[size="lg"]::part(title),
+uix-stat[size="lg"]::part(desc) {
+  font-size: var(--typography-fontSize-base, 1rem);
+}
+
+/* =============================================
+   Color Variants - Only affect value color
+   ============================================= */
+
+uix-stat[variant="primary"]::part(value) {
+  color: var(--color-primary);
+}
+
+uix-stat[variant="secondary"]::part(value) {
+  color: var(--color-secondary);
+}
+
+uix-stat[variant="success"]::part(value) {
+  color: var(--color-success);
+}
+
+uix-stat[variant="danger"]::part(value) {
+  color: var(--color-danger);
+}
+
+uix-stat[variant="warning"]::part(value) {
+  color: var(--color-warning);
+}
+
+uix-stat[variant="info"]::part(value) {
+  color: var(--color-info);
+}
+
+/* =============================================
+   Centered Layout
+   ============================================= */
+
+uix-stat[centered] {
+  text-align: center;
+  justify-content: center;
+}
+
+uix-stat[centered]::part(body) {
+  align-items: center;
+}
+
+uix-stat[centered]::part(figure) {
+  order: 0; /* Figure on top when centered */
+}
+
+/* =============================================
+   Stats inside uix-join - with dividers
+   ============================================= */
+
+/* Base styles for stats in join */
+.uix-join > uix-stat {
+  flex: 1;
+  position: relative;
+}
+
+/* Horizontal join - dividers */
+.uix-join:not([orientation="vertical"]) > uix-stat + uix-stat::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 15%;
+  height: 70%;
+  border-left: 1px solid var(--color-surface-dark, rgba(255, 255, 255, 0.1));
+}
+
+/* Vertical join - dividers */
+.uix-join[orientation="vertical"] > uix-stat + uix-stat::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 15%;
+  width: 70%;
+  border-top: 1px solid var(--color-surface-dark, rgba(255, 255, 255, 0.1));
+}
+
+/* Remove negative margins from join for stats */
+.uix-join > uix-stat + uix-stat {
+  margin-left: 0;
+  margin-top: 0;
+}
+
+/* Stats in join don't need border radius adjustments */
+.uix-join > uix-stat {
+  border-radius: 0;
+}

@@ -1,0 +1,60 @@
+/**
+ * Page Component Styles
+ */
+
+.uix-page {
+  display: block;
+  min-height: 100vh;
+
+  &::part(container) {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  &::part(header) {
+    flex-shrink: 0;
+  }
+
+  &::part(content) {
+    flex: 1;
+    width: 100%;
+    max-width: var(--page-max-width, 1024px);
+    margin: 0 auto;
+    padding: var(--page-content-padding, var(--spacing-lg, 1rem));
+  }
+
+  &::part(footer) {
+    flex-shrink: 0;
+  }
+
+  /* Max width variants */
+  &[max-width="sm"]::part(content) {
+    max-width: 640px;
+  }
+
+  &[max-width="md"]::part(content) {
+    max-width: 768px;
+  }
+
+  &[max-width="lg"]::part(content) {
+    max-width: 1024px;
+  }
+
+  &[max-width="xl"]::part(content) {
+    max-width: 1280px;
+  }
+
+  &[max-width="2xl"]::part(content) {
+    max-width: 1536px;
+  }
+
+  &[max-width="full"]::part(content) {
+    max-width: 100%;
+  }
+
+  /* Padding control */
+  &[padding="none"]::part(content) {
+    padding: 0;
+  }
+}

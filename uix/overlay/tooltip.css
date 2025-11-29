@@ -1,0 +1,24 @@
+/**
+ * UIX Tooltip Styles
+ * Uses theme variables for consistent styling
+ * Works with custom popover controller system
+ */
+
+.uix-tooltip[data-open] {
+  display: block;
+  padding: var(--theme-spacing-xs, 0.25rem) var(--theme-spacing-sm, 0.5rem);
+  background: var(--theme-colors-background-elevated, #3c3836);
+  color: var(--theme-colors-text-primary, default);
+  border: 1px solid var(--theme-colors-border-primary, #504945);
+  border-radius: var(--theme-radius-sm, 0.25rem);
+  font-size: var(--theme-fontSize-xs, 0.75rem);
+  white-space: nowrap;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  max-width: 300px;
+  word-wrap: break-word;
+}
+
+/* Allow multiline if needed */
+.uix-tooltip[data-open].multiline {
+  white-space: normal;
+}

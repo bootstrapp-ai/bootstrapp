@@ -1,0 +1,6 @@
+uix-tree {
+  display: block;
+  background: var(--theme-colors-background-primary);
+  color: var(--theme-colors-text-primary);
+  user-select: none;
+}

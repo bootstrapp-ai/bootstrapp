@@ -1,0 +1,67 @@
+:where(.uix-icon) {
+  display: inline-block;
+  vertical-align: middle;
+
+  /* Default size if none is specified (optional, defaulting to md) */
+  --_icon-size: calc(var(--spacing) * 4);
+  width: var(--_icon-size);
+  height: var(--_icon-size);
+
+  svg {
+    height: inherit;
+    width: inherit;
+  }
+
+  &[solid] {
+    stroke: currentColor;
+    fill: currentColor;
+  }
+
+  /* --- Color Variants --- */
+  &[color="primary"] {
+    color: var(--color-primary);
+  }
+  &[color="secondary"] {
+    color: var(--color-secondary);
+  }
+  &[color="success"] {
+    color: var(--color-success);
+  }
+  &[color="danger"] {
+    color: var(--color-danger);
+  }
+  &[color="warning"] {
+    color: var(--color-warning);
+  }
+  &[color="info"] {
+    color: var(--color-info);
+  }
+  &[color="inverse"] {
+    color: var(--color-inverse);
+  }
+
+  &[size="xs"] {
+    --_icon-size: calc(var(--spacing-xs) * 3);
+  }
+  &[size="sm"] {
+    --_icon-size: calc(var(--spacing-xs) * 4);
+  }
+  &[size="md"] {
+    --_icon-size: calc(var(--spacing-xs) * 6);
+  }
+  &[size="lg"] {
+    --_icon-size: calc(var(--spacing-xs) * 10);
+  }
+  &[size="xl"] {
+    --_icon-size: calc(var(--spacing-xs) * 14);
+  }
+  &[size="2xl"] {
+    --_icon-size: calc(var(--spacing-xs) * 24);
+  }
+  &[size="3xl"] {
+    --_icon-size: calc(var(--spacing-xs) * 36);
+  }
+  &[size="4xl"] {
+    --_icon-size: calc(var(--spacing-xs) * 48);
+  }
+}

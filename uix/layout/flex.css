@@ -1,0 +1,192 @@
+/**
+ * UIX Flex Styles
+ * Flexbox container component
+ */
+
+.uix-flex {
+  display: flex;
+  flex-direction: var(--flex-direction, row);
+  gap: var(--flex-gap);
+  align-items: var(--flex-align, stretch);
+  justify-content: var(--flex-justify, flex-start);
+  flex-wrap: var(--flex-wrap, nowrap);
+  box-sizing: border-box;
+}
+
+/* Direction variants */
+.uix-flex[direction="row"] {
+  --flex-direction: row;
+}
+
+.uix-flex[direction="column"] {
+  --flex-direction: column;
+}
+
+.uix-flex[direction="row-reverse"] {
+  --flex-direction: row-reverse;
+}
+
+.uix-flex[direction="column-reverse"] {
+  --flex-direction: column-reverse;
+}
+
+/* Gap variants */
+.uix-flex[gap="none"] {
+  --flex-gap: 0;
+}
+
+.uix-flex[gap="xs"] {
+  --flex-gap: var(--spacing-xs, 0.25rem);
+}
+
+.uix-flex[gap="sm"] {
+  --flex-gap: var(--spacing-sm, 0.5rem);
+}
+
+.uix-flex[gap="md"] {
+  --flex-gap: var(--spacing-md, 0.75rem);
+}
+
+.uix-flex[gap="lg"] {
+  --flex-gap: var(--spacing-lg, 1rem);
+}
+
+.uix-flex[gap="xl"] {
+  --flex-gap: var(--spacing-xl, 1.5rem);
+}
+
+.uix-flex[gap="2xl"] {
+  --flex-gap: var(--spacing-2xl, 2rem);
+}
+
+.uix-flex[gap="3xl"] {
+  --flex-gap: var(--spacing-3xl, 3rem);
+}
+
+/* Align variants */
+.uix-flex[align="start"] {
+  --flex-align: flex-start;
+}
+
+.uix-flex[align="center"] {
+  --flex-align: center;
+}
+
+.uix-flex[align="end"] {
+  --flex-align: flex-end;
+}
+
+.uix-flex[align="stretch"] {
+  --flex-align: stretch;
+}
+
+.uix-flex[align="baseline"] {
+  --flex-align: baseline;
+}
+
+/* Justify variants */
+.uix-flex[justify="start"] {
+  --flex-justify: flex-start;
+}
+
+.uix-flex[justify="center"] {
+  --flex-justify: center;
+}
+
+.uix-flex[justify="end"] {
+  --flex-justify: flex-end;
+}
+
+.uix-flex[justify="space-between"] {
+  --flex-justify: space-between;
+}
+
+.uix-flex[justify="space-around"] {
+  --flex-justify: space-around;
+}
+
+.uix-flex[justify="space-evenly"] {
+  --flex-justify: space-evenly;
+}
+
+/* Wrap variants */
+.uix-flex[wrap="wrap"] {
+  --flex-wrap: wrap;
+}
+
+.uix-flex[wrap="nowrap"] {
+  --flex-wrap: nowrap;
+}
+
+.uix-flex[wrap="wrap-reverse"] {
+  --flex-wrap: wrap-reverse;
+}
+
+/* =============================================
+   Flex Item Properties (for direct children)
+   ============================================= */
+
+/* Flex shortcuts */
+.uix-flex > [flex-1] {
+  flex: 1 1 0%;
+}
+
+.uix-flex > [flex-auto] {
+  flex: 1 1 auto;
+}
+
+.uix-flex > [flex-initial] {
+  flex: 0 1 auto;
+}
+
+.uix-flex > [flex-none] {
+  flex: none;
+}
+
+/* Flex grow */
+.uix-flex > [flex-grow] {
+  flex-grow: 1;
+}
+
+.uix-flex > [flex-grow="0"] {
+  flex-grow: 0;
+}
+
+/* Flex shrink */
+.uix-flex > [flex-shrink] {
+  flex-shrink: 1;
+}
+
+.uix-flex > [flex-shrink="0"] {
+  flex-shrink: 0;
+}
+
+/* Flex basis */
+.uix-flex > [flex-basis="auto"] {
+  flex-basis: auto;
+}
+
+.uix-flex > [flex-basis="0"] {
+  flex-basis: 0;
+}
+
+/* Align self (individual item alignment) */
+.uix-flex > [align-self="start"] {
+  align-self: flex-start;
+}
+
+.uix-flex > [align-self="center"] {
+  align-self: center;
+}
+
+.uix-flex > [align-self="end"] {
+  align-self: flex-end;
+}
+
+.uix-flex > [align-self="stretch"] {
+  align-self: stretch;
+}
+
+.uix-flex > [w-full] {
+  width: 100%;
+}

@@ -1,0 +1,268 @@
+:where(.uix-button) {
+  /* --- 1. Layout & Core Props --- */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--button-width, fit-content);
+  white-space: nowrap;
+  box-sizing: border-box;
+
+  /* Typography */
+  font-family: inherit;
+  font-weight: var(--button-font-weight, 700);
+  font-size: var(--button-font-size, 0.875rem);
+  line-height: var(--button-line-height, 1.5);
+  text-align: center;
+  gap: var(--button-gap, 0.5rem);
+
+  /* Appearance */
+  border-radius: var(--button-border-radius, var(--radius-md, 0.375rem));
+  border: var(--button-border-size, 0) solid
+    var(--button-border-color, transparent);
+  box-shadow: var(--button-shadow, none);
+
+  /* --- Default Color Mapping (The crucial part) --- */
+  background-color: var(--button-background-color, #000);
+  --link-color: var(--color-surface, var(--color-inverse));
+  color: var(--link-color);
+  &:not([variant]) {
+    --link-color: #fff;
+    --button-background-color: #000;
+    --button-border-color: #000;
+    --button-hover-background-color: #222;
+    --button-active-background-color: #222;
+  }
+  /* Transitions */
+  transition:
+    transform 0.1s ease-in-out,
+    background-color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out,
+    color 0.2s ease-in-out;
+
+  cursor: pointer;
+  user-select: none;
+
+  /* --- 2. Interactive States --- */
+  &:focus-visible {
+    outline: 2px solid var(--color-primary-dark);
+    outline-offset: 2px;
+  }
+
+  &:not([disabled]):not([aria-disabled="true"]):active {
+    transform: scale(0.97);
+  }
+
+  /* Generic Hover/Active (overridable by variants) */
+  &:not([disabled]):not([aria-disabled="true"]):hover {
+    background-color: var(
+      --button-hover-background-color,
+      var(--color-primary-dark)
+    );
+    border-color: var(
+      --button-hover-border-color,
+      var(--button-border-color, transparent)
+    );
+    color: var(--button-hover-color, var(--link-color));
+  }
+
+  &:not([disabled]):not([aria-disabled="true"]):active {
+    background-color: var(
+      --button-active-background-color,
+      var(--color-primary-darker)
+    );
+  }
+
+  &[primary],
+  &[variant="primary"] {
+    --button-background-color: var(--color-primary);
+    --button-border-color: var(--color-primary);
+    --button-hover-background-color: var(--color-primary-dark);
+    --button-active-background-color: var(--color-primary-darker);
+  }
+
+  &[secondary],
+  &[variant="secondary"] {
+    --button-background-color: var(--color-secondary);
+    --button-border-color: var(--color-secondary);
+
+    --button-hover-background-color: var(--color-secondary-dark);
+    --button-active-background-color: var(--color-secondary-darker);
+  }
+
+  &[danger],
+  &[variant="danger"] {
+    --button-background-color: var(--color-danger);
+    --button-border-color: var(--color-danger);
+
+    --button-hover-background-color: var(--color-danger-dark);
+    --button-active-background-color: var(--color-danger-darker);
+  }
+
+  &[success],
+  &[variant="success"] {
+    --button-background-color: var(--color-success);
+    --button-border-color: var(--color-success);
+
+    --button-hover-background-color: var(--color-success-dark);
+    --button-active-background-color: var(--color-success-darker);
+  }
+
+  &[warning],
+  &[variant="warning"] {
+    --button-background-color: var(--color-warning);
+    --button-border-color: var(--color-warning);
+
+    --button-hover-background-color: var(--color-warning-dark);
+    --button-active-background-color: var(--color-warning-darker);
+  }
+
+  &[bordered] {
+    --button-border-size: 1px;
+  }
+  /* B. OUTLINE VARIANTS */
+  /* Logic: Transparent BG, visible border. Fills on hover. */
+
+  &[outline] {
+    --button-background-color: transparent;
+    --button-border-size: 1px;
+    --link-color: var(--text-color);
+    /* Shared Hover Logic for Outlines (Solid on Hover) */
+    --button-hover-color: var(--color-surface-lighter);
+
+    &[primary] {
+      --button-border-color: var(--color-primary-dark);
+      --button-hover-background-color: var(--color-primary);
+      --button-hover-border-color: var(--color-primary);
+    }
+
+    &[secondary] {
+      --button-border-color: var(--color-secondary-dark);
+      --button-hover-background-color: var(--color-secondary);
+      --button-hover-border-color: var(--color-secondary);
+    }
+
+    &[danger] {
+      --button-border-color: var(--color-danger-dark);
+      --button-hover-background-color: var(--color-danger);
+      --button-hover-border-color: var(--color-danger);
+    }
+
+    &[success] {
+      --button-border-color: var(--color-success-dark);
+      --button-hover-background-color: var(--color-success);
+      --button-hover-border-color: var(--color-success);
+    }
+  }
+
+  /* C. GHOST VARIANTS */
+  /* Logic: Transparent BG, No Border. Subtle tinted hover. */
+
+  &[ghost] {
+    --button-background-color: transparent;
+    --button-border-color: transparent;
+    --link-color: var(--text-color);
+
+    /* Default ghost hover - subtle surface highlight */
+    --button-hover-background-color: var(--color-surface-light);
+    --button-hover-color: var(--text-color);
+
+    &[primary] {
+      --button-hover-background-color: color-mix(
+        in srgb,
+        var(--color-primary),
+        transparent 85%
+      );
+      --button-hover-color: var(--color-primary-darker);
+    }
+
+    &[secondary] {
+      --button-hover-background-color: color-mix(
+        in srgb,
+        var(--color-secondary),
+        transparent 85%
+      );
+      --button-hover-color: var(--color-secondary-darker);
+    }
+
+    &[danger] {
+      --button-hover-background-color: color-mix(
+        in srgb,
+        var(--color-danger),
+        transparent 85%
+      );
+      --button-hover-color: var(--color-danger-darker);
+    }
+
+    &[success] {
+      --button-hover-background-color: color-mix(
+        in srgb,
+        var(--color-success),
+        transparent 85%
+      );
+      --button-hover-color: var(--color-success-darker);
+    }
+  }
+
+  /* --- 4. Sizing --- */
+
+  &[size="xs"] {
+    --button-padding-y: 0.2rem;
+    --button-padding-x: 0.5rem;
+    --button-font-size: 0.6rem;
+    --button-line-height: 1rem;
+    --button-gap: 0.25rem;
+  }
+
+  &[size="sm"] {
+    --button-padding-y: 0.3rem;
+    --button-padding-x: 0.8rem;
+    --button-font-size: 0.8rem;
+    --button-line-height: 1.25rem;
+    --button-gap: 0.375rem;
+  }
+
+  &[size="md"] {
+    --button-padding-y: 0.4rem;
+    --button-padding-x: 1.25rem;
+    --button-font-size: 0.9rem;
+    --button-line-height: 1.5rem;
+    --button-gap: 0.5rem;
+  }
+
+  &[size="lg"] {
+    --button-padding-y: 0.5rem;
+    --button-padding-x: 1.5rem;
+    --button-font-size: 1.1rem;
+    --button-line-height: 1.75rem;
+    --button-gap: 0.625rem;
+  }
+
+  &[size="xl"] {
+    --button-padding-y: 0.625rem;
+    --button-padding-x: 2rem;
+    --button-font-size: 1.25rem;
+    --button-line-height: 2rem;
+    --button-gap: 0.75rem;
+  }
+
+  /* Full width */
+  &[w-full] {
+    width: 100%;
+    display: block;
+  }
+}
+
+/* Shadow DOM Anchor Helper */
+.uix-button::part(anchor) {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  /* Spacing */
+  padding: var(--button-padding-y, 0.5rem) var(--button-padding-x, 1rem);
+}

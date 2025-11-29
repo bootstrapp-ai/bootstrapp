@@ -1,0 +1,195 @@
+body {
+  font-family: var(--font-family);
+}
+html,
+body {
+  font-family: var(--theme-font-family);
+  background-color: var(--background-color);
+  color: var(--text-color);
+  width: 100%;
+  min-height: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  font-size: 14px;
+}
+@media (max-width: 768px) {
+  html {
+    font-size: 18px;
+  }
+}
+@media (max-width: 480px) {
+  html {
+    font-size: 20px;
+  }
+}
+textarea {
+  font-family: inherit;
+  font-feature-settings: inherit;
+  font-variation-settings: inherit;
+  font-size: 100%;
+  font-weight: inherit;
+  line-height: inherit;
+  color: inherit;
+  margin: 0;
+  padding: 0;
+}
+:root {
+  box-sizing: border-box;
+  text-size-adjust: none;
+  line-height: 1.2;
+}
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+* {
+  margin: 0;
+}
+body {
+  font-family: var(--font-family);
+}
+button,
+textarea,
+select {
+  background-color: inherit;
+  border-width: 0;
+  color: inherit;
+}
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  background: inherit;
+  border: inherit;
+}
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-family);
+  overflow-wrap: break-word;
+}
+dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(121, 121, 121, 0.4);
+  border-radius: 0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 100, 100, 0.7);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: rgba(85, 85, 85, 0.8);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(121, 121, 121, 0.4) transparent;
+}
+
+*:not(:defined) {
+  display: block;
+  height: 100vh;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.dark {
+  filter: invert(1) hue-rotate(180deg);
+}
+.dark img,
+.dark dialog,
+.dark video,
+.dark iframe {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+/**
+ * UIX Global Utility Attributes
+ * Common utility attributes that can be used across all components
+ */
+
+[direction="horizontal"] {
+  --flex-direction: row;
+  flex-direction: row;
+}
+
+[direction="vertical"] {
+  --flex-direction: column;
+  flex-direction: row;
+}
+
+[cursor-pointer] {
+  cursor: pointer;
+}
+
+/* Width utilities */
+[w-full] {
+  width: 100%;
+}
+
+/* Height utilities */
+[h-full] {
+  height: 100%;
+}
+
+[min-h-0] {
+  min-height: 0;
+}
+
+[min-w-0] {
+  min-width: 0;
+}
+/* Flex utilities */
+[flex] {
+  display: flex;
+}
+
+[flex-col] {
+  flex-direction: column;
+}
+
+[flex-1] {
+  flex: 1;
+}
+
+[flex-grow] {
+  flex-grow: 1;
+}
+[flex-shrink-0] {
+  flex-shrink: 0;
+}

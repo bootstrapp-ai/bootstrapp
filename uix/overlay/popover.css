@@ -1,0 +1,133 @@
+/**
+ * UIX Popover Styles
+ * Uses theme variables for consistent styling
+ * Works with custom popover controller system
+ */
+
+/* Base styles */
+.uix-popover[data-open] {
+  display: block;
+  min-width: 250px;
+  max-width: 400px;
+  background: var(--theme-colors-background-elevated, #3c3836);
+  color: var(--theme-colors-text-primary, default);
+  border: 1px solid var(--theme-colors-border-primary, #504945);
+  border-radius: var(--theme-radius-md, 0.375rem);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  padding: var(--theme-spacing-md, 0.75rem);
+}
+
+/* Arrow using ::before pseudo-element */
+.uix-popover[data-open][arrow]::before {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+}
+
+/* Arrow positioning for bottom - arrow points UP to trigger */
+.uix-popover[position="bottom"][arrow]::before,
+.uix-popover[position="bottom-left"][arrow]::before,
+.uix-popover[position="bottom-right"][arrow]::before {
+  top: -8px;
+  left: 20px;
+  border-width: 0 8px 8px 8px;
+  border-color: transparent transparent
+    var(--theme-colors-background-elevated, #3c3836) transparent;
+}
+
+/* Arrow border for bottom */
+.uix-popover[position="bottom"][arrow]::after,
+.uix-popover[position="bottom-left"][arrow]::after,
+.uix-popover[position="bottom-right"][arrow]::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  top: -9px;
+  left: 20px;
+  border-width: 0 8px 8px 8px;
+  border-color: transparent transparent
+    var(--theme-colors-border-primary, #504945) transparent;
+}
+
+/* Arrow positioning for top - arrow points DOWN to trigger */
+.uix-popover[position="top"][arrow]::before,
+.uix-popover[position="top-left"][arrow]::before,
+.uix-popover[position="top-right"][arrow]::before {
+  bottom: -8px;
+  left: 20px;
+  border-width: 8px 8px 0 8px;
+  border-color: var(--theme-colors-background-elevated, #3c3836) transparent
+    transparent transparent;
+}
+
+.uix-popover[position="top"][arrow]::after,
+.uix-popover[position="top-left"][arrow]::after,
+.uix-popover[position="top-right"][arrow]::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  bottom: -9px;
+  left: 20px;
+  border-width: 8px 8px 0 8px;
+  border-color: var(--theme-colors-border-primary, #504945) transparent
+    transparent transparent;
+}
+
+/* Arrow positioning for left - arrow points RIGHT to trigger */
+.uix-popover[position="left"][arrow]::before {
+  right: -8px;
+  top: 20px;
+  border-width: 8px 0 8px 8px;
+  border-color: transparent transparent transparent
+    var(--theme-colors-background-elevated, #3c3836);
+}
+
+.uix-popover[position="left"][arrow]::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  right: -9px;
+  top: 20px;
+  border-width: 8px 0 8px 8px;
+  border-color: transparent transparent transparent
+    var(--theme-colors-border-primary, #504945);
+}
+
+/* Arrow positioning for right - arrow points LEFT to trigger */
+.uix-popover[position="right"][arrow]::before {
+  left: -8px;
+  top: 20px;
+  border-width: 8px 8px 8px 0;
+  border-color: transparent var(--theme-colors-background-elevated, #3c3836)
+    transparent transparent;
+}
+
+.uix-popover[position="right"][arrow]::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  left: -9px;
+  top: 20px;
+  border-width: 8px 8px 8px 0;
+  border-color: transparent var(--theme-colors-border-primary, #504945)
+    transparent transparent;
+}
+
+/* Content styling */
+.uix-popover[data-open] > * {
+  margin: 0;
+}
+
+.uix-popover[data-open] > * + * {
+  margin-top: var(--theme-spacing-sm, 0.5rem);
+}

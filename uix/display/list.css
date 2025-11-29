@@ -1,0 +1,46 @@
+/**
+ * UIX List Styles
+ */
+
+.uix-list {
+  display: block;
+}
+
+.uix-list .uix-list-inner {
+  list-style: inside;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--list-spacing, var(--spacing-sm, 0.5rem));
+}
+
+/* Variant: unstyled */
+.uix-list[variant="unstyled"] .uix-list-inner {
+  list-style: none;
+}
+
+/* Spacing variants */
+.uix-list[spacing="none"] .uix-list-inner {
+  gap: 0;
+}
+
+.uix-list[spacing="xs"] .uix-list-inner {
+  gap: var(--spacing-xs, 0.25rem);
+}
+
+.uix-list[spacing="sm"] .uix-list-inner {
+  gap: var(--spacing-sm, 0.5rem);
+}
+
+.uix-list[spacing="md"] .uix-list-inner {
+  gap: var(--spacing-md, 0.75rem);
+}
+
+.uix-list[spacing="lg"] .uix-list-inner {
+  gap: var(--spacing-lg, 1rem);
+}
+
+.uix-list[spacing="xl"] .uix-list-inner {
+  gap: var(--spacing-xl, 1.5rem);
+}

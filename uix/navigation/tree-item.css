@@ -1,0 +1,53 @@
+uix-tree-item {
+  display: block;
+}
+
+uix-tree-item::part(item-content) {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  border-radius: 0.25rem;
+  transition: background 0.15s ease;
+}
+
+uix-tree-item::part(item-content):hover {
+  background: var(--theme-colors-background-hover, rgba(255, 255, 255, 0.05));
+}
+
+uix-tree-item[active]::part(item-content) {
+  background: rgba(250, 189, 47, 0.2);
+  color: var(--theme-colors-accent-primary);
+}
+
+/* Children container */
+uix-tree-item::part(children) {
+  padding-left: 1.5rem;
+  border-left: 1px solid var(--theme-colors-border-primary, rgba(255, 255, 255, 0.1));
+  margin-left: 0.5rem;
+}
+
+uix-tree-item:not([expanded])::part(children) {
+  display: none;
+}
+
+uix-tree-item .label {
+  flex: 1;
+  font-size: 0.875rem;
+}
+
+uix-tree-item .modified {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--theme-colors-accent-primary);
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+uix-tree-item uix-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}

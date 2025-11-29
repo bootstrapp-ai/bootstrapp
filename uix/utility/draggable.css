@@ -1,0 +1,10 @@
+.uix-draggable {
+	--uix-container-height: auto;
+	transition:
+		transform 0.6s ease,
+		opacity 0.6s ease;
+	will-change: transform;
+}
+&.dragging {
+	opacity: 0.1;
+}

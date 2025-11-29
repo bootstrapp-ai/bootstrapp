@@ -1,0 +1,113 @@
+.uix-drawer {
+  &:not([open]) {
+    pointer-events: none;
+  }
+
+  &[open] {
+    pointer-events: auto;
+    display: flex;
+  }
+
+  &:not([open])::part(backdrop) {
+    display: none;
+    pointer-events: none;
+  }
+
+  &[open]::part(backdrop) {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 100;
+    animation: backdrop-fade-in 0.25s ease-out;
+  }
+
+  /* Drawer Panel Base */
+  &::part(panel) {
+    transition: all 0.5s ease-in-out;
+    position: absolute;
+    height: 100%;
+    background-color: var(--drawer-bg, var(--color-surface-lighter, #fff));
+    box-shadow: var(--drawer-shadow, 0 0 30px rgba(0, 0, 0, 0.4));
+    z-index: 1000;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  &:not([open])::part(panel) {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  &[open]::part(panel) {
+    opacity: 1;
+  }
+
+  /* Position: Left (default) */
+  &[position="left"]::part(panel) {
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: var(--drawer-width, 280px);
+    min-width: min(70%, 280px);
+    max-width: 400px;
+    transform: translateX(-100%);
+  }
+
+  &[position="left"][open]::part(panel) {
+    transform: translateX(0);
+  }
+
+  /* Position: Right */
+  &[position="right"]::part(panel) {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: var(--drawer-width, 280px);
+    min-width: min(70%, 280px);
+    max-width: 400px;
+    transform: translateX(100%);
+  }
+
+  &[position="right"][open]::part(panel) {
+    transform: translateX(0);
+  }
+
+  /* Position: Top */
+  &[position="top"]::part(panel) {
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--drawer-height, 50vh);
+    transform: translateY(-100%);
+  }
+
+  &[position="top"][open]::part(panel) {
+    transform: translateY(0);
+  }
+
+  /* Position: Bottom */
+  &[position="bottom"]::part(panel) {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: var(--drawer-height, 50vh);
+    transform: translateY(100%);
+  }
+
+  &[position="bottom"][open]::part(panel) {
+    transform: translateY(0);
+  }
+}
+
+/* Animations */
+@keyframes backdrop-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

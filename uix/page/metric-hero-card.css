@@ -1,0 +1,60 @@
+/**
+ * Metric Hero Card Component Styles
+ */
+
+.uix-metric-hero-card {
+  display: block;
+  width: 100%;
+}
+
+/* Card container */
+.uix-metric-hero-card::part(card) {
+  height: 100%;
+  color: var(--metric-hero-text-color, #fff);
+}
+
+/* Container */
+.uix-metric-hero-card::part(container) {
+  width: 100%;
+}
+
+/* Label text */
+.uix-metric-hero-card::part(label) {
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Content section */
+.uix-metric-hero-card::part(content) {
+  width: 100%;
+}
+
+/* Value heading */
+.uix-metric-hero-card::part(value) {
+  line-height: 1;
+  font-size: var(--metric-hero-value-size, 2.5rem);
+}
+
+/* Subtitle text */
+.uix-metric-hero-card::part(subtitle) {
+  opacity: 0.9;
+}
+
+/* Chart slot */
+.uix-metric-hero-card::part(chart) {
+  width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .uix-metric-hero-card::part(value) {
+    font-size: var(--metric-hero-value-size-mobile, 2rem);
+  }
+}
+
+/* Hover effect for cards with shadow */
+.uix-metric-hero-card[shadow]:hover::part(card) {
+  transform: translateY(-4px);
+  transition: transform 0.3s ease;
+}

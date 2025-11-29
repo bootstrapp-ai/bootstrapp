@@ -1,0 +1,257 @@
+.uix-app-container {
+  /* Layout */
+  display: flex;
+  width: 100%;
+  overflow: hidden;
+
+  /* Safe area support */
+  &[use-safe-area] {
+    --safe-top: env(safe-area-inset-top);
+    --safe-bottom: env(safe-area-inset-bottom);
+    --safe-left: env(safe-area-inset-left);
+    --safe-right: env(safe-area-inset-right);
+  }
+}
+
+/* ============================================
+   MOBILE LAYOUT
+   ============================================ */
+
+.uix-app-container::part(container) {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  position: relative;
+  background: var(--color-background);
+}
+
+/* Mobile content area */
+.uix-app-container::part(content) {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: var(--content-padding, 0);
+}
+
+/* Adjust padding when header is fixed */
+.uix-app-container[header-fixed]::part(content) {
+  padding-top: calc(56px + var(--safe-top, 0px));
+}
+
+/* Adjust padding when bottom nav is shown */
+.uix-app-container[show-bottom-nav]::part(content) {
+  padding-bottom: calc(56px + var(--safe-bottom, 0px));
+}
+
+/* Floating action button positioning */
+.uix-app-container [slot="floating-action"] {
+  position: fixed;
+  bottom: calc(72px + var(--safe-bottom, 0px));
+  right: var(--spacing-lg);
+  z-index: 90;
+}
+
+.uix-app-container:not([show-bottom-nav]) [slot="floating-action"] {
+  bottom: calc(var(--spacing-lg) + var(--safe-bottom, 0px));
+}
+
+/* ============================================
+   DESKTOP LAYOUT
+   ============================================ */
+
+/* Desktop body (contains sidebar + main + panel) */
+.uix-app-container::part(body) {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Desktop main area (toolbar + content) */
+.uix-app-container::part(main) {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Toolbar */
+.uix-app-container::part(toolbar) {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  min-height: 40px;
+  padding: var(--spacing-xs) var(--spacing-md);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* Desktop content area - additional padding for desktop */
+@media (min-width: 768px) {
+  .uix-app-container::part(content) {
+    padding: var(--content-padding, var(--spacing-lg));
+    background: var(--color-background);
+  }
+}
+
+/* Secondary panel (multi-pane mode) */
+.uix-app-container::part(panel) {
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  min-width: 200px;
+  max-width: 600px;
+  border-left: 1px solid var(--color-border);
+  background: var(--color-surface);
+  overflow-y: auto;
+  resize: horizontal;
+}
+
+/* Status bar */
+.uix-app-container::part(statusbar) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  min-height: 24px;
+  padding: var(--spacing-xs) var(--spacing-md);
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+/* Hide if empty */
+.uix-app-container::part(statusbar):empty {
+  display: none;
+}
+
+/* ============================================
+   SIDEBAR INTEGRATION
+   ============================================ */
+
+.uix-app-container uix-sidebar {
+  height: 100%;
+  border-right: 1px solid var(--color-border);
+}
+
+/* Right-positioned sidebar */
+.uix-app-container uix-sidebar[position="right"] {
+  order: 3;
+  border-right: none;
+  border-left: 1px solid var(--color-border);
+}
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+
+/* Tablet portrait: adjust sidebar */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .uix-app-container uix-sidebar {
+    width: 240px;
+  }
+
+  .uix-app-container::part(content) {
+    padding: var(--spacing-md);
+  }
+}
+
+/* Small desktop: adjust panel */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .uix-app-container::part(panel) {
+    width: 250px;
+  }
+}
+
+/* Large desktop: increase content padding */
+@media (min-width: 1440px) {
+  .uix-app-container::part(content) {
+    padding: var(--content-padding, var(--spacing-xl));
+  }
+}
+
+/* ============================================
+   SLOT CONTENT STYLING
+   ============================================ */
+
+/* Toolbar slot content */
+.uix-app-container [slot="toolbar"] {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+}
+
+/* Status bar slot content */
+.uix-app-container [slot="status-bar"] {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+/* ============================================
+   THEME VARIANTS
+   ============================================ */
+
+/* Dark theme adjustments */
+@media (prefers-color-scheme: dark) {
+  .uix-app-container::part(toolbar) {
+    background: var(--color-surface-dark);
+  }
+
+  .uix-app-container::part(statusbar) {
+    background: var(--color-surface-dark);
+  }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+/* Focus visible styles */
+.uix-app-container *:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .uix-app-container::part(content) {
+    scroll-behavior: auto;
+  }
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+
+@media print {
+  .uix-app-container {
+    height: auto;
+  }
+
+  .uix-app-container::part(container) {
+    display: block;
+    height: auto;
+  }
+
+  .uix-app-container uix-app-header,
+  .uix-app-container uix-bottom-nav,
+  .uix-app-container uix-title-bar,
+  .uix-app-container uix-sidebar,
+  .uix-app-container::part(toolbar),
+  .uix-app-container::part(statusbar),
+  .uix-app-container::part(panel) {
+    display: none;
+  }
+
+  .uix-app-container::part(content) {
+    overflow: visible;
+    height: auto;
+    padding: 0;
+  }
+}

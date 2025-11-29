@@ -1,0 +1,207 @@
+/**
+ * Card Component Styles
+ * Card-specific styles for structured content with header/body/footer
+ * Inherits base container styles from uix-container
+ */
+
+/* Host element - Card-specific layout */
+.uix-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Override container default for cards */
+
+  &::part(body) {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Header Part */
+  > [slot="header"] {
+    margin: 0;
+    display: flex;
+    padding: var(
+      --card-header-padding,
+      var(--theme-spacing-md, 0.75rem) var(--theme-spacing-lg, 1rem)
+    );
+    border-bottom-width: var(--card-header-border-width, 0);
+    border-bottom-style: solid;
+    border-bottom-color: var(
+      --card-header-border-color,
+      var(--card-border-primary, #504945)
+    );
+    background: var(--card-header-background-color, inherit);
+  }
+
+  /* Footer Part */
+  > [slot="footer"] {
+    display: flex;
+    padding: var(
+      --card-footer-padding,
+      var(--theme-spacing-md, 0.75rem) var(--theme-spacing-lg, 1rem)
+    );
+    border-top-width: var(--card-footer-border-width, 0);
+    border-top-style: var(--theme-card-footer-borderStyle, solid);
+    border-top-color: var(
+      --card-footer-border-color,
+      var(--theme-colors-border-primary, #504945)
+    );
+    background: var(--card-footer-background-color, inherit);
+    flex-direction: row;
+    gap: var(--theme-spacing-sm, 0.5rem);
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  /* Body Part */
+  &::part(body) {
+    flex: 1;
+    background: var(--card-background, inherit);
+  }
+
+  /* Gradient background support - use style="--card-gradient-from: color1; --card-gradient-to: color2" */
+  &[style*="--card-gradient-from"]::part(body) {
+    background: linear-gradient(
+      135deg,
+      var(--card-gradient-from),
+      var(--card-gradient-to, var(--card-gradient-from))
+    );
+  }
+
+  /* Body padding based on inherited padding attribute */
+  &[padding="none"]::part(body) {
+    padding: 0;
+  }
+
+  &[padding="sm"]::part(body) {
+    padding: var(--spacing-sm, 0.5rem);
+  }
+
+  &[padding="md"]::part(body) {
+    padding: var(--spacing-md, 0.75rem) var(--spacing-lg, 1rem);
+  }
+
+  &[padding="lg"]::part(body) {
+    padding: var(--spacing-lg, 1rem) var(--spacing-xl, 1.5rem);
+  }
+
+  /* Border Width Control */
+  &[borderWidth="none"] {
+    border-width: 0;
+  }
+
+  &[borderWidth="1"] {
+    border-width: 1px;
+  }
+
+  &[borderWidth="2"] {
+    border-width: 2px;
+  }
+
+  &[borderWidth="3"] {
+    border-width: 3px;
+  }
+
+  /* Border Style Control */
+  &[borderStyle="solid"] {
+    border-style: solid;
+  }
+
+  &[borderStyle="dashed"] {
+    border-style: dashed;
+  }
+
+  &[borderStyle="dotted"] {
+    border-style: dotted;
+  }
+
+  /* Gap Control for Body Content */
+  &[gap="none"]::part(body) {
+    gap: 0;
+  }
+
+  &[gap="xs"]::part(body) {
+    gap: var(--spacing-xs, 0.25rem);
+  }
+
+  &[gap="sm"]::part(body) {
+    gap: var(--spacing-sm, 0.5rem);
+  }
+
+  &[gap="md"]::part(body) {
+    gap: var(--spacing-md, 0.75rem);
+  }
+
+  &[gap="lg"]::part(body) {
+    gap: var(--spacing-lg, 1rem);
+  }
+
+  &[gap="xl"]::part(body) {
+    gap: var(--spacing-xl, 1.5rem);
+  }
+
+  /* Shadow Variants */
+  &[shadow="sm"] {
+    box-shadow: var(--shadow-sm, 0 1px 2px 0 rgba(0, 0, 0, 0.05));
+  }
+
+  &[shadow="md"] {
+    box-shadow: var(
+      --shadow-md,
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06)
+    );
+  }
+
+  &[shadow="lg"] {
+    box-shadow: var(
+      --shadow-lg,
+      0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05)
+    );
+  }
+
+  /* Brutalist Shadow - Hard offset shadow with no blur */
+  &[shadow="brutalist"] {
+    box-shadow: var(--theme-card-shadow-brutalist, 4px 4px 0px #1d2021);
+  }
+
+  /* Hover Effects */
+  &[hover] {
+    transition: all 200ms ease;
+    cursor: pointer;
+
+    &:hover {
+      border-color: var(--theme-card-borderHover, #83a598);
+    }
+
+    /* Brutalist shadow hover effect */
+    &[shadow="brutalist"]:hover {
+      box-shadow: var(--theme-card-shadow-brutalistHover, 6px 6px 0px #83a598);
+    }
+
+    /* Enhanced shadows on hover for other shadow types */
+    &[shadow="sm"]:hover {
+      box-shadow: var(
+        --shadow-md,
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06)
+      );
+    }
+
+    &[shadow="md"]:hover {
+      box-shadow: var(
+        --shadow-lg,
+        0 10px 15px -3px rgba(0, 0, 0, 0.1),
+        0 4px 6px -2px rgba(0, 0, 0, 0.05)
+      );
+    }
+
+    &[shadow="lg"]:hover {
+      box-shadow: var(
+        --shadow-xl,
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04)
+      );
+    }
+  }
+}

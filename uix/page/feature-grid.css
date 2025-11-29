@@ -1,0 +1,379 @@
+.uix-feature-grid {
+  /* Layout */
+  display: block;
+  width: 100%;
+
+  /* Column variants */
+  &[columns="2"] {
+    --feature-columns: 2;
+  }
+
+  &[columns="3"] {
+    --feature-columns: 3;
+  }
+
+  &[columns="4"] {
+    --feature-columns: 4;
+  }
+}
+
+/* Feature grid section */
+.uix-feature-grid::part(section) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xl);
+  padding: var(--spacing-3xl) var(--spacing-lg);
+  background: var(--color-background);
+}
+
+/* Header */
+.uix-feature-grid::part(header) {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.uix-feature-grid::part(heading) {
+  margin: 0 0 var(--spacing-md);
+  font-size: var(--font-size-3xl);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.uix-feature-grid::part(subheading) {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  color: var(--color-text-muted);
+}
+
+/* Feature container */
+.uix-feature-grid::part(container) {
+  display: grid;
+  gap: var(--spacing-2xl);
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+
+  /* Grid variant (default) */
+  .uix-feature-grid[variant="grid"] & {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+
+  /* List variant */
+  .uix-feature-grid[variant="list"] & {
+    grid-template-columns: 1fr;
+    max-width: 800px;
+    gap: var(--spacing-lg);
+  }
+
+  /* Cards variant */
+  .uix-feature-grid[variant="cards"] & {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-xl);
+  }
+
+  /* Horizontal variant */
+  .uix-feature-grid[variant="horizontal"] & {
+    grid-template-columns: 1fr;
+    max-width: 1000px;
+    gap: var(--spacing-xl);
+  }
+
+  /* Specific column counts (grid and cards variants) */
+  .uix-feature-grid[variant="grid"][columns="2"] &,
+  .uix-feature-grid[variant="cards"][columns="2"] & {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    max-width: 900px;
+  }
+
+  .uix-feature-grid[variant="grid"][columns="3"] &,
+  .uix-feature-grid[variant="cards"][columns="3"] & {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    max-width: 1200px;
+  }
+
+  .uix-feature-grid[variant="grid"][columns="4"] &,
+  .uix-feature-grid[variant="cards"][columns="4"] & {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    max-width: 1400px;
+  }
+}
+
+/* Feature item */
+.uix-feature-grid::part(feature) {
+  display: flex;
+  gap: var(--spacing-lg);
+  align-items: flex-start;
+
+  /* Grid and cards variants - vertical layout */
+  .uix-feature-grid[variant="grid"] &,
+  .uix-feature-grid[variant="cards"] & {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+
+  /* List variant - horizontal layout */
+  .uix-feature-grid[variant="list"] & {
+    flex-direction: row;
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid var(--color-border);
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  /* Horizontal variant - horizontal layout with more spacing */
+  .uix-feature-grid[variant="horizontal"] & {
+    flex-direction: row;
+    gap: var(--spacing-xl);
+    padding: var(--spacing-xl);
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+  }
+
+  /* Cards variant - card styling */
+  .uix-feature-grid[variant="cards"] & {
+    padding: var(--spacing-xl);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+
+    &:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+  }
+}
+
+/* Feature icon wrapper */
+.uix-feature-grid::part(icon-wrapper) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  uix-icon {
+    color: var(--color-primary);
+  }
+
+  /* Grid and cards variants - larger icon container */
+  .uix-feature-grid[variant="grid"] &,
+  .uix-feature-grid[variant="cards"] & {
+    width: 64px;
+    height: 64px;
+    background: var(--color-primary-light);
+    border-radius: var(--radius-lg);
+  }
+
+  /* List variant - smaller icon */
+  .uix-feature-grid[variant="list"] & {
+    width: 48px;
+    height: 48px;
+    background: var(--color-primary-light);
+    border-radius: var(--radius-md);
+  }
+
+  /* Horizontal variant - medium icon */
+  .uix-feature-grid[variant="horizontal"] & {
+    width: 56px;
+    height: 56px;
+    background: var(--color-primary-light);
+    border-radius: var(--radius-lg);
+  }
+}
+
+/* Feature content */
+.uix-feature-grid::part(content) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  flex: 1;
+  min-width: 0;
+}
+
+/* Feature title */
+.uix-feature-grid::part(title) {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--color-text);
+
+  /* Grid and cards variants */
+  .uix-feature-grid[variant="grid"] &,
+  .uix-feature-grid[variant="cards"] & {
+    font-size: var(--font-size-xl);
+  }
+
+  /* Horizontal variant */
+  .uix-feature-grid[variant="horizontal"] & {
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+  }
+}
+
+/* Feature description */
+.uix-feature-grid::part(description) {
+  margin: 0;
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+  color: var(--color-text-muted);
+
+  /* List variant */
+  .uix-feature-grid[variant="list"] & {
+    font-size: var(--font-size-sm);
+  }
+}
+
+/* Slot content styling */
+.uix-feature-grid[slot] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* Responsive adjustments */
+@media (max-width: 767px) {
+  .uix-feature-grid::part(section) {
+    padding: var(--spacing-2xl) var(--spacing-md);
+    gap: var(--spacing-xl);
+  }
+
+  .uix-feature-grid::part(heading) {
+    font-size: var(--font-size-2xl);
+  }
+
+  .uix-feature-grid::part(subheading) {
+    font-size: var(--font-size-base);
+  }
+
+  .uix-feature-grid::part(container) {
+    /* Force single column on mobile for all variants */
+    grid-template-columns: 1fr !important;
+    gap: var(--spacing-lg);
+
+    /* List variant on mobile */
+    .uix-feature-grid[variant="list"] & {
+      gap: var(--spacing-md);
+    }
+
+    /* Horizontal variant switches to vertical on mobile */
+    .uix-feature-grid[variant="horizontal"] & {
+      gap: var(--spacing-md);
+    }
+  }
+
+  .uix-feature-grid::part(feature) {
+    /* Horizontal variant becomes vertical on mobile */
+    .uix-feature-grid[variant="horizontal"] & {
+      flex-direction: column;
+      text-align: center;
+      align-items: center;
+      padding: var(--spacing-lg);
+    }
+
+    /* List variant adjusts padding */
+    .uix-feature-grid[variant="list"] & {
+      padding: var(--spacing-md);
+    }
+  }
+
+  .uix-feature-grid::part(icon-wrapper) {
+    /* Smaller icons on mobile */
+    .uix-feature-grid[variant="grid"] &,
+    .uix-feature-grid[variant="cards"] &,
+    .uix-feature-grid[variant="horizontal"] & {
+      width: 48px;
+      height: 48px;
+    }
+  }
+
+  .uix-feature-grid::part(title) {
+    font-size: var(--font-size-lg);
+
+    .uix-feature-grid[variant="horizontal"] & {
+      font-size: var(--font-size-lg);
+    }
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .uix-feature-grid::part(container) {
+    /* Force 2 columns on tablet for grid variants */
+    .uix-feature-grid[variant="grid"][columns="3"] &,
+    .uix-feature-grid[variant="grid"][columns="4"] &,
+    .uix-feature-grid[variant="cards"][columns="3"] &,
+    .uix-feature-grid[variant="cards"][columns="4"] & {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+}
+
+@media (min-width: 1024px) {
+  .uix-feature-grid::part(heading) {
+    font-size: var(--font-size-4xl);
+  }
+
+  .uix-feature-grid::part(container) {
+    /* Exact columns on desktop */
+    .uix-feature-grid[variant="grid"][columns="2"] &,
+    .uix-feature-grid[variant="cards"][columns="2"] & {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .uix-feature-grid[variant="grid"][columns="3"] &,
+    .uix-feature-grid[variant="cards"][columns="3"] & {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .uix-feature-grid[variant="grid"][columns="4"] &,
+    .uix-feature-grid[variant="cards"][columns="4"] & {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  .uix-feature-grid::part(icon-wrapper) {
+    background: var(--color-primary-dark);
+  }
+
+  .uix-feature-grid[variant="cards"] .feature-item,
+  .uix-feature-grid[variant="horizontal"] .feature-item {
+    background: var(--color-surface-dark);
+  }
+}
+
+/* Print styles */
+@media print {
+  .uix-feature-grid::part(section) {
+    padding: var(--spacing-lg);
+  }
+
+  .uix-feature-grid::part(container) {
+    gap: var(--spacing-md);
+    page-break-inside: avoid;
+
+    /* Force 2 columns for print */
+    .uix-feature-grid[variant="grid"] &,
+    .uix-feature-grid[variant="cards"] & {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .uix-feature-grid::part(feature) {
+    /* Remove shadows and transforms for print */
+    .uix-feature-grid[variant="cards"] & {
+      box-shadow: none !important;
+      transform: none !important;
+    }
+
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}

@@ -1,0 +1,7 @@
+.uix-droparea {
+	transition: all 0.3s ease;
+	will-change: transform;
+}
+&.over {
+	background-color: rgba(0, 0, 0, 0.3);
+}

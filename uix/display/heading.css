@@ -1,0 +1,122 @@
+/**
+ * UIX Heading Styles
+ */
+
+.uix-heading h1,
+.uix-heading h2,
+.uix-heading h3,
+.uix-heading h4,
+.uix-heading h5,
+.uix-heading h6 {
+  margin: 0;
+  font-weight: var(--typography-fontWeight-bold, 700);
+  color: var(--text-color);
+  line-height: var(--typography-lineHeight-tight, 1.2);
+}
+
+/* Default sizes based on heading level */
+.uix-heading[level="1"] h1 {
+  font-size: var(--typography-fontSize-4xl, 2.25rem);
+}
+
+.uix-heading[level="2"] h2 {
+  font-size: var(--typography-fontSize-3xl, 1.875rem);
+}
+
+.uix-heading[level="3"] h3 {
+  font-size: var(--typography-fontSize-2xl, 1.5rem);
+}
+
+.uix-heading[level="4"] h4 {
+  font-size: var(--typography-fontSize-xl, 1.25rem);
+}
+
+.uix-heading[level="5"] h5 {
+  font-size: var(--typography-fontSize-lg, 1.125rem);
+}
+
+.uix-heading[level="6"] h6 {
+  font-size: var(--typography-fontSize-base, 1rem);
+}
+
+/* Size overrides */
+.uix-heading[size="xs"] h1,
+.uix-heading[size="xs"] h2,
+.uix-heading[size="xs"] h3,
+.uix-heading[size="xs"] h4,
+.uix-heading[size="xs"] h5,
+.uix-heading[size="xs"] h6 {
+  font-size: var(--typography-fontSize-xs, 0.75rem);
+}
+
+.uix-heading[size="sm"] h1,
+.uix-heading[size="sm"] h2,
+.uix-heading[size="sm"] h3,
+.uix-heading[size="sm"] h4,
+.uix-heading[size="sm"] h5,
+.uix-heading[size="sm"] h6 {
+  font-size: var(--typography-fontSize-sm, 0.875rem);
+}
+
+.uix-heading[size="base"] h1,
+.uix-heading[size="base"] h2,
+.uix-heading[size="base"] h3,
+.uix-heading[size="base"] h4,
+.uix-heading[size="base"] h5,
+.uix-heading[size="base"] h6 {
+  font-size: var(--typography-fontSize-base, 1rem);
+}
+
+.uix-heading[size="lg"] h1,
+.uix-heading[size="lg"] h2,
+.uix-heading[size="lg"] h3,
+.uix-heading[size="lg"] h4,
+.uix-heading[size="lg"] h5,
+.uix-heading[size="lg"] h6 {
+  font-size: var(--typography-fontSize-lg, 1.125rem);
+}
+
+.uix-heading[size="xl"] h1,
+.uix-heading[size="xl"] h2,
+.uix-heading[size="xl"] h3,
+.uix-heading[size="xl"] h4,
+.uix-heading[size="xl"] h5,
+.uix-heading[size="xl"] h6 {
+  font-size: var(--typography-fontSize-xl, 1.25rem);
+}
+
+.uix-heading[size="2xl"] h1,
+.uix-heading[size="2xl"] h2,
+.uix-heading[size="2xl"] h3,
+.uix-heading[size="2xl"] h4,
+.uix-heading[size="2xl"] h5,
+.uix-heading[size="2xl"] h6 {
+  font-size: var(--typography-fontSize-2xl, 1.5rem);
+}
+
+.uix-heading[size="3xl"] h1,
+.uix-heading[size="3xl"] h2,
+.uix-heading[size="3xl"] h3,
+.uix-heading[size="3xl"] h4,
+.uix-heading[size="3xl"] h5,
+.uix-heading[size="3xl"] h6 {
+  font-size: var(--typography-fontSize-3xl, 1.875rem);
+}
+
+.uix-heading[size="4xl"] h1,
+.uix-heading[size="4xl"] h2,
+.uix-heading[size="4xl"] h3,
+.uix-heading[size="4xl"] h4,
+.uix-heading[size="4xl"] h5,
+.uix-heading[size="4xl"] h6 {
+  font-size: var(--typography-fontSize-4xl, 2.25rem);
+}
+
+.uix-heading[size="5xl"] h1,
+.uix-heading[size="5xl"] h2,
+.uix-heading[size="5xl"] h3,
+.uix-heading[size="5xl"] h4,
+.uix-heading[size="5xl"] h5,
+.uix-heading[size="5xl"] h6 {
+  font-size: var(--typography-fontSize-5xl, 3rem);
+}

@@ -1,0 +1,5 @@
+.uix-circle {
+	&:not([solid]) {
+		background-color: transparent;
+	}
+}

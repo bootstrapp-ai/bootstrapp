@@ -1,0 +1,271 @@
+.uix-stats-section {
+  /* Layout */
+  display: block;
+  width: 100%;
+
+  /* Column variants */
+  &[columns="2"] {
+    --stats-columns: 2;
+  }
+
+  &[columns="3"] {
+    --stats-columns: 3;
+  }
+
+  &[columns="4"] {
+    --stats-columns: 4;
+  }
+}
+
+/* Stats section */
+.uix-stats-section::part(section) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xl);
+  padding: var(--spacing-3xl) var(--spacing-lg);
+  background: var(--color-background);
+}
+
+/* Header */
+.uix-stats-section::part(header) {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.uix-stats-section::part(heading) {
+  margin: 0 0 var(--spacing-md);
+  font-size: var(--font-size-3xl);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.uix-stats-section::part(subheading) {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  color: var(--color-text-muted);
+}
+
+/* Stats container */
+.uix-stats-section::part(container) {
+  display: grid;
+  gap: var(--spacing-xl);
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+
+  /* Default variant (grid) */
+  .uix-stats-section[variant="default"] & {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  /* Bordered variant */
+  .uix-stats-section[variant="bordered"] & {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+
+    > * {
+      padding: var(--spacing-xl);
+      border-right: 1px solid var(--color-border);
+      border-bottom: 1px solid var(--color-border);
+
+      &:nth-child(var(--stats-columns)n) {
+        border-right: none;
+      }
+    }
+  }
+
+  /* Cards variant */
+  .uix-stats-section[variant="cards"] & {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-lg);
+
+    > * {
+      padding: var(--spacing-xl);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+
+      &:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+      }
+    }
+  }
+
+  /* Specific column counts */
+  .uix-stats-section[columns="2"] & {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    max-width: 800px;
+  }
+
+  .uix-stats-section[columns="3"] & {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    max-width: 1000px;
+  }
+
+  .uix-stats-section[columns="4"] & {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    max-width: 1400px;
+  }
+
+  /* Bordered variant column adjustments */
+  .uix-stats-section[variant="bordered"][columns="2"] & {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .uix-stats-section[variant="bordered"][columns="3"] & {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .uix-stats-section[variant="bordered"][columns="4"] & {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Slot content styling */
+.uix-stats-section uix-stat {
+  width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767px) {
+  .uix-stats-section::part(section) {
+    padding: var(--spacing-2xl) var(--spacing-md);
+    gap: var(--spacing-xl);
+  }
+
+  .uix-stats-section::part(heading) {
+    font-size: var(--font-size-2xl);
+  }
+
+  .uix-stats-section::part(subheading) {
+    font-size: var(--font-size-base);
+  }
+
+  .uix-stats-section::part(container) {
+    /* Force single column on mobile for all variants */
+    grid-template-columns: 1fr !important;
+    gap: var(--spacing-lg);
+
+    /* Bordered variant on mobile */
+    .uix-stats-section[variant="bordered"] & {
+      gap: 0;
+
+      > * {
+        border-right: none;
+
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+    }
+
+    /* Cards variant on mobile */
+    .uix-stats-section[variant="cards"] & {
+      gap: var(--spacing-md);
+    }
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .uix-stats-section::part(container) {
+    /* Force 2 columns on tablet */
+    .uix-stats-section[columns="3"] &,
+    .uix-stats-section[columns="4"] & {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Bordered variant on tablet */
+    .uix-stats-section[variant="bordered"][columns="3"] &,
+    .uix-stats-section[variant="bordered"][columns="4"] & {
+      > * {
+        &:nth-child(2n) {
+          border-right: none;
+        }
+      }
+    }
+  }
+}
+
+@media (min-width: 1024px) {
+  .uix-stats-section::part(heading) {
+    font-size: var(--font-size-4xl);
+  }
+
+  .uix-stats-section::part(container) {
+    /* Exact columns on desktop */
+    .uix-stats-section[columns="2"] & {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .uix-stats-section[columns="3"] & {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .uix-stats-section[columns="4"] & {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    /* Bordered variant exact columns on desktop */
+    .uix-stats-section[variant="bordered"] & {
+      > * {
+        /* Reset all borders first */
+        border-right: 1px solid var(--color-border);
+        border-bottom: 1px solid var(--color-border);
+      }
+
+      /* Remove right border for last item in each row */
+      > *:nth-child(var(--stats-columns)n) {
+        border-right: none;
+      }
+
+      /* Remove bottom border for items in last row */
+      &:has(> *:nth-last-child(-n + var(--stats-columns))) {
+        > *:nth-last-child(-n + var(--stats-columns)) {
+          border-bottom: none;
+        }
+      }
+    }
+  }
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  .uix-stats-section[variant="cards"] .stats-container > * {
+    background: var(--color-surface-dark);
+  }
+
+  .uix-stats-section[variant="bordered"] .stats-container {
+    background: var(--color-surface-dark);
+  }
+}
+
+/* Print styles */
+@media print {
+  .uix-stats-section::part(section) {
+    padding: var(--spacing-lg);
+  }
+
+  .uix-stats-section::part(container) {
+    gap: var(--spacing-md);
+    page-break-inside: avoid;
+
+    /* Force 2 columns for print */
+    .uix-stats-section[columns="3"] &,
+    .uix-stats-section[columns="4"] & {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Remove shadows and transforms for print */
+    .uix-stats-section[variant="cards"] & > * {
+      box-shadow: none !important;
+      transform: none !important;
+    }
+  }
+}

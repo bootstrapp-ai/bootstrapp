@@ -1,0 +1,377 @@
+.uix-cta-section {
+  /* Layout */
+  display: block;
+  width: 100%;
+}
+
+/* CTA section */
+.uix-cta-section::part(section) {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: var(--spacing-3xl) var(--spacing-lg);
+  background: var(--color-primary);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: white;
+
+  /* Simple variant (default) - centered */
+  .uix-cta-section[variant="simple"] & {
+    min-height: 400px;
+  }
+
+  /* Split variant - two column layout */
+  .uix-cta-section[variant="split"] & {
+    min-height: 500px;
+    background: var(--color-background);
+    color: var(--color-text);
+  }
+
+  /* Boxed variant - contained box */
+  .uix-cta-section[variant="boxed"] & {
+    min-height: 300px;
+    background: var(--color-background);
+    color: var(--color-text);
+  }
+
+  /* Banner variant - compact banner */
+  .uix-cta-section[variant="banner"] & {
+    min-height: auto;
+    padding: var(--spacing-xl) var(--spacing-lg);
+  }
+}
+
+/* Overlay */
+.uix-cta-section::part(overlay) {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: black;
+  z-index: 1;
+}
+
+/* Container */
+.uix-cta-section::part(container) {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xl);
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  align-items: center;
+
+  /* Split variant - row layout */
+  .uix-cta-section[variant="split"] & {
+    flex-direction: row;
+    gap: var(--spacing-3xl);
+    align-items: center;
+  }
+
+  /* Boxed variant - contained box with border */
+  .uix-cta-section[variant="boxed"] & {
+    max-width: 800px;
+    padding: var(--spacing-3xl);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+  }
+
+  /* Banner variant - full width */
+  .uix-cta-section[variant="banner"] & {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-xl);
+    max-width: 1400px;
+  }
+}
+
+/* Content */
+.uix-cta-section::part(content) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  text-align: center;
+  max-width: 600px;
+
+  /* Left alignment */
+  .uix-cta-section[align="left"] & {
+    text-align: left;
+    align-items: flex-start;
+  }
+
+  /* Right alignment */
+  .uix-cta-section[align="right"] & {
+    text-align: right;
+    align-items: flex-end;
+  }
+
+  /* Center alignment (default) */
+  .uix-cta-section[align="center"] & {
+    text-align: center;
+    align-items: center;
+  }
+
+  /* Split variant */
+  .uix-cta-section[variant="split"] & {
+    flex: 1;
+    max-width: none;
+    text-align: left;
+    align-items: flex-start;
+  }
+
+  /* Banner variant */
+  .uix-cta-section[variant="banner"] & {
+    flex: 1;
+    gap: var(--spacing-sm);
+    text-align: left;
+    align-items: flex-start;
+  }
+}
+
+/* Heading */
+.uix-cta-section::part(heading) {
+  margin: 0;
+  font-size: var(--font-size-4xl);
+  font-weight: 700;
+  line-height: 1.2;
+
+  /* Boxed variant */
+  .uix-cta-section[variant="boxed"] & {
+    font-size: var(--font-size-3xl);
+  }
+
+  /* Banner variant */
+  .uix-cta-section[variant="banner"] & {
+    font-size: var(--font-size-2xl);
+  }
+}
+
+/* Subheading */
+.uix-cta-section::part(subheading) {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  opacity: 0.95;
+  line-height: 1.5;
+
+  /* Split and boxed variants */
+  .uix-cta-section[variant="split"] &,
+  .uix-cta-section[variant="boxed"] & {
+    color: var(--color-text-muted);
+  }
+
+  /* Banner variant */
+  .uix-cta-section[variant="banner"] & {
+    font-size: var(--font-size-base);
+    color: var(--color-text-muted);
+  }
+}
+
+/* Actions */
+.uix-cta-section::part(actions) {
+  display: flex;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+
+  /* Center alignment (default) */
+  .uix-cta-section[align="center"] & {
+    justify-content: center;
+  }
+
+  /* Left alignment */
+  .uix-cta-section[align="left"] & {
+    justify-content: flex-start;
+  }
+
+  /* Right alignment */
+  .uix-cta-section[align="right"] & {
+    justify-content: flex-end;
+  }
+
+  /* Banner variant */
+  .uix-cta-section[variant="banner"] & {
+    flex-shrink: 0;
+    gap: var(--spacing-sm);
+  }
+}
+
+/* Media (split variant) */
+.uix-cta-section::part(media) {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 50%;
+
+  img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+  }
+}
+
+/* Slot content styling */
+.uix-cta-section [slot="media"] {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+}
+
+.uix-cta-section [slot="actions"] {
+  display: flex;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767px) {
+  .uix-cta-section::part(section) {
+    min-height: 300px;
+    padding: var(--spacing-2xl) var(--spacing-md);
+
+    .uix-cta-section[variant="split"] &,
+    .uix-cta-section[variant="boxed"] & {
+      min-height: auto;
+    }
+
+    .uix-cta-section[variant="banner"] & {
+      padding: var(--spacing-lg) var(--spacing-md);
+    }
+  }
+
+  .uix-cta-section::part(container) {
+    gap: var(--spacing-xl);
+
+    /* Split variant becomes column on mobile */
+    .uix-cta-section[variant="split"] & {
+      flex-direction: column;
+    }
+
+    /* Boxed variant reduces padding */
+    .uix-cta-section[variant="boxed"] & {
+      padding: var(--spacing-xl);
+    }
+
+    /* Banner variant becomes column on mobile */
+    .uix-cta-section[variant="banner"] & {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--spacing-md);
+    }
+  }
+
+  .uix-cta-section::part(content) {
+    /* All variants become center-aligned on mobile for better readability */
+    text-align: center;
+    align-items: center;
+
+    .uix-cta-section[variant="split"] &,
+    .uix-cta-section[variant="banner"] & {
+      text-align: center;
+      align-items: center;
+    }
+  }
+
+  .uix-cta-section::part(heading) {
+    font-size: var(--font-size-2xl);
+
+    .uix-cta-section[variant="boxed"] &,
+    .uix-cta-section[variant="banner"] & {
+      font-size: var(--font-size-xl);
+    }
+  }
+
+  .uix-cta-section::part(subheading) {
+    font-size: var(--font-size-base);
+
+    .uix-cta-section[variant="banner"] & {
+      font-size: var(--font-size-sm);
+    }
+  }
+
+  .uix-cta-section::part(actions) {
+    justify-content: center;
+    width: 100%;
+
+    uix-button {
+      flex: 1;
+      min-width: 120px;
+    }
+  }
+
+  .uix-cta-section::part(media) {
+    max-width: 100%;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .uix-cta-section::part(heading) {
+    font-size: var(--font-size-3xl);
+  }
+
+  .uix-cta-section::part(subheading) {
+    font-size: var(--font-size-lg);
+  }
+
+  .uix-cta-section::part(media) {
+    max-width: 45%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .uix-cta-section::part(heading) {
+    font-size: var(--font-size-5xl);
+
+    .uix-cta-section[variant="boxed"] & {
+      font-size: var(--font-size-4xl);
+    }
+
+    .uix-cta-section[variant="banner"] & {
+      font-size: var(--font-size-3xl);
+    }
+  }
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  .uix-cta-section[variant="boxed"] .cta-container {
+    background: var(--color-surface-dark);
+  }
+
+  .uix-cta-section[variant="split"] .cta-section {
+    background: var(--color-surface-dark);
+  }
+}
+
+/* Print styles */
+@media print {
+  .uix-cta-section::part(section) {
+    min-height: auto;
+    padding: var(--spacing-lg);
+    background: white !important;
+    color: black !important;
+  }
+
+  .uix-cta-section::part(overlay) {
+    display: none;
+  }
+
+  .uix-cta-section::part(container) {
+    page-break-inside: avoid;
+  }
+
+  .uix-cta-section::part(actions) {
+    display: none;
+  }
+}

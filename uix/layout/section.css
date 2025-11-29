@@ -1,0 +1,69 @@
+/**
+ * Section Component Styles
+ */
+
+.uix-section {
+  display: block;
+
+  &::part(container) {
+    width: 100%;
+    padding: var(--section-padding, var(--spacing-xl, 1.5rem) var(--spacing-lg, 1rem));
+  }
+
+  &::part(inner) {
+    width: 100%;
+    max-width: var(--section-max-width, 1024px);
+    margin: 0 auto;
+  }
+
+  /* Centered content */
+  &[centered]::part(inner) {
+    text-align: center;
+  }
+
+  /* Max width variants */
+  &[max-width="sm"]::part(inner) {
+    max-width: 640px;
+  }
+
+  &[max-width="md"]::part(inner) {
+    max-width: 768px;
+  }
+
+  &[max-width="lg"]::part(inner) {
+    max-width: 1024px;
+  }
+
+  &[max-width="xl"]::part(inner) {
+    max-width: 1280px;
+  }
+
+  &[max-width="2xl"]::part(inner) {
+    max-width: 1536px;
+  }
+
+  &[max-width="full"]::part(inner) {
+    max-width: 100%;
+  }
+
+  /* Padding variants */
+  &[padding="none"]::part(container) {
+    padding: 0;
+  }
+
+  &[padding="sm"]::part(container) {
+    padding: var(--spacing-md, 0.75rem) var(--spacing-lg, 1rem);
+  }
+
+  &[padding="md"]::part(container) {
+    padding: var(--spacing-xl, 1.5rem) var(--spacing-lg, 1rem);
+  }
+
+  &[padding="lg"]::part(container) {
+    padding: var(--spacing-2xl, 2rem) var(--spacing-xl, 1.5rem);
+  }
+
+  &[padding="xl"]::part(container) {
+    padding: var(--spacing-3xl, 3rem) var(--spacing-2xl, 2rem);
+  }
+}

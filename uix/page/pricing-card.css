@@ -1,0 +1,213 @@
+.uix-pricing-card {
+  /* Layout */
+  display: block;
+  width: 100%;
+
+  /* Featured variant */
+  &[featured] {
+    --card-border-color: var(--color-primary);
+    --card-shadow: var(--shadow-lg);
+    transform: scale(1.05);
+    z-index: 1;
+  }
+}
+
+/* Pricing card container */
+.uix-pricing-card::part(pricing-card) {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-xl);
+  background: var(--color-surface);
+  border: 1px solid var(--card-border-color, var(--color-border));
+  border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow, var(--shadow-sm));
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+}
+
+.uix-pricing-card[featured]::part(pricing-card) {
+  border-width: 2px;
+}
+
+/* Featured badge */
+.uix-pricing-card::part(badge) {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: var(--spacing-xs) var(--spacing-md);
+  background: var(--color-primary);
+  color: white;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+/* Pricing header */
+.uix-pricing-card::part(header) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
+}
+
+.uix-pricing-card::part(header) h3,
+.uix-pricing-card::part(plan-name) {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.uix-pricing-card::part(header) p,
+.uix-pricing-card::part(description) {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+/* Pricing price */
+.uix-pricing-card::part(price) {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-xl);
+  padding-bottom: var(--spacing-xl);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.uix-pricing-card::part(currency) {
+  font-size: var(--font-size-2xl);
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.uix-pricing-card::part(amount) {
+  font-size: var(--font-size-4xl);
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1;
+}
+
+.uix-pricing-card::part(period) {
+  font-size: var(--font-size-base);
+  color: var(--color-text-muted);
+}
+
+/* Features list */
+.uix-pricing-card::part(features) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin: 0 0 var(--spacing-xl);
+  padding: 0;
+  list-style: none;
+  flex: 1;
+}
+
+/* Feature item */
+.uix-pricing-card::part(feature),
+.uix-pricing-card::part(feature-excluded) {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+}
+
+.uix-pricing-card::part(feature) uix-icon,
+.uix-pricing-card::part(feature-excluded) uix-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+}
+
+.uix-pricing-card::part(feature) span,
+.uix-pricing-card::part(feature-excluded) span {
+  flex: 1;
+}
+
+.uix-pricing-card::part(feature-excluded),
+.uix-pricing-card::part(feature-excluded) span {
+  color: var(--color-text-muted);
+  text-decoration: line-through;
+}
+
+/* CTA button */
+.uix-pricing-card::part(cta) {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.uix-pricing-card::part(cta) uix-button {
+  width: 100%;
+}
+
+/* Footer */
+.uix-pricing-card::part(footer) {
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+
+  &:empty {
+    display: none;
+  }
+}
+
+/* Slot content styling */
+.uix-pricing-card [slot="footer"] {
+  display: block;
+  text-align: center;
+  margin-top: var(--spacing-md);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+  .uix-pricing-card::part(pricing-card) {
+    padding: var(--spacing-2xl);
+  }
+
+  .uix-pricing-card::part(amount) {
+    font-size: var(--font-size-5xl);
+  }
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  .uix-pricing-card::part(pricing-card) {
+    background: var(--color-surface-dark);
+  }
+
+  .uix-pricing-card::part(badge) {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* Print styles */
+@media print {
+  .uix-pricing-card::part(badge) {
+    position: static;
+    transform: none;
+    display: inline-block;
+    margin-bottom: var(--spacing-md);
+  }
+
+  .uix-pricing-card::part(pricing-card) {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+}

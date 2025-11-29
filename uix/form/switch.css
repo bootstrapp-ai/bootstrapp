@@ -1,0 +1,167 @@
+.uix-switch {
+  display: inline-block;
+}
+
+.uix-switch .switch-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.uix-switch .switch-label {
+  font-size: 0.875rem;
+  color: var(--theme-colors-text-primary);
+}
+
+.uix-switch .switch-control {
+  position: relative;
+  width: 2.5rem;
+  height: 1.5rem;
+  background: var(--theme-colors-background-secondary, #3c3836);
+  border-radius: var(--radius-full, 9999px);
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+  padding: 0.125rem;
+}
+
+.uix-switch .switch-thumb {
+  position: absolute;
+  width: 1.25rem;
+  height: 1.25rem;
+  background: var(--theme-colors-background-primary, #282828);
+  border-radius: var(--radius-full, 9999px);
+  transition: transform 0.1s ease;
+  top: 0.125rem;
+  right: 0.125rem;
+}
+
+.uix-switch .switch-native {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Checked state - thumb movement (moves to left) */
+.uix-switch:has(.switch-native:checked) .switch-thumb {
+  transform: translateX(-1rem);
+}
+
+/* Checked state - background color (colored when checked/on right) */
+.uix-switch[variant="primary"]:has(.switch-native:checked) .switch-control {
+  background: var(--theme-colors-accent-primary, #fabd2f);
+}
+
+/* Hover */
+.uix-switch .switch-wrapper:hover
+  .switch-control:not(:has(.switch-native:disabled)) {
+  opacity: 0.9;
+}
+
+/* Focus */
+.uix-switch .switch-native:focus-visible ~ .switch-control,
+.uix-switch .switch-control:has(.switch-native:focus-visible) {
+  outline: 2px solid var(--theme-colors-accent-primary, #fabd2f);
+  outline-offset: 2px;
+}
+
+/* Disabled */
+.uix-switch[disabled] .switch-wrapper,
+.uix-switch .switch-wrapper:has(.switch-native:disabled) {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.uix-switch[disabled] .switch-control,
+.uix-switch .switch-control:has(.switch-native:disabled) {
+  cursor: not-allowed;
+}
+
+/* Size variants */
+.uix-switch[size="xs"] .switch-control {
+  width: 1.75rem;
+  height: 1rem;
+  padding: 0.0625rem;
+}
+
+.uix-switch[size="xs"] .switch-thumb {
+  width: 0.875rem;
+  height: 0.875rem;
+  top: 0.0625rem;
+  right: 0.0625rem;
+}
+
+.uix-switch[size="xs"]:has(.switch-native:checked) .switch-thumb {
+  transform: translateX(-0.75rem);
+}
+
+.uix-switch[size="sm"] .switch-control {
+  width: 2rem;
+  height: 1.25rem;
+  padding: 0.125rem;
+}
+
+.uix-switch[size="sm"] .switch-thumb {
+  width: 1rem;
+  height: 1rem;
+  top: 0.125rem;
+  right: 0.125rem;
+}
+
+.uix-switch[size="sm"]:has(.switch-native:checked) .switch-thumb {
+  transform: translateX(-0.75rem);
+}
+
+.uix-switch[size="lg"] .switch-control {
+  width: 3rem;
+  height: 1.75rem;
+  padding: 0.125rem;
+}
+
+.uix-switch[size="lg"] .switch-thumb {
+  width: 1.5rem;
+  height: 1.5rem;
+  top: 0.125rem;
+  right: 0.125rem;
+}
+
+.uix-switch[size="lg"]:has(.switch-native:checked) .switch-thumb {
+  transform: translateX(-1.25rem);
+}
+
+.uix-switch[size="xl"] .switch-control {
+  width: 3.5rem;
+  height: 2rem;
+  padding: 0.125rem;
+}
+
+.uix-switch[size="xl"] .switch-thumb {
+  width: 1.75rem;
+  height: 1.75rem;
+  top: 0.125rem;
+  right: 0.125rem;
+}
+
+.uix-switch[size="xl"]:has(.switch-native:checked) .switch-thumb {
+  transform: translateX(-1.5rem);
+}
+
+/* Variant colors - checked state shows color */
+.uix-switch[variant="secondary"]:has(.switch-native:checked) .switch-control {
+  background: var(--theme-colors-accent-secondary, #83a598);
+}
+
+.uix-switch[variant="success"]:has(.switch-native:checked) .switch-control {
+  background: var(--theme-colors-accent-success, #b8bb26);
+}
+
+.uix-switch[variant="warning"]:has(.switch-native:checked) .switch-control {
+  background: var(--theme-colors-accent-warning, #fe8019);
+}
+
+.uix-switch[variant="error"]:has(.switch-native:checked) .switch-control {
+  background: var(--theme-colors-accent-danger, #fb4934);
+}

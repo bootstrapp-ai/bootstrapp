@@ -1,0 +1,89 @@
+/**
+ * Circular Progress Component Styles
+ */
+
+:where(.uix-circular-progress) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+
+  &.indeterminate {
+    & .circular-progress-indicator {
+      animation: circularProgressSpin 1.4s linear infinite;
+    }
+  }
+
+  & .circular-progress-svg {
+    transform: rotate(-90deg);
+  }
+
+  & .circular-progress-track {
+    stroke: var(--circular-progress-track-color, var(--color-surface-darker));
+  }
+
+  & .circular-progress-indicator {
+    stroke: var(--circular-progress-color, var(--color-primary));
+    transition: stroke-dashoffset 0.3s ease;
+  }
+
+  & .circular-progress-primary {
+    stroke: var(--color-primary);
+  }
+
+  & .circular-progress-secondary {
+    stroke: var(--color-secondary);
+  }
+
+  & .circular-progress-success {
+    stroke: var(--color-success);
+  }
+
+  & .circular-progress-warning {
+    stroke: var(--color-warning);
+  }
+
+  & .circular-progress-error {
+    stroke: var(--color-danger);
+  }
+
+  & .circular-progress-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: var(--circular-progress-label-font-size, 0.75rem);
+    font-weight: 600;
+    color: var(--circular-progress-label-color, var(--color-primary));
+  }
+
+  /* Size variants */
+  &[size="xs"] {
+    --circular-progress-label-font-size: 0.625rem;
+  }
+
+  &[size="sm"] {
+    --circular-progress-label-font-size: 0.75rem;
+  }
+
+  &[size="md"] {
+    --circular-progress-label-font-size: 0.875rem;
+  }
+
+  &[size="lg"] {
+    --circular-progress-label-font-size: 1rem;
+  }
+
+  &[size="xl"] {
+    --circular-progress-label-font-size: 1.25rem;
+  }
+}
+
+@keyframes circularProgressSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

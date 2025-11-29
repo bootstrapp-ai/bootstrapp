@@ -1,0 +1,130 @@
+:where(.uix-tabs) {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  --tabs-list-bg: transparent;
+  --tabs-list-border-color: var(--color-surface-dark);
+  --tab-text-hover: var(--color-primary-light);
+  --tab-bg-hover: var(--color-surface-dark);
+  --tab-text-active: var(--color-primary);
+  --tab-bg-active: transparent;
+  --tab-indicator-color: var(--color-primary-dark);
+  --tab-gap: var(--spacing-xs, 0.25rem);
+  --tab-padding: var(--spacing-md, 0.75rem) var(--spacing-lg, 1rem);
+  --tab-font-size: var(--typography-fontSize-sm, 0.875rem);
+  --tab-font-weight: var(--typography-fontWeight-medium, 500);
+  --tab-border-width: 2px;
+}
+
+.uix-tabs::part(tab-list) {
+  display: flex;
+  flex-direction: row;
+  background: var(--tabs-list-bg);
+  border-bottom: 1px solid var(--tabs-list-border-color);
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex-shrink: 0;
+}
+
+.uix-tabs [slot="tab"] {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  cursor: pointer;
+  position: relative;
+
+  gap: var(--tab-gap);
+  padding: var(--tab-padding);
+
+  font-family: inherit;
+  font-size: var(--tab-font-size);
+  font-weight: var(--tab-font-weight);
+  color: var(--tab-text);
+
+  background: transparent;
+  border: none;
+  border-bottom: var(--tab-border-width) solid transparent;
+  outline: none;
+
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.uix-tabs [slot="tab"]:hover {
+  color: var(--tab-text-hover);
+  background: var(--tab-bg-hover);
+}
+
+.uix-tabs [slot="tab"]:focus-visible {
+  background: var(--tab-bg-hover);
+}
+
+.uix-tabs [slot="tab"][active] {
+  color: var(--tab-text-active);
+  background: var(--tab-bg-active);
+  border-bottom-color: var(--tab-indicator-color);
+}
+
+.uix-tabs [slot="tab"][disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.uix-tabs[vertical] {
+  flex-direction: row;
+  height: 100%;
+}
+.uix-tabs::part(tab-panel) {
+  display: flex;
+  width: 100%;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.uix-tabs[vertical]::part(tab-list) {
+  flex-direction: column;
+  border-bottom: none;
+  border-right: 1px solid var(--tabs-list-border-color);
+  min-width: 150px;
+}
+
+.uix-tabs[vertical] [slot="tab"] {
+  justify-content: flex-start;
+  border-bottom: none;
+  border-right: var(--tab-border-width) solid transparent;
+}
+
+.uix-tabs[vertical] [slot="tab"][active] {
+  border-color: transparent;
+  border-right-color: var(--tab-indicator-color);
+}
+
+.uix-tabs [slot="panel"] {
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--spacing-lg, 1rem);
+  flex-grow: 1;
+  /* Animation for switching panels */
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.uix-tabs [slot="panel"][hide] {
+  display: none;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

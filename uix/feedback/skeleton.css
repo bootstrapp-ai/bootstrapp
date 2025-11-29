@@ -1,0 +1,57 @@
+/**
+ * Skeleton Component Styles
+ */
+
+:where(.uix-skeleton) {
+  display: block;
+
+  & .skeleton-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--skeleton-gap, 0.5rem);
+  }
+
+  & .skeleton {
+    background-color: var(--skeleton-background, var(--color-surface-darker));
+    background-image: linear-gradient(
+      90deg,
+      transparent,
+      var(--skeleton-shimmer-color, rgba(255, 255, 255, 0.1)),
+      transparent
+    );
+    background-size: 200% 100%;
+    border-radius: var(--skeleton-border-radius, var(--radius-sm));
+    overflow: hidden;
+
+    &.animated {
+      animation: skeletonShimmer 1.5s ease-in-out infinite;
+    }
+  }
+
+  & .skeleton-text {
+    height: 1em;
+    border-radius: var(--skeleton-border-radius, var(--radius-sm));
+  }
+
+  & .skeleton-circle {
+    border-radius: 50%;
+    aspect-ratio: 1;
+  }
+
+  & .skeleton-rect {
+    border-radius: var(--skeleton-border-radius, var(--radius-sm));
+  }
+
+  & .skeleton-rounded {
+    border-radius: var(--skeleton-border-radius-rounded, var(--radius-lg));
+  }
+}
+
+@keyframes skeletonShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}

@@ -1,0 +1,72 @@
+/**
+ * Panel Component Styles
+ */
+
+.uix-panel {
+  display: block;
+
+  &::part(container) {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--panel-background, var(--color-surface));
+    border: 1px solid var(--panel-border-color, var(--color-primary));
+    border-radius: var(--panel-border-radius, var(--radius-lg));
+    overflow: hidden;
+  }
+
+  &::part(header) {
+    padding: var(
+      --panel-header-padding,
+      var(--spacing-md, 0.75rem) var(--spacing-lg, 1rem)
+    );
+    border-bottom: 1px solid
+      var(--panel-header-border-color, var(--color-primary));
+    background-color: var(--panel-header-background, inherit);
+  }
+
+  &::part(body) {
+    flex: 1;
+    padding: var(--panel-body-padding, var(--spacing-lg, 1rem));
+  }
+
+  &::part(footer) {
+    padding: var(
+      --panel-footer-padding,
+      var(--spacing-md, 0.75rem) var(--spacing-lg, 1rem)
+    );
+    border-top: 1px solid var(--panel-footer-border-color, var(--color-primary));
+    background-color: var(--panel-footer-background, inherit);
+    display: flex;
+    gap: var(--spacing-sm, 0.5rem);
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  /* Variant: Bordered */
+  &[variant="bordered"]::part(container) {
+    border-width: 2px;
+  }
+
+  /* Variant: Elevated */
+  &[variant="elevated"]::part(container) {
+    box-shadow: var(--panel-elevated-shadow, 0 2px 8px rgba(0, 0, 0, 0.1));
+    border: none;
+  }
+
+  /* Padding variants */
+  &[padding="none"]::part(body) {
+    padding: 0;
+  }
+
+  &[padding="sm"]::part(body) {
+    padding: var(--spacing-sm, 0.5rem);
+  }
+
+  &[padding="md"]::part(body) {
+    padding: var(--spacing-md, 0.75rem) var(--spacing-lg, 1rem);
+  }
+
+  &[padding="lg"]::part(body) {
+    padding: var(--spacing-lg, 1rem) var(--spacing-xl, 1.5rem);
+  }
+}
