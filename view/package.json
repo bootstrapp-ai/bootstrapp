@@ -1,0 +1,40 @@
+{
+  "name": "@bootstrapp/view",
+  "version": "0.1.2",
+  "description": "Web components framework built on Custom Elements API with lit-html templating",
+  "main": "./index.js",
+  "module": "./index.js",
+  "scripts": {
+    "docs": "npx serve docs -p 3000"
+  },
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./loader": "./loader.js"
+  },
+  "keywords": [
+    "web-components",
+    "custom-elements",
+    "lit-html",
+    "reactive",
+    "view",
+    "bootstrapp",
+    "framework"
+  ],
+  "author": "Alan Leal",
+  "license": "AGPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bootstrapp-ai/bootstrapp.git",
+    "directory": "base/view"
+  },
+  "homepage": "https://github.com/bootstrapp-ai/bootstrapp#readme",
+  "bugs": {
+    "url": "https://github.com/bootstrapp-ai/bootstrapp/issues"
+  },
+  "dependencies": {
+    "@bootstrapp/types": "^0.1.0",
+    "lit": "^3.0.0"
+  },
+  "devDependencies": {}
+}

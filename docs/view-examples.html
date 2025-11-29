@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>@bootstrapp/view Examples</title>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "lit": "https://esm.sh/lit@3",
+      "@bootstrapp/types": "/types/index.js",
+      "@bootstrapp/view": "/view/index.js"
+    }
+  }
+  </script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: #f5f5f5;
+    }
+
+    nav {
+      background: #2c3e50;
+      padding: 1rem 2rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-right: 2rem;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      transition: background 0.3s;
+    }
+
+    nav a:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    nav a.active {
+      background: #3498db;
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      color: #7f8c8d;
+      margin-bottom: 2rem;
+    }
+
+    section {
+      background: white;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    section h2 {
+      color: #2c3e50;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #3498db;
+    }
+
+    .demo-box {
+      padding: 2rem;
+      background: #f9f9f9;
+      border-radius: 4px;
+      margin: 1rem 0;
+    }
+
+    .code {
+      background: #2c3e50;
+      color: #ecf0f1;
+      padding: 1rem;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      margin-top: 1rem;
+    }
+
+    /* Example component styles */
+    my-counter {
+      display: block;
+      padding: 1rem;
+    }
+
+    my-counter h2 {
+      color: #2c3e50;
+      border: none;
+      margin-bottom: 0.5rem;
+    }
+
+    my-counter button {
+      background: #3498db;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.3s;
+    }
+
+    my-counter button:hover {
+      background: #2980b9;
+    }
+
+    my-form input, my-form textarea {
+      width: 100%;
+      padding: 0.5rem;
+      margin: 0.5rem 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    my-form button {
+      background: #27ae60;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 0.5rem;
+    }
+
+    my-form button:hover {
+      background: #229954;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="view-examples.html" class="active">View Examples</a>
+    <a href="uix-showcase.html">UIX Showcase</a>
+  </nav>
+
+  <main>
+    <h1>@bootstrapp/view Examples</h1>
+    <p class="subtitle">Basic component examples demonstrating the View.define() API</p>
+
+    <section>
+      <h2>Basic Counter Component</h2>
+      <p>A simple reactive counter demonstrating properties, methods, and event handling.</p>
+
+      <div class="demo-box">
+        <my-counter label="Click Counter"></my-counter>
+        <my-counter count="10" label="Started at 10"></my-counter>
+      </div>
+
+      <div class="code">View.define('my-counter', {
+  properties: {
+    count: T.number({ defaultValue: 0 }),
+    label: T.string({ defaultValue: 'Counter' })
+  },
+
+  increment() {
+    this.count++;
+  },
+
+  render() {
+    return html`
+      &lt;h2&gt;${this.label}&lt;/h2&gt;
+      &lt;p&gt;Count: ${this.count}&lt;/p&gt;
+      &lt;button @click=${this.increment}&gt;Increment&lt;/button&gt;
+    `;
+  }
+});</div>
+    </section>
+
+    <section>
+      <h2>Form Component</h2>
+      <p>A form component demonstrating input handling and custom events.</p>
+
+      <div class="demo-box">
+        <my-form></my-form>
+      </div>
+
+      <div class="code">View.define('my-form', {
+  properties: {
+    name: T.string({ defaultValue: '' }),
+    message: T.string({ defaultValue: '' })
+  },
+
+  _handleSubmit(e) {
+    e.preventDefault();
+    this.emit('form-submit', {
+      name: this.name,
+      message: this.message
+    });
+    alert(`Submitted: ${this.name} - ${this.message}`);
+  },
+
+  render() {
+    return html`
+      &lt;form @submit=${this._handleSubmit}&gt;
+        &lt;input
+          type="text"
+          placeholder="Name"
+          .value=${this.name}
+          @input=${e => this.name = e.target.value}
+        &gt;
+        &lt;textarea
+          placeholder="Message"
+          .value=${this.message}
+          @input=${e => this.message = e.target.value}
+        &gt;&lt;/textarea&gt;
+        &lt;button type="submit"&gt;Submit&lt;/button&gt;
+      &lt;/form&gt;
+    `;
+  }
+});</div>
+    </section>
+
+    <section>
+      <h2>Getting Started</h2>
+      <p>To use @bootstrapp/view in your project, add the importmap and start defining components:</p>
+
+      <div class="code">&lt;script type="importmap"&gt;
+{
+  "imports": {
+    "lit": "https://esm.sh/lit@3",
+    "@bootstrapp/types": "https://esm.sh/@bootstrapp/types@0.1.0",
+    "@bootstrapp/view": "https://esm.sh/@bootstrapp/view@0.1.0"
+  }
+}
+&lt;/script&gt;
+
+&lt;script type="module"&gt;
+  import View from '@bootstrapp/view';
+  import { html } from 'lit';
+  import T from '@bootstrapp/types';
+
+  View.define('my-component', {
+    // Component definition
+  });
+&lt;/script&gt;</div>
+    </section>
+  </main>
+
+  <script type="module">
+    import View from '@bootstrapp/view';
+    import { html } from 'lit';
+    import T from '@bootstrapp/types';
+
+    // Counter Component
+    View.define('my-counter', {
+      properties: {
+        count: T.number({ defaultValue: 0 }),
+        label: T.string({ defaultValue: 'Counter' })
+      },
+
+      increment() {
+        this.count++;
+      },
+
+      render() {
+        return html`
+          <h2>${this.label}</h2>
+          <p>Count: ${this.count}</p>
+          <button @click=${this.increment}>Increment</button>
+        `;
+      }
+    });
+
+    // Form Component
+    View.define('my-form', {
+      properties: {
+        name: T.string({ defaultValue: '' }),
+        message: T.string({ defaultValue: '' })
+      },
+
+      _handleSubmit(e) {
+        e.preventDefault();
+        this.emit('form-submit', {
+          name: this.name,
+          message: this.message
+        });
+        alert(`Submitted: ${this.name} - ${this.message}`);
+      },
+
+      render() {
+        return html`
+          <form @submit=${this._handleSubmit}>
+            <input
+              type="text"
+              placeholder="Name"
+              .value=${this.name}
+              @input=${e => this.name = e.target.value}
+            >
+            <textarea
+              placeholder="Message"
+              .value=${this.message}
+              @input=${e => this.message = e.target.value}
+            ></textarea>
+            <button type="submit">Submit</button>
+          </form>
+        `;
+      }
+    });
+  </script>
+</body>
+</html>

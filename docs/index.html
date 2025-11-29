@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bootstrapp Documentation</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    nav {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 1rem 2rem;
+      backdrop-filter: blur(10px);
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-right: 2rem;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      transition: background 0.3s;
+    }
+
+    nav a:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    nav a.active {
+      background: rgba(255,255,255,0.3);
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .hero {
+      color: white;
+      margin-bottom: 3rem;
+    }
+
+    .hero h1 {
+      font-size: 3.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+
+    .hero p {
+      font-size: 1.3rem;
+      opacity: 0.95;
+      max-width: 600px;
+      margin: 0 auto;
+      text-shadow: 0 1px 5px rgba(0,0,0,0.2);
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      max-width: 900px;
+      width: 100%;
+    }
+
+    .card {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      transition: transform 0.3s, box-shadow 0.3s;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    }
+
+    .card-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .card h2 {
+      color: #2c3e50;
+      margin-bottom: 0.75rem;
+      font-size: 1.5rem;
+    }
+
+    .card p {
+      color: #555;
+      margin-bottom: 1rem;
+    }
+
+    .card .badge {
+      display: inline-block;
+      background: #3498db;
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .card.view .badge {
+      background: #3498db;
+    }
+
+    .card.uix .badge {
+      background: #9b59b6;
+    }
+
+    footer {
+      background: rgba(0, 0, 0, 0.2);
+      color: white;
+      text-align: center;
+      padding: 1.5rem;
+      backdrop-filter: blur(10px);
+    }
+
+    footer a {
+      color: white;
+      text-decoration: underline;
+    }
+
+    footer a:hover {
+      opacity: 0.8;
+    }
+
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+
+      .hero p {
+        font-size: 1.1rem;
+      }
+
+      .cards {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="active">Home</a>
+    <a href="view-examples.html">View Examples</a>
+    <a href="uix-showcase.html">UIX Showcase</a>
+  </nav>
+
+  <main>
+    <div class="hero">
+      <h1>Bootstrapp</h1>
+      <p>Modern web components framework with powerful abstractions for building beautiful, reactive applications</p>
+    </div>
+
+    <div class="cards">
+      <a href="view-examples.html" class="card view">
+        <div class="card-icon">🧩</div>
+        <h2>@bootstrapp/view</h2>
+        <p>Web components framework built on Custom Elements API with lit-html templating. Learn the fundamentals of creating reactive components.</p>
+        <span class="badge">View Examples</span>
+      </a>
+
+      <a href="uix-showcase.html" class="card uix">
+        <div class="card-icon">🎨</div>
+        <h2>@bootstrapp/uix</h2>
+        <p>Production-ready UI component toolkit. Explore our collection of beautiful, accessible components for modern web applications.</p>
+        <span class="badge">UIX Showcase</span>
+      </a>
+    </div>
+  </main>
+
+  <footer>
+    <p>
+      Built with ❤️ by Alan Leal |
+      <a href="https://github.com/bootstrapp-ai/bootstrapp" target="_blank">GitHub</a> |
+      Licensed under AGPL-3.0
+    </p>
+  </footer>
+</body>
+</html>
