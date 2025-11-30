@@ -1,5 +1,5 @@
 import T from "@bootstrapp/types";
-import { unsafeHTML } from "lit/directives/unsafe-html.js";
+import { unsafeHTML } from "lit-html/directives/unsafe-html.js";
 import $APP from "/app";
 
 export default {

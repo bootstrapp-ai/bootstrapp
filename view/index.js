@@ -5,7 +5,7 @@
  */
 
 import T from "@bootstrapp/types";
-import { render } from "lit";
+import { render } from "lit-html";
 
 /**
  * Base View class for all custom components
@@ -17,7 +17,7 @@ class View extends HTMLElement {
   /** @static {Object} Property definitions for the component */
   static properties = {};
 
-  static components;
+  static components = new Map();
   /** @static {Object} Internal attribute cache */
   static _attrs = {};
 

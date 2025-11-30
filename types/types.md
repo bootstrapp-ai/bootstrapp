@@ -16,7 +16,7 @@ When defining a UI component, the `Types` library is used to define the `propert
 **Example: `simple-counter` Component**
 
 ```javascript
-import { html } from "lit";
+import { html } from "lit-html";
 import T from "/node_modules/@bootstrapp/base/types/index.js";
 
 export default {

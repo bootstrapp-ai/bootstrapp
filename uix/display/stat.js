@@ -1,5 +1,5 @@
 import T from "@bootstrapp/types";
-import { html, nothing } from "lit";
+import { html, nothing } from "lit-html";
 
 export default {
   tag: "uix-stat",

@@ -77,7 +77,7 @@ export default {
  *
  * @example With Click Handler
  * ```javascript
- * import { html } from "lit";
+ * import { html } from "lit-html";
  *
  * export default {
  *   tag: "my-component",

@@ -1,5 +1,5 @@
 import T from "@bootstrapp/types";
-import { html, svg } from "lit";
+import { html, svg } from "lit-html";
 
 export default {
   tag: "uix-circular-progress",

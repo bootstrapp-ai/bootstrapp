@@ -4,7 +4,7 @@
  */
 
 import T from "@bootstrapp/types";
-import { html } from "lit";
+import { html } from "lit-html";
 
 const resources = [
   { id: "installation", label: "Installation", icon: "download" },

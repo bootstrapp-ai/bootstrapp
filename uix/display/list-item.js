@@ -3,7 +3,7 @@
  * Simple list item for use within uix-list
  */
 
-import { html } from "lit";
+import { html } from "lit-html";
 
 export default {
   shadowDOM: false,

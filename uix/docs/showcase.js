@@ -4,9 +4,9 @@
  */
 
 import T from "@bootstrapp/types";
-import { html, nothing } from "lit";
-import { unsafeHTML } from "lit/directives/unsafe-html.js";
-import { html as staticHTML, unsafeStatic } from "lit/static-html.js";
+import { html, nothing } from "lit-html";
+import { unsafeHTML } from "lit-html/directives/unsafe-html.js";
+import { html as staticHTML, unsafeStatic } from "lit-html/static.js";
 import $APP from "/app";
 import {
   getComponentList,

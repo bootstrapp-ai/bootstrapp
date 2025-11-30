@@ -1,6 +1,6 @@
 import Dexie from "https://esm.sh/dexie@4.0.11";
 import T from "@bootstrapp/types";
-import { html } from "lit";
+import { html } from "lit-html";
 
 export default {
   tag: "uix-indexeddb-explorer",

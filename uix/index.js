@@ -1,5 +1,5 @@
 import Theme from "@bootstrapp/theme";
-import { html } from "lit";
+import { html } from "lit-html";
 import $APP from "/app";
 
 // Load UIX theme CSS using Theme's CSS loader (replaces $APP.fs.css)

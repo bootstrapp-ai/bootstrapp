@@ -2,7 +2,7 @@ let throttleTimeout = null;
 let lastEvent = null;
 
 import T from "@bootstrapp/types";
-import { html } from "lit";
+import { html } from "lit-html";
 export default {
   tag: "uix-divider",
   style: true,

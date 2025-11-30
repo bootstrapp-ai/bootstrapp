@@ -1,5 +1,5 @@
 import T from "@bootstrapp/types";
-import { html } from "lit";
+import { html } from "lit-html";
 
 /**
  * @component uix-nav-item

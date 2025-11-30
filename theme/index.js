@@ -1,5 +1,25 @@
+import View from "@bootstrapp/view";
+
 // CSS Loading Utility (replaces $APP.fs.css)
 const loadedCSSFiles = new Set();
+/**
+ * Fetch CSS content as text (for shadow DOM injection)
+ * @param {string} url - URL or path to CSS file
+ * @returns {Promise<string|null>} CSS content as string, or null if fetch fails
+ */
+const fetchCSS = async (url) => {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      console.warn(`Failed to fetch CSS from ${url}: ${response.status}`);
+      return null;
+    }
+    return await response.text();
+  } catch (error) {
+    console.error(`Error fetching CSS from ${url}:`, error);
+    return null;
+  }
+};
 
 const loadCSS = (href, prepend = false) => {
   if (loadedCSSFiles.has(href)) {
@@ -18,6 +38,19 @@ const loadCSS = (href, prepend = false) => {
 
   loadedCSSFiles.add(href);
 };
+
+const loadComponentCSS = async (file, tag) => {
+  const css = await fetchCSS(file);
+  if (css) {
+    globalStyleTag.textContent += css;
+    const entry = View.components.get(tag);
+    if (entry) entry.cssContent = css;
+  }
+};
+
+const globalStyleTag = document.createElement("style");
+globalStyleTag.id = "compstyles";
+document.head.appendChild(globalStyleTag);
 
 // Font Loading Utility (moved from base/frontend.js)
 const loadedFonts = new Set();
@@ -350,11 +383,11 @@ export default {
   loadTheme,
   applyTheme,
   availableThemes,
-
+  fetchCSS,
   // Resource loading
   loadCSS,
   loadFont,
-
+  loadComponentCSS,
   // Utility functions
   rgbToHSL,
   hslToCSS,

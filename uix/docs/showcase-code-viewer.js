@@ -4,7 +4,7 @@
  */
 
 import T from "@bootstrapp/types";
-import { html } from "lit";
+import { html } from "lit-html";
 import $APP from "/app";
 
 $APP.define("showcase-code-viewer", {

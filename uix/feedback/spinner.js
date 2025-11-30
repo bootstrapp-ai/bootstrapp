@@ -49,7 +49,7 @@
  */
 
 import T from "@bootstrapp/types";
-import { html } from "lit";
+import { html } from "lit-html";
 
 export default {
   tag: "uix-spinner",

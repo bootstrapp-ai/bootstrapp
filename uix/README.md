@@ -16,7 +16,7 @@ npm install @bootstrapp/uix
 <script type="importmap">
 {
   "imports": {
-    "lit": "https://esm.sh/lit@3",
+    "lit-html": "https://esm.sh/lit-html",
     "@bootstrapp/types": "https://esm.sh/@bootstrapp/types@0.1.0",
     "@bootstrapp/view": "https://esm.sh/@bootstrapp/view@0.1.0",
     "@bootstrapp/uix": "https://esm.sh/@bootstrapp/uix@0.1.0"
@@ -34,7 +34,7 @@ npm install @bootstrapp/uix
   <script type="importmap">
   {
     "imports": {
-      "lit": "https://esm.sh/lit@3",
+      "lit-html": "https://esm.sh/lit-html",
       "@bootstrapp/view": "https://esm.sh/@bootstrapp/view@0.1.0",
       "@bootstrapp/uix": "https://esm.sh/@bootstrapp/uix@0.1.0"
     }
@@ -104,7 +104,7 @@ npm install @bootstrapp/uix
 
 ```javascript
 import View from "@bootstrapp/view";
-import { html } from "lit";
+import { html } from "lit-html";
 import T from "@bootstrapp/types";
 
 View.define("uix-component-name", {
@@ -247,7 +247,7 @@ export default {
 ### Basic Structure
 
 ```javascript
-import { html } from "lit";
+import { html } from "lit-html";
 import T from "@bootstrapp/types";
 
 export default {
@@ -813,7 +813,7 @@ Does the component have visual sizing?
 **File: `display/example.js`**
 
 ```javascript
-import { html } from "lit";
+import { html } from "lit-html";
 import T from "@bootstrapp/types";
 
 export default {
@@ -914,7 +914,7 @@ export default {
 **File: `layout/example.js`**
 
 ```javascript
-import { html } from "lit";
+import { html } from "lit-html";
 import T from "@bootstrapp/types";
 
 export default {
@@ -990,7 +990,7 @@ export default {
 **File: `page/example-card.js`**
 
 ```javascript
-import { html } from "lit";
+import { html } from "lit-html";
 import T from "@bootstrapp/types";
 
 export default {

@@ -5,7 +5,7 @@
  */
 
 import T from "@bootstrapp/types";
-import { html, nothing } from "lit";
+import { html, nothing } from "lit-html";
 import $APP from "/app";
 
 // Color categories with their default values (Gruvbox-inspired)

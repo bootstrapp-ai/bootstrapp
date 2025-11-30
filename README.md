@@ -18,7 +18,7 @@ Use importmaps to load directly from esm.sh:
 <script type="importmap">
 {
   "imports": {
-    "lit": "https://esm.sh/lit@3",
+    "lit-html": "https://esm.sh/lit-html",
     "@bootstrapp/types": "https://esm.sh/@bootstrapp/types@0.1.0",
     "@bootstrapp/view": "https://esm.sh/@bootstrapp/view@0.1.0"
   }
@@ -45,7 +45,7 @@ Here's a complete example showing how to create and use a component with importm
   <script type="importmap">
   {
     "imports": {
-      "lit": "https://esm.sh/lit@3",
+      "lit-html": "https://esm.sh/lit-html",
       "@bootstrapp/types": "https://esm.sh/@bootstrapp/types@0.1.0",
       "@bootstrapp/view": "https://esm.sh/@bootstrapp/view@0.1.0"
     }

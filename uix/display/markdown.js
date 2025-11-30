@@ -1,6 +1,6 @@
 import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
 import T from "@bootstrapp/types";
-import { unsafeHTML } from "lit/directives/unsafe-html.js";
+import { unsafeHTML } from "lit-html/directives/unsafe-html.js";
 // TODO: add DOMPurify
 export default {
   tag: "uix-markdown",

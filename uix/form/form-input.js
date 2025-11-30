@@ -1,10 +1,10 @@
-import { ifDefined } from "lit/directives/if-defined.js";
+import { ifDefined } from "lit-html/directives/if-defined.js";
 
 const inputTypes = { string: "text" };
 let uniqueIdCounter = 0;
 
 import T from "@bootstrapp/types";
-import { html } from "lit";
+import { html } from "lit-html";
 export default {
   tag: "uix-form-input",
   style: true,
