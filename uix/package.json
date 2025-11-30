@@ -41,9 +41,9 @@
     "url": "https://github.com/bootstrapp-ai/bootstrapp/issues"
   },
   "dependencies": {
-    "@bootstrapp/view": "^0.1.0",
-    "@bootstrapp/types": "^0.1.0",
-    "@bootstrapp/theme": "^0.1.0",
+    "@bootstrapp/view": "^0.2.0",
+    "@bootstrapp/types": "^0.2.0",
+    "@bootstrapp/theme": "^0.2.0",
     "lit-html": "^3.0.0"
   }
 }

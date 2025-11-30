@@ -2,20 +2,10 @@ import Theme from "@bootstrapp/theme";
 import { html } from "lit-html";
 import $APP from "/app";
 
-// Load UIX theme CSS using Theme's CSS loader (replaces $APP.fs.css)
 Theme.loadCSS("/node_modules/@bootstrapp/uix/theme.css", true);
-
-// Attach theme functions to $APP (maintain existing API)
-$APP.loadTheme = Theme.loadTheme;
-$APP.applyTheme = Theme.applyTheme;
-
-// Load default theme
 Theme.loadTheme("gruvbox-dark");
 
 $APP.routes.set({ "/showcase": () => html`<uix-showcase></uix-showcase>` });
-$APP.routes.set({
-  "/explorer": () => html`<uix-indexeddb-explorer></uix-indexeddb-explorer>`,
-});
 
 $APP.addModule({
   name: "uix",

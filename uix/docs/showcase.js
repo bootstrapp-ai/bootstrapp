@@ -3,6 +3,7 @@
  * Interactive component library viewer with lazy loading
  */
 
+import Theme from "@bootstrapp/theme";
 import T from "@bootstrapp/types";
 import { html, nothing } from "lit-html";
 import { unsafeHTML } from "lit-html/directives/unsafe-html.js";
@@ -106,7 +107,7 @@ export default {
   },
 
   _handleThemeChange(themeName) {
-    $APP.loadTheme(themeName);
+    Theme.loadTheme(themeName);
   },
 
   renderLiveComponent() {

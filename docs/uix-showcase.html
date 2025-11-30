@@ -18,7 +18,8 @@
   </script>
   <link rel="stylesheet" href="/uix/theme.css">
   <script type="module">
-    // Load components early in head to prevent FOUC
+    import Theme from "@bootstrapp/theme";
+    Theme.loadTheme("gruvbox-dark");
     import '@bootstrapp/uix/import.js?components=button,card,container,input,checkbox,switch,select,textarea';
   </script>
 

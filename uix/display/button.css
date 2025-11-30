@@ -22,7 +22,7 @@
   box-shadow: var(--button-shadow, none);
   text-decoration: none;
   padding: var(--theme-spacing-sm, 0.5rem) var(--theme-spacing-md, 0.75rem);
-  color: #fff;
+  color: var(--button-color, #fff);
   cursor: pointer;
   transition:
     transform 0.1s ease-in-out,
@@ -33,9 +33,8 @@
   user-select: none;
 
   background-color: var(--button-background-color, #000);
-  --link-color: var(--color-surface, var(--color-inverse));
   &:not([variant]) {
-    --link-color: #fff;
+    --button-color: #fff;
     --button-background-color: #000;
     --button-border-color: #000;
     --button-hover-background-color: #222;
@@ -63,7 +62,7 @@
       --button-hover-border-color,
       var(--button-border-color, transparent)
     );
-    color: var(--button-hover-color, var(--link-color));
+    color: var(--button-hover-color, var(--button-color));
   }
 
   &:not([disabled]):not([aria-disabled="true"]):active {
@@ -126,7 +125,7 @@
   &[outline] {
     --button-background-color: transparent;
     --button-border-size: 1px;
-    --link-color: var(--text-color);
+    --button-color: var(--text-color);
     /* Shared Hover Logic for Outlines (Solid on Hover) */
     --button-hover-color: var(--color-surface-lighter);
 
@@ -161,7 +160,7 @@
   &[ghost] {
     --button-background-color: transparent;
     --button-border-color: transparent;
-    --link-color: var(--text-color);
+    --button-color: var(--text-color);
 
     /* Default ghost hover - subtle surface highlight */
     --button-hover-background-color: var(--color-surface-light);

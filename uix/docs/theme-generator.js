@@ -3,10 +3,9 @@
  * Interactive tool for creating custom themes
  * Uses the new semantic shade format (lighter, light, DEFAULT, dark, darker)
  */
-
+import Theme from "@bootstrapp/theme";
 import T from "@bootstrapp/types";
 import { html, nothing } from "lit-html";
-import $APP from "/app";
 
 // Color categories with their default values (Gruvbox-inspired)
 const DEFAULT_COLORS = {
@@ -140,11 +139,8 @@ export default {
   },
 
   _applyPreview() {
-    // Apply theme preview using the generated theme object
     const theme = this.generateThemeObject();
-    if ($APP.applyTheme) {
-      $APP.applyTheme(theme);
-    }
+    Theme.applyTheme(theme);
   },
 
   _toggleExpanded(category) {
