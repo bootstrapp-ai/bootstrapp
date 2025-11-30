@@ -4,20 +4,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>@bootstrapp/uix Showcase</title>
-
   <script type="importmap">
   {
     "imports": {
       "lit": "https://esm.sh/lit@3",
       "@bootstrapp/types": "/types/index.js",
       "@bootstrapp/view": "/view/index.js",
+      "@bootstrapp/theme": "/theme/index.js",
       "@bootstrapp/uix/": "/uix/",
       "@bootstrapp/uix": "/uix/index.js"
     }
   }
   </script>
-
   <link rel="stylesheet" href="/uix/theme.css">
+  <script type="module">
+    // Load components early in head to prevent FOUC
+    import '@bootstrapp/uix/import.js?components=button,card,container,input,checkbox,switch,select,textarea';
+  </script>
 
   <style>
     * {
@@ -341,17 +344,5 @@
       </div>
     </section>
   </main>
-
-  <script type="module">
-    // Import UIX components for the showcase
-    import '@bootstrapp/uix/display/button.js';
-    import '@bootstrapp/uix/layout/card.js';
-    import '@bootstrapp/uix/layout/container.js';
-    import '@bootstrapp/uix/form/input.js';
-    import '@bootstrapp/uix/form/checkbox.js';
-    import '@bootstrapp/uix/form/switch.js';
-    import '@bootstrapp/uix/form/select.js';
-    import '@bootstrapp/uix/form/textarea.js';
-  </script>
 </body>
 </html>

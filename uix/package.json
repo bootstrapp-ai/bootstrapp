@@ -7,6 +7,7 @@
   "type": "module",
   "exports": {
     ".": "./index.js",
+    "./import.js": "./import.js",
     "./display/*": "./display/*.js",
     "./layout/*": "./layout/*.js",
     "./form/*": "./form/*.js",
@@ -42,6 +43,7 @@
   "dependencies": {
     "@bootstrapp/view": "^0.1.0",
     "@bootstrapp/types": "^0.1.0",
+    "@bootstrapp/theme": "^0.1.0",
     "lit": "^3.0.0"
   }
 }

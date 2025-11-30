@@ -20,11 +20,20 @@
   border: var(--button-border-size, 0) solid
     var(--button-border-color, transparent);
   box-shadow: var(--button-shadow, none);
+  text-decoration: none;
+  padding: var(--theme-spacing-sm, 0.5rem) var(--theme-spacing-md, 0.75rem);
+  color: #fff;
+  cursor: pointer;
+  transition:
+    transform 0.1s ease-in-out,
+    background-color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out,
+    color 0.2s ease-in-out;
+  background: transparent;
+  user-select: none;
 
-  /* --- Default Color Mapping (The crucial part) --- */
   background-color: var(--button-background-color, #000);
   --link-color: var(--color-surface, var(--color-inverse));
-  color: var(--link-color);
   &:not([variant]) {
     --link-color: #fff;
     --button-background-color: #000;
@@ -33,14 +42,6 @@
     --button-active-background-color: #222;
   }
   /* Transitions */
-  transition:
-    transform 0.1s ease-in-out,
-    background-color 0.2s ease-in-out,
-    border-color 0.2s ease-in-out,
-    color 0.2s ease-in-out;
-
-  cursor: pointer;
-  user-select: none;
 
   /* --- 2. Interactive States --- */
   &:focus-visible {

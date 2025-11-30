@@ -1,0 +1,31 @@
+{
+  "name": "@bootstrapp/theme",
+  "version": "0.1.0",
+  "description": "Standalone theming system with dynamic CSS variable generation and color utilities",
+  "main": "./index.js",
+  "module": "./index.js",
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./themes/*": "./themes/*.js"
+  },
+  "keywords": [
+    "theme",
+    "theming",
+    "css-variables",
+    "color-utilities",
+    "design-system",
+    "bootstrapp"
+  ],
+  "author": "Alan Leal",
+  "license": "AGPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bootstrapp-ai/bootstrapp.git",
+    "directory": "public/theme"
+  },
+  "homepage": "https://github.com/bootstrapp-ai/bootstrapp#readme",
+  "bugs": {
+    "url": "https://github.com/bootstrapp-ai/bootstrapp/issues"
+  }
+}

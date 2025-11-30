@@ -7,7 +7,7 @@
 const fontFamily = "Manrope";
 export default {
   font: {
-    family: `'${fontFamily}', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif`,
+    family: fontFamily,
     icon: {
       family: "lucide",
     },
