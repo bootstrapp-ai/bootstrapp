@@ -1,6 +1,6 @@
 {
   "name": "@bootstrapp/uix",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "UI/UX component toolkit built on @bootstrapp/view with ready-to-use components for modern web applications",
   "main": "./index.js",
   "module": "./index.js",

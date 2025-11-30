@@ -1,6 +1,6 @@
 {
   "name": "@bootstrapp/types",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Type validation and coercion library for model fields and component properties",
   "main": "./index.js",
   "module": "./index.js",

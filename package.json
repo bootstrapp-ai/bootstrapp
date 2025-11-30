@@ -1,6 +1,6 @@
 {
-  "name": "@bootstrapp/public",
-  "version": "0.1.0",
+  "name": "@bootstrapp/base",
+  "version": "0.2.0",
   "private": true,
   "description": "Public demos and documentation for Bootstrapp packages",
   "type": "module",
