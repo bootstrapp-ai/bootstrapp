@@ -1,5 +1,36 @@
-import View from "@bootstrapp/view";
+import View, { settings } from "@bootstrapp/view";
 
+View.plugins.push({
+  name: "theme",
+  init: async ({ tag, component }) => {
+    console.error(component.style, settings.loadStyle);
+    if (component.style && settings.loadStyle) {
+      const path = View.getComponentPath(tag);
+      await loadComponentCSS(`${path}.css`, tag);
+    }
+  },
+  events: {
+    connected: (opts) => {
+      const { tag, component, instance } = opts;
+      if (!component.style) return;
+      const root = instance.getRootNode();
+      if (!(root instanceof ShadowRoot)) return;
+      const entry = View.components.get(tag);
+      if (!entry?.cssContent) return;
+      let injected = View.shadowStylesInjected.get(root);
+      if (!injected) {
+        injected = new Set();
+        View.shadowStylesInjected.set(root, injected);
+      }
+      if (injected.has(component)) return;
+      const style = document.createElement("style");
+      style.setAttribute("data-component-style", component.tag);
+      style.textContent = entry.cssContent;
+      root.prepend(style);
+      injected.add(component);
+    },
+  },
+});
 // CSS Loading Utility (replaces $APP.fs.css)
 const loadedCSSFiles = new Set();
 /**

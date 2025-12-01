@@ -1,20 +1,10 @@
-import Theme from "@bootstrapp/theme";
-import { html } from "lit-html";
-import $APP from "/app";
-
-Theme.loadCSS("/node_modules/@bootstrapp/uix/theme.css", true);
-Theme.loadTheme("gruvbox-dark");
-
-$APP.routes.set({ "/showcase": () => html`<uix-showcase></uix-showcase>` });
-
-$APP.addModule({
+export default {
   name: "uix",
   path: "/node_modules/@bootstrapp",
   root: true,
   i18n: {
     pt: () => import("./locales/pt.js"),
   },
-  themes: Theme.availableThemes,
   components: {
     navigation: [
       "accordion",
@@ -132,4 +122,4 @@ $APP.addModule({
       "theme-generator",
     ],
   },
-});
+};

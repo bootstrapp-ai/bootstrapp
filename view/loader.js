@@ -29,7 +29,7 @@ const Loader = {
    * Maps module component definitions to file paths.
    * @param {Object} module - The module object containing definition and path
    */
-  registerModule(module) {
+  addModule(module) {
     if (!module.components) return;
 
     Object.entries(module.components).forEach(([name, value]) => {
@@ -135,11 +135,11 @@ const Loader = {
         const entry = View.components.get(tag) || {};
         entry._constructor = component;
         View.components.set(tag, entry);
-
-        for (const { init } of BaseClass.plugins) {
-          if (init && typeof init === "function")
-            await init({ View, component, definition, tag });
-        }
+        if (BaseClass?.plugins)
+          for (const { init } of BaseClass.plugins) {
+            if (init && typeof init === "function")
+              await init({ View, component, definition, tag });
+          }
 
         if (!customElements.get(tag) || View.reloadComponents)
           customElements.define(tag, component);
@@ -247,5 +247,11 @@ const Loader = {
     Loader.observeDOMChanges();
   },
 };
+
+const getComponentPath = (tag) => {
+  return View.components.get(tag)?.path || Loader.resolvePath(tag);
+};
+
+View.getComponentPath = getComponentPath;
 
 export default Loader;

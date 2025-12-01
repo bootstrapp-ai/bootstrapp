@@ -8,8 +8,10 @@
   {
     "imports": {
       "lit-html": "https://esm.sh/lit-html",
+      "lit-html/": "https://esm.sh/lit-html/",
       "@bootstrapp/types": "/types/index.js",
       "@bootstrapp/view": "/view/index.js",
+      "@bootstrapp/view/": "/view/",
       "@bootstrapp/theme": "/theme/index.js",
       "@bootstrapp/uix/": "/uix/",
       "@bootstrapp/uix": "/uix/index.js"
@@ -19,8 +21,19 @@
   <link rel="stylesheet" href="/uix/theme.css">
   <script type="module">
     import Theme from "@bootstrapp/theme";
+    import { settings } from "@bootstrapp/view";
+    import Loader from "@bootstrapp/view/loader.js";
+    import UIX from "@bootstrapp/uix";
+    Loader.configure({
+      basePath:  "http://localhost:3000/",
+      modules:  {},
+      dev: true,
+    });
+  settings.loadStyle = true;
+  settings.iconFontFamily = `node_modules/@bootstrapp/icon-lucide/lucide`;
     Theme.loadTheme("gruvbox-dark");
-    import '@bootstrapp/uix/import.js?components=button,card,container,input,checkbox,switch,select,textarea';
+    Loader.addModule({...UIX, path: ".."})
+    Loader.initDOM();
   </script>
 
   <style>

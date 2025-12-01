@@ -45,7 +45,7 @@ $APP.define("showcase-code-viewer", {
   generateImportCode() {
     if (!this.category || !this.name) return "";
 
-    return `import "/node_modules/@bootstrapp/uix/index.js";
+    return `import "/node_modules/@bootstrapp/uix/app.js";
 
 // Component auto-loaded from:
 // /node_modules/@bootstrapp/uix/${this.category}/${this.name}.js`;

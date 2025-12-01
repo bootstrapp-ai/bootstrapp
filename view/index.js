@@ -7,6 +7,7 @@
 import T from "@bootstrapp/types";
 import { render } from "lit-html";
 
+export const settings = {};
 /**
  * Base View class for all custom components
  * Extends HTMLElement to provide reactive properties, lifecycle hooks, and templating
@@ -51,7 +52,8 @@ class View extends HTMLElement {
    * @param {Class} BaseClass - The class to extend (View or other component)
    * @returns {Class} The generated class
    */
-  static createClass(tag, definition, BaseClass = View) {
+  static createClass(tag, definition, BaseClass) {
+    BaseClass ||= View;
     if (typeof definition === "function") {
       const renderFn = definition;
       const properties = renderFn.properties || {};
@@ -66,6 +68,7 @@ class View extends HTMLElement {
     const {
       properties = {},
       icons,
+      static: staticProps,
       formAssociated = false,
       dataQuery = false,
       style = false,
@@ -81,7 +84,6 @@ class View extends HTMLElement {
     } = definition;
 
     const methodKeysToBind = Object.keys(prototypeMethods);
-
     const mergedPlugins = new Map();
     [...View.plugins, ...BaseClass.plugins].forEach((plugin) => {
       mergedPlugins.set(plugin.name, plugin);
@@ -141,6 +143,10 @@ class View extends HTMLElement {
         return merged;
       })();
     };
+
+    if (staticProps && typeof staticProps === "object") {
+      Object.assign(component, staticProps);
+    }
 
     Object.defineProperty(component, "name", { value: tag });
 

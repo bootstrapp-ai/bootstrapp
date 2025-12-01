@@ -1,10 +1,12 @@
 import T from "@bootstrapp/types";
+import { settings } from "@bootstrapp/view";
 import { unsafeHTML } from "lit-html/directives/unsafe-html.js";
-import $APP from "/app";
 
+const Icons = new Map();
 export default {
   tag: "uix-icon",
   style: true,
+  static: { Icons },
   properties: {
     name: T.string(),
     svg: T.string(),
@@ -23,17 +25,13 @@ export default {
     }),
   },
   async getIcon(name) {
-    if ($APP.Icons.has(name)) this.svg = $APP.Icons.get(name);
+    if (Icons.has(name)) this.svg = Icons.get(name);
     else {
       try {
-        const response = await fetch(
-          $APP.fs.getFilePath(
-            `node_modules/@bootstrapp/icon-${$APP.theme.font.icon.family}/${$APP.theme.font.icon.family}/${name}.svg`,
-          ),
-        );
+        const response = await fetch(`${settings.iconFontFamily}/${name}.svg`);
         if (response.ok) {
           const svgElement = await response.text();
-          $APP.Icons.set(name, svgElement);
+          Icons.set(name, svgElement);
           this.svg = svgElement;
         } else {
           console.error(`Failed to fetch icon: ${name}`);
