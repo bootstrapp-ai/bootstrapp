@@ -8,7 +8,7 @@ import T from "@bootstrapp/types";
 import { html, nothing } from "lit-html";
 import { unsafeHTML } from "lit-html/directives/unsafe-html.js";
 import { html as staticHTML, unsafeStatic } from "lit-html/static.js";
-import $APP from "/app";
+import View from "@bootstrapp/view";
 import {
   getComponentList,
   getDefaultValues,
@@ -19,7 +19,8 @@ import "./showcase-property-editor.js";
 import "./showcase-code-viewer.js";
 import "./theme-generator.js";
 
-export default {
+const ShowcaseDefinition = {
+  tag: "uix-showcase",
   style: true,
   properties: {
     selectedCategory: T.string({ sync: "querystring" }),
@@ -420,8 +421,7 @@ export default {
   },
 
   render() {
-    const uixModule = $APP.modules?.uix;
-    const availableThemes = uixModule?.themes || {};
+    const availableThemes = Theme.availableThemes || {};
 
     return html`
       <uix-split-pane direction="vertical"  initialSize="50px" minSize="50px" style="height: 100vh;">
@@ -453,3 +453,7 @@ export default {
     `;
   },
 };
+
+View.define("uix-showcase", ShowcaseDefinition);
+
+export default ShowcaseDefinition;

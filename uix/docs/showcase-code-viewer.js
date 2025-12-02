@@ -4,12 +4,13 @@
  */
 
 import T from "@bootstrapp/types";
+import View from "@bootstrapp/view";
 import { html } from "lit-html";
-import $APP from "/app";
 
-$APP.define("showcase-code-viewer", {
+const ShowcaseCodeViewerDefinition = {
+  tag: "uix-showcase-code-viewer",
   properties: {
-    tag: T.string(), // Component tag name
+    componentTag: T.string(), // Component tag name
     props: T.object(), // Current property values
     category: T.string(), // Component category
     name: T.string(), // Component file name
@@ -17,7 +18,7 @@ $APP.define("showcase-code-viewer", {
     copiedImport: T.boolean(),
   },
   generateBasicExample() {
-    if (!this.tag) return "";
+    if (!this.componentTag) return "";
 
     const { tag, props } = this;
     const attributes = [];
@@ -89,7 +90,7 @@ $APP.define("showcase-code-viewer", {
   },
 
   render() {
-    if (!this.tag) {
+    if (!this.componentTag) {
       return html`
         <uix-card variant="outlined" padding="md">
           <uix-text size="sm" align="center" muted>No code example available</uix-text>
@@ -144,6 +145,8 @@ $APP.define("showcase-code-viewer", {
       </uix-flex>
     `;
   },
-});
+};
 
-export default "showcase-code-viewer";
+View.define("uix-showcase-code-viewer", ShowcaseCodeViewerDefinition);
+
+export default ShowcaseCodeViewerDefinition;

@@ -186,8 +186,13 @@ class View extends HTMLElement {
             },
       });
     }
+    const filteredPrototypeMethods = Object.fromEntries(
+      Object.entries(prototypeMethods).filter(
+        ([key]) => !Object.hasOwn(component.properties, key),
+      ),
+    );
+    Object.assign(component.prototype, filteredPrototypeMethods);
 
-    Object.assign(component.prototype, prototypeMethods);
     component.tag = tag;
     component._attrs = Object.fromEntries(
       Object.keys(component.properties).map((prop) => [

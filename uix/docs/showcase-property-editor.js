@@ -5,8 +5,10 @@
 
 import T from "@bootstrapp/types";
 import { html } from "lit-html";
+import View from "@bootstrapp/view";
 
-export default {
+const ShowcasePropertyEditorDefinition = {
+  tag: "uix-showcase-property-editor",
   properties: {
     properties: T.object(), // Component property metadata
     values: T.object(), // Current property values
@@ -199,3 +201,7 @@ export default {
     `;
   },
 };
+
+View.define("uix-showcase-property-editor", ShowcasePropertyEditorDefinition);
+
+export default ShowcasePropertyEditorDefinition;

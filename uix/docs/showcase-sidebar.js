@@ -5,6 +5,7 @@
 
 import T from "@bootstrapp/types";
 import { html } from "lit-html";
+import View from "@bootstrapp/view";
 
 const resources = [
   { id: "installation", label: "Installation", icon: "download" },
@@ -21,8 +22,9 @@ const categoryIcons = {
   feedback: "loader",
   utility: "pen-tool",
 };
-export default {
-  tag: "showcase-sidebar",
+
+const ShowcaseSidebarDefinition = {
+  tag: "uix-showcase-sidebar",
   properties: {
     componentList: T.object(), // Component categories and names
     selectedCategory: T.string({ sync: "querystring" }), // Currently selected category
@@ -143,3 +145,7 @@ export default {
     `;
   },
 };
+
+View.define("uix-showcase-sidebar", ShowcaseSidebarDefinition);
+
+export default ShowcaseSidebarDefinition;

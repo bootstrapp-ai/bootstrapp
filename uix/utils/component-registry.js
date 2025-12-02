@@ -3,7 +3,7 @@
  * Provides component list and lazy-loads component modules on-demand
  */
 
-import $APP from "/app";
+import UIX from "@bootstrapp/uix";
 import {
   extractExamplesFromComments,
   extractDescription,
@@ -20,13 +20,12 @@ const componentCache = new Map();
  * Returns component names organized by category
  */
 export function getComponentList() {
-  const uixModule = $APP.modules?.uix;
-  if (!uixModule?.components) {
+  if (!UIX?.components) {
     console.warn("UIX module not loaded or no components found");
     return {};
   }
 
-  return uixModule.components;
+  return UIX.components;
 }
 
 /**
