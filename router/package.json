@@ -1,0 +1,34 @@
+{
+  "name": "@bootstrapp/router",
+  "version": "0.1.0",
+  "description": "Client-side router with URLPattern API support, nested routes, and history management",
+  "main": "./index.js",
+  "module": "./index.js",
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./app": "./app.js",
+    "./ui": "./ui.js"
+  },
+  "keywords": [
+    "router",
+    "routing",
+    "spa",
+    "urlpattern",
+    "history",
+    "navigation",
+    "bootstrapp"
+  ],
+  "author": "Alan Leal",
+  "license": "AGPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bootstrapp-ai/bootstrapp.git",
+    "directory": "public/router"
+  },
+  "homepage": "https://github.com/bootstrapp-ai/bootstrapp#readme",
+  "bugs": {
+    "url": "https://github.com/bootstrapp-ai/bootstrapp/issues"
+  },
+  "dependencies": {}
+}

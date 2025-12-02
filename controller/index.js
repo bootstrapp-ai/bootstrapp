@@ -9,14 +9,9 @@ import { createController } from "./core.js";
 import * as syncUtils from "./sync.js";
 import { createSync } from "./sync-factory.js";
 
-// Create controller instance with built-in adapters
 const adapters = { ...adaptersStorage, ...adaptersUrl };
 const Controller = createController(adapters);
-
-// Add sync factory
 Controller.createSync = createSync;
-
-// Expose sync utilities on Controller
 Controller.registerSyncType = syncUtils.registerSyncType;
 Controller.getSyncInfo = syncUtils.getSyncInfo;
 
