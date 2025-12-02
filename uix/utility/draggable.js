@@ -1,5 +1,5 @@
 import T from "@bootstrapp/types";
-import Controller from "/app/controller";
+import Controller from "@bootstrapp/controller";
 export default {
   tag: "uix-draggable",
   style: true,

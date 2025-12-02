@@ -1,0 +1,29 @@
+{
+  "name": "@bootstrapp/events",
+  "version": "0.2.0",
+  "description": "Lightweight event system with pub/sub pattern and event handler installation",
+  "main": "./index.js",
+  "module": "./index.js",
+  "type": "module",
+  "exports": {
+    ".": "./index.js"
+  },
+  "keywords": [
+    "events",
+    "pub-sub",
+    "event-emitter",
+    "observer-pattern",
+    "bootstrapp"
+  ],
+  "author": "Alan Leal",
+  "license": "AGPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bootstrapp-ai/bootstrapp.git",
+    "directory": "public/events"
+  },
+  "homepage": "https://github.com/bootstrapp-ai/bootstrapp#readme",
+  "bugs": {
+    "url": "https://github.com/bootstrapp-ai/bootstrapp/issues"
+  }
+}

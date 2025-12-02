@@ -1,0 +1,38 @@
+{
+  "name": "@bootstrapp/controller",
+  "version": "0.2.0",
+  "description": "Reactive state management with storage, URL, and custom adapters",
+  "main": "./index.js",
+  "module": "./index.js",
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./sync": "./sync.js",
+    "./sync-factory": "./sync-factory.js",
+    "./adapters/storage": "./adapters/storage.js",
+    "./adapters/url": "./adapters/url.js",
+    "./app": "./app.js"
+  },
+  "keywords": [
+    "state-management",
+    "reactive",
+    "storage",
+    "url-state",
+    "controller",
+    "bootstrapp"
+  ],
+  "author": "Alan Leal",
+  "license": "AGPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bootstrapp-ai/bootstrapp.git",
+    "directory": "public/controller"
+  },
+  "homepage": "https://github.com/bootstrapp-ai/bootstrapp#readme",
+  "bugs": {
+    "url": "https://github.com/bootstrapp-ai/bootstrapp/issues"
+  },
+  "dependencies": {
+    "@bootstrapp/events": "^0.2.0"
+  }
+}

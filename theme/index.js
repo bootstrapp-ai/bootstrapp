@@ -3,7 +3,6 @@ import View, { settings } from "@bootstrapp/view";
 View.plugins.push({
   name: "theme",
   init: async ({ tag, component }) => {
-    console.error(component.style, settings.loadStyle);
     if (component.style && settings.loadStyle) {
       const path = View.getComponentPath(tag);
       await loadComponentCSS(`${path}.css`, tag);

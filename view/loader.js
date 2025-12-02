@@ -30,6 +30,7 @@ const Loader = {
    * @param {Object} module - The module object containing definition and path
    */
   addModule(module) {
+    Loader.settings.modules[module.name] = module;
     if (!module.components) return;
 
     Object.entries(module.components).forEach(([name, value]) => {
@@ -57,13 +58,10 @@ const Loader = {
   resolvePath(tagName) {
     const cached = View.components.get(tagName);
     if (cached?.path) return cached.path;
-
     const parts = tagName.split("-");
     const moduleName = parts[0];
-
     const module = Loader.settings.modules[moduleName];
     const componentName = parts.slice(1).join("-");
-
     return (
       module
         ? [module.path ?? moduleName, componentName]
