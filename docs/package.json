@@ -1,0 +1,19 @@
+{
+  "name": "@bootstrapp/docs",
+  "version": "0.0.1",
+  "type": "module",
+  "description": "Documentation and showcase for Bootstrapp packages",
+  "private": true,
+  "dependencies": {
+    "@bootstrapp/types": "file:../types",
+    "@bootstrapp/view": "file:../view",
+    "@bootstrapp/events": "file:../events",
+    "@bootstrapp/controller": "file:../controller",
+    "@bootstrapp/theme": "file:../theme",
+    "@bootstrapp/icon-lucide": "file:../icon-lucide",
+    "@bootstrapp/uix": "file:../uix"
+  },
+  "scripts": {
+    "start": "npx serve . -p 3000"
+  }
+}

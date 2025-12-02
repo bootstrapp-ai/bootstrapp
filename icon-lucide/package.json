@@ -1,0 +1,12 @@
+{
+  "name": "@bootstrapp/icon-lucide",
+  "version": "0.0.1",
+  "type": "module",
+  "description": "Lucide icon library for Bootstrapp framework",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./lucide/*": "./lucide/*",
+    "./app.js": "./app.js"
+  }
+}

@@ -4,7 +4,7 @@
  */
 
 /**
- * Creates an event handler with on, off, emit, set, get, onAny, offAny methods
+ * Creates an event handler with on, off, emit, set, get
  * @param {Object} target - The target object to install event methods on (optional)
  * @param {Object} options - Configuration options
  * @param {boolean} options.getter - Whether to include the 'get' method (default: true)
@@ -12,7 +12,6 @@
  */
 function createEventHandler(target = {}, { getter = true } = {}) {
   const listeners = new Map();
-  const anyListeners = new Set();
 
   target.listeners = listeners;
   target.hasListeners = (key) => listeners.has(key);
@@ -40,13 +39,6 @@ function createEventHandler(target = {}, { getter = true } = {}) {
     if (callbackSet.size === 0) listeners.delete(key);
   };
 
-  target.onAny = (callback) =>
-    callback
-      ? anyListeners.add(callback.bind(target))
-      : console.error("Error adding onAny listener: no callback passed");
-
-  target.offAny = (callback) => anyListeners.delete(callback);
-
   target.emit = (key, data) => {
     const results = [];
     listeners.get(key)?.forEach((callback) => {
@@ -56,20 +48,10 @@ function createEventHandler(target = {}, { getter = true } = {}) {
         console.error(`Error in listener for key "${key}":`, error);
       }
     });
-    anyListeners.forEach((callback) => {
-      try {
-        const bindedFn = callback.bind(target);
-        results.push(bindedFn({ key, data }));
-      } catch (error) {
-        console.error(`Error in onAny listener for key "${key}":`, error);
-      }
-    });
     return results;
   };
 
   return target;
 }
-/**
- * Default export - singleton instance
- */
+
 export default createEventHandler;

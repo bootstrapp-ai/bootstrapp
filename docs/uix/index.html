@@ -9,50 +9,38 @@
     "imports": {
       "lit-html": "https://esm.sh/lit-html",
       "lit-html/": "https://esm.sh/lit-html/",
-      "@bootstrapp/types": "/types/index.js",
-      "@bootstrapp/view": "/view/index.js",
-      "@bootstrapp/events": "/events/index.js",
-      "@bootstrapp/controller": "/controller/index.js",
-      "@bootstrapp/view/": "/view/",
-      "@bootstrapp/theme": "/theme/index.js",
-      "@bootstrapp/uix/": "/uix/",
-      "@bootstrapp/uix": "/uix/index.js"
+      "@bootstrapp/types": "/node_modules/@bootstrapp/types/index.js",
+      "@bootstrapp/view": "/node_modules/@bootstrapp/view/index.js",
+      "@bootstrapp/events": "/node_modules/@bootstrapp/events/index.js",
+      "@bootstrapp/controller": "/node_modules/@bootstrapp/controller/index.js",
+      "@bootstrapp/icon-lucide": "/node_modules/@bootstrapp/icon-lucide/index.js",
+      "@bootstrapp/icon-lucide/": "/node_modules/@bootstrapp/icon-lucide/",
+      "@bootstrapp/view/": "/node_modules/@bootstrapp/view/",
+      "@bootstrapp/theme": "/node_modules/@bootstrapp/theme/index.js",
+      "@bootstrapp/uix/": "/node_modules/@bootstrapp/uix/",
+      "@bootstrapp/uix": "/node_modules/@bootstrapp/uix/index.js"
     }
   }
   </script>
-  <link rel="stylesheet" href="/uix/theme.css">
+  <link rel="stylesheet" href="/node_modules/@bootstrapp/uix/theme.css">
   <script type="module">
     import Theme from "@bootstrapp/theme";
     import View, { settings } from "@bootstrapp/view";
     import Loader from "@bootstrapp/view/loader.js";
     import Controller from "@bootstrapp/controller";
     import UIX from "@bootstrapp/uix";
-
-    // Configure loader
     Loader.configure({
       basePath: "http://localhost:3000/",
       modules: {},
       dev: true,
     });
-
-    // Configure view settings
     settings.loadStyle = true;
     settings.iconFontFamily = `/node_modules/@bootstrapp/icon-lucide/lucide`;
-
-    // Initialize controller
     Controller.initUrlSync();
-    Controller.installViewPlugin(View, settings.View);
-
-    // Load theme
+    Controller.installViewPlugin(View, settings);
     Theme.loadTheme("gruvbox-dark");
-
-    // Add UIX module
-    Loader.addModule({...UIX, path: ".."});
-
-    // Import showcase component (registers itself via View.define)
+    Loader.addModule({...UIX, path: "/node_modules/@bootstrapp"});
     await import("@bootstrapp/uix/docs/showcase.js");
-
-    // Initialize DOM scanning
     Loader.initDOM();
   </script>
 </head>

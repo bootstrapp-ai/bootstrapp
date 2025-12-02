@@ -45,7 +45,6 @@ function loadModelTypeAsync({ instance, key, prop, syncObj, updateState }) {
  * @param {Object} View - The View instance
  */
 export function initControllerApp($APP, Controller, View) {
-  // Service Worker sync handler (truly $APP-specific)
   $APP.swEvents.set(
     "SW:PROP_SYNC_UPDATE",
     ({ payload: { sync, key, value } }) => {
@@ -57,13 +56,11 @@ export function initControllerApp($APP, Controller, View) {
     },
   );
 
-  // Install View plugin with $APP-specific callbacks
   Controller.installViewPlugin(View, {
     onBroadcast: (data) => $APP.SW.request("SW:BROADCAST_SYNCED_PROP", data),
     onAsyncLoad: loadModelTypeAsync,
   });
 
-  // Initialize URL sync
   Controller.initUrlSync();
 }
 

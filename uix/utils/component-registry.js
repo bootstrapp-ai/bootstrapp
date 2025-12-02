@@ -5,8 +5,8 @@
 
 import UIX from "@bootstrapp/uix";
 import {
-  extractExamplesFromComments,
   extractDescription,
+  extractExamplesFromComments,
   extractMetadataTags,
   extractParts,
   extractSlots,
@@ -120,7 +120,11 @@ function extractMetadata(componentDef, name) {
  */
 function extractPropertyMetadata(typeDef) {
   // Handle simple default values (T.string("default"))
-  if (typeof typeDef === "string" || typeof typeDef === "number" || typeof typeDef === "boolean") {
+  if (
+    typeof typeDef === "string" ||
+    typeof typeDef === "number" ||
+    typeof typeDef === "boolean"
+  ) {
     return {
       type: typeof typeDef,
       defaultValue: typeDef,
