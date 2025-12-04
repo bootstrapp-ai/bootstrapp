@@ -1,11 +1,13 @@
 import T from "@bootstrapp/types";
 import { html } from "lit-html";
 import { html as staticHTML, unsafeStatic } from "lit-html/static.js";
+import Router from "./index.js";
+
 export default {
   tag: "router-ui",
   properties: {
     currentRoute: T.object({
-      sync: "ram",
+      sync: Router,
     }),
   },
   renderRoute(route, params) {
@@ -21,7 +23,6 @@ export default {
 
   render() {
     const { route, params } = this.currentRoute || {};
-    console.log(this.currentRoute);
     return route
       ? this.renderRoute(
           typeof route === "function" ? { component: route } : route,

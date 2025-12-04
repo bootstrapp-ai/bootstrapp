@@ -1,9 +1,33 @@
-.uix-bottom-nav {
+:where(.uix-bottom-nav) {
   /* Layout */
-  display: block;
+  display: flex;
+  flex-direction: row;
   width: 100%;
 
-  /* Host attributes */
+  /* Container properties */
+  align-items: center;
+  justify-content: space-around;
+  gap: var(--bottom-nav-gap, var(--spacing-xs, 0.5rem));
+  min-height: var(--bottom-nav-height, 56px);
+  padding: var(--bottom-nav-padding-y, var(--spacing-xs, 0.5rem))
+    var(--bottom-nav-padding-x, var(--spacing-sm, 0.75rem));
+  background: var(--bottom-nav-bg, var(--color-surface, white));
+
+  /* Safe area support for iOS home indicator */
+  padding-bottom: calc(
+    var(--bottom-nav-padding-y, var(--spacing-xs, 0.5rem)) +
+    env(safe-area-inset-bottom)
+  );
+  padding-left: calc(
+    var(--bottom-nav-padding-x, var(--spacing-sm, 0.75rem)) +
+    env(safe-area-inset-left)
+  );
+  padding-right: calc(
+    var(--bottom-nav-padding-x, var(--spacing-sm, 0.75rem)) +
+    env(safe-area-inset-right)
+  );
+
+  /* Fixed positioning when [fixed] attribute is set */
   &[fixed] {
     position: fixed;
     bottom: 0;
@@ -12,157 +36,75 @@
     z-index: 100;
   }
 
+  /* Floating variant */
   &[variant="floating"] {
     --bottom-nav-bg: var(--color-surface);
     --bottom-nav-border-radius: var(--radius-xl);
-    --bottom-nav-margin: var(--spacing-md);
-    --bottom-nav-shadow: var(--shadow-lg);
+    margin: var(--bottom-nav-margin, var(--spacing-md));
+    margin-bottom: calc(
+      var(--bottom-nav-margin, var(--spacing-md)) +
+      env(safe-area-inset-bottom)
+    );
+    border-radius: var(--bottom-nav-border-radius);
   }
 
+  /* Filled variant */
   &[variant="filled"] {
     --bottom-nav-item-active-bg: var(--color-primary);
     --bottom-nav-item-active-color: white;
   }
 }
 
-/* Navigation container */
-.uix-bottom-nav::part(nav) {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  gap: var(--spacing-xs);
-  min-height: 56px;
-  padding: var(--spacing-xs) var(--spacing-sm);
-  background: var(--bottom-nav-bg, var(--color-surface));
-  border-top: 1px solid var(--color-border);
-  box-shadow: var(--bottom-nav-shadow, var(--shadow-sm));
-
-  /* Safe area support for iOS home indicator */
-  padding-bottom: calc(var(--spacing-xs) + env(safe-area-inset-bottom));
-  padding-left: calc(var(--spacing-sm) + env(safe-area-inset-left));
-  padding-right: calc(var(--spacing-sm) + env(safe-area-inset-right));
-}
-
-/* Floating variant */
-.uix-bottom-nav[variant="floating"]::part(nav) {
-  margin: var(--bottom-nav-margin);
-  margin-bottom: calc(var(--bottom-nav-margin) + env(safe-area-inset-bottom));
-  border-radius: var(--bottom-nav-border-radius);
-  border: none;
-  width: calc(100% - (var(--bottom-nav-margin) * 2));
-}
-
-/* Navigation item */
-.uix-bottom-nav::part(item) {
-  position: relative;
+/* Direct children (app-link, a, .nav-item, etc.) */
+.uix-bottom-nav > * {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-xs, 4px);
-  padding: var(--spacing-xs) var(--spacing-sm);
+  text-align: center;
+  --justify-content: center;
+  gap: var(--bottom-nav-item-gap, var(--spacing-xs, 0.25rem));
+  padding: var(
+    --bottom-nav-item-padding,
+    var(--spacing-xs, 0.5rem) var(--spacing-sm, 0.75rem)
+  );
   flex: 1;
   min-width: 0;
   color: var(--bottom-nav-item-color, var(--color-text-muted));
   text-decoration: none;
-  border-radius: var(--radius-sm);
-  transition: all 0.2s ease;
+  border-radius: var(--bottom-nav-item-radius, var(--radius-sm, 0.25rem));
+  transition: var(--bottom-nav-item-transition, all 0.2s ease);
   cursor: pointer;
 
-  /* Hover state */
   &:hover {
-    background: var(--bottom-nav-item-hover-bg, var(--color-surface-light));
-    color: var(--bottom-nav-item-hover-color, var(--color-text));
-  }
-}
-
-/* Icon only */
-.uix-bottom-nav:not([show-labels])::part(item) {
-  padding: var(--spacing-sm);
-}
-
-/* Active state */
-.uix-bottom-nav::part(item-active) {
-  color: var(--bottom-nav-item-active-color, var(--color-primary));
-}
-
-/* Filled variant active state */
-.uix-bottom-nav[variant="filled"]::part(item-active) {
-  background: var(--bottom-nav-item-active-bg, var(--color-primary));
-  color: var(--bottom-nav-item-active-color, white);
-}
-
-/* Icon */
-.uix-bottom-nav::part(item) uix-icon {
-  width: 24px;
-  height: 24px;
-  flex-shrink: 0;
-}
-
-/* Item label */
-.uix-bottom-nav::part(label) {
-  font-size: var(--font-size-xs);
-  font-weight: 500;
-  text-align: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 100%;
-}
-
-/* Badge indicator */
-.uix-bottom-nav::part(badge) {
-  position: absolute;
-  top: 2px;
-  right: calc(50% - 16px);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 4px;
-  background: var(--color-danger);
-  color: white;
-  font-size: 10px;
-  font-weight: 600;
-  border-radius: 9px;
-  border: 2px solid var(--bottom-nav-bg, var(--color-surface));
-  z-index: 1;
-}
-
-/* Slot content styling */
-.uix-bottom-nav a,
-.uix-bottom-nav .nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-xs, 4px);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  flex: 1;
-  min-width: 0;
-  color: var(--bottom-nav-item-color, var(--color-text-muted));
-  text-decoration: none;
-  border-radius: var(--radius-sm);
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: var(--bottom-nav-item-hover-bg, var(--color-surface-light));
+    background: var(--bottom-nav-item-hover-bg, var(--color-primary-lighter));
     color: var(--bottom-nav-item-hover-color, var(--color-text));
   }
 
-  &.active {
+  &.active,
+  &[aria-current] {
     color: var(--bottom-nav-item-active-color, var(--color-primary));
   }
 }
 
-.uix-bottom-nav uix-icon {
-  width: 24px;
-  height: 24px;
+/* Filled variant - active items get background */
+.uix-bottom-nav[variant="filled"] > *.active,
+.uix-bottom-nav[variant="filled"] > *[aria-current] {
+  background: var(--bottom-nav-item-active-bg, var(--color-primary));
+  color: var(--bottom-nav-item-active-color, white);
 }
 
+/* Icon styling */
+.uix-bottom-nav uix-icon,
+.uix-bottom-nav svg {
+  width: var(--bottom-nav-icon-size, 24px);
+  height: var(--bottom-nav-icon-size, 24px);
+  flex-shrink: 0;
+}
+
+/* Text/label styling */
 .uix-bottom-nav span {
-  font-size: var(--font-size-xs);
-  font-weight: 500;
+  font-size: var(--bottom-nav-text-size, var(--font-size-xs, 0.75rem));
+  font-weight: var(--bottom-nav-text-weight, 500);
   text-align: center;
 }

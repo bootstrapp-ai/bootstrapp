@@ -1,5 +1,4 @@
 import T from "@bootstrapp/types";
-import { html } from "lit-html";
 
 export default {
   tag: "uix-bottom-nav",
@@ -11,15 +10,7 @@ export default {
     fixed: T.boolean(),
   },
   style: true,
-  shadow: true,
-
-  render() {
-    return html`
-      <nav part="nav" class="bottom-nav" role="navigation">
-        <slot></slot>
-      </nav>
-    `;
-  },
+  role: "navigation",
 };
 
 /**

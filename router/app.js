@@ -9,10 +9,16 @@ export function initRouterApp($APP, Router, Controller = null) {
     Router.init($APP.routes, {
       appName: $APP.settings.name,
       isProduction: $APP.settings.production,
-      onRouteChange: Controller
-        ? (route) => Controller.ram.set("currentRoute", route)
-        : null,
+      onRouteChange: null,
     });
+
+    // Register Router as a sync type for component bindings
+    if (Controller) {
+      Controller.registerSyncType(
+        (adapter) => adapter === Router,
+        (adapter) => ({ adapter: "router", syncObj: adapter.$sync })
+      );
+    }
 
     // Make Router available on $APP
     $APP.Router = Router;
@@ -29,9 +35,12 @@ export function initRouterApp($APP, Router, Controller = null) {
   });
 
   // Set up popstate handler for browser back/forward
-  window.addEventListener("popstate", () => {
-    Router.handleHistoryNavigation();
-  });
+  // Only for browser-based routers
+  if (Router.adapter?.type === "browser") {
+    window.addEventListener("popstate", () => {
+      Router.handleHistoryNavigation();
+    });
+  }
 }
 
 export default initRouterApp;

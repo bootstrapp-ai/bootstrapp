@@ -7,6 +7,9 @@
 import T from "@bootstrapp/types";
 import { render } from "lit-html";
 
+// Global constant for security checks
+const PROTOTYPE_POLLUTION_KEYS = ["__proto__", "constructor", "prototype"];
+
 export const settings = {};
 /**
  * Base View class for all custom components
@@ -80,8 +83,17 @@ class View extends HTMLElement {
       firstUpdated,
       updated,
       class: klass,
-      ...prototypeMethods
+      role,
+      ...prototypeMethods // Catches all methods/properties not explicitly destructured
     } = definition;
+
+    // SECURITY FIX 1: Filter prototypeMethods to prevent pollution
+    for (const key of PROTOTYPE_POLLUTION_KEYS) {
+      if (Object.hasOwn(prototypeMethods, key)) {
+        // In a real environment, you might log this attempt
+        delete prototypeMethods[key];
+      }
+    }
 
     const methodKeysToBind = Object.keys(prototypeMethods);
     const mergedPlugins = new Map();
@@ -112,10 +124,12 @@ class View extends HTMLElement {
       constructor() {
         super();
         methodKeysToBind.forEach((key) => {
+          // This relies on the keys in prototypeMethods being safe (fixed above)
           if (typeof this[key] === "function") this[key] = this[key].bind(this);
         });
 
         if (klass) this.classList.add(...klass.split(" "));
+        if (role) this.setAttribute("role", role);
       }
 
       static get observedAttributes() {
@@ -127,7 +141,14 @@ class View extends HTMLElement {
       static properties = (() => {
         const baseProperties = BaseClass.properties || {};
         const merged = { ...baseProperties };
+
+        // SECURITY FIX 2: Filter properties keys to prevent pollution during merge
         for (const key of Object.keys(properties)) {
+          if (PROTOTYPE_POLLUTION_KEYS.includes(key)) {
+            // Skip keys that can access the prototype chain
+            continue;
+          }
+
           const config = properties[key];
           if (config.type === "object" && config.properties)
             config.properties = merged[key]?.properties
@@ -188,9 +209,12 @@ class View extends HTMLElement {
     }
     const filteredPrototypeMethods = Object.fromEntries(
       Object.entries(prototypeMethods).filter(
+        // We already filtered dangerous keys from prototypeMethods above,
+        // but we retain the filter against properties key collision
         ([key]) => !Object.hasOwn(component.properties, key),
       ),
     );
+    // This Object.assign is now safe because prototypeMethods was sanitized (Fix 1)
     Object.assign(component.prototype, filteredPrototypeMethods);
 
     component.tag = tag;
