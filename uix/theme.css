@@ -1,9 +1,6 @@
-body {
-  font-family: var(--font-family);
-}
 html,
 body {
-  font-family: var(--theme-font-family);
+  font-family: var(--theme-font-family, var(--font-family));
   background-color: var(--background-color);
   color: var(--text-color);
   width: 100%;

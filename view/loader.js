@@ -79,6 +79,7 @@ const Loader = {
     if (cached?.definition) return cached.definition;
 
     const path = Loader.resolvePath(tag);
+    if (tag === "app-template") console.trace();
     const { default: definition } = await import(`${path}.js`);
 
     if (!definition)
@@ -167,7 +168,6 @@ const Loader = {
       const entry = View.components.get(tag) || {};
       entry.definition = definition;
       View.components.set(tag, entry);
-
       if (!Loader.settings.dev) {
         Loader.get(tag).catch((e) =>
           console.error(

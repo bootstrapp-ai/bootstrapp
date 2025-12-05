@@ -69,9 +69,11 @@ export function getScopedKey(base, prop, inst) {
  * @param {string} key - Property key
  * @param {*} val - New value
  */
-export function updateState(inst, key, val) {
-  inst.state[key] = val;
-  inst.requestUpdate(key, "$$");
+export function updateState(instance, key, val) {
+  const oldValue = instance.state[key];
+  instance.state[key] = val;
+  if (!instance.isConnected) return;
+  instance.requestUpdate(key, oldValue);
 }
 
 /**
@@ -175,9 +177,7 @@ export function cleanupSyncBindings(instance, Controller) {
   if (instance._listeners) {
     Object.entries(instance._listeners).forEach(([name, fns]) => {
       const adapter = Controller[name];
-      if (adapter) {
-        Object.entries(fns).forEach(([k, fn]) => adapter.off(k, fn));
-      }
+      if (adapter) Object.entries(fns).forEach(([k, fn]) => adapter.off(k, fn));
     });
   }
 

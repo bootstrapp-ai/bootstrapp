@@ -1,5 +1,6 @@
 import T from "@bootstrapp/types";
 import { html } from "lit-html";
+import { keyed } from "lit-html/directives/keyed.js";
 import { html as staticHTML, unsafeStatic } from "lit-html/static.js";
 import Router from "./index.js";
 
@@ -24,9 +25,12 @@ export default {
   render() {
     const { route, params } = this.currentRoute || {};
     return route
-      ? this.renderRoute(
-          typeof route === "function" ? { component: route } : route,
-          params,
+      ? keyed(
+          route.name ?? route.path,
+          this.renderRoute(
+            typeof route === "function" ? { component: route } : route,
+            params,
+          ),
         )
       : html`404: Page not found`;
   },

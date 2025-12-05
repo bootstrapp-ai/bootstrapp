@@ -1,11 +1,10 @@
 :where(.uix-icon) {
   display: inline-block;
   vertical-align: middle;
-
   /* Default size if none is specified (optional, defaulting to md) */
-  --_icon-size: calc(var(--spacing) * 4);
-  width: var(--_icon-size);
-  height: var(--_icon-size);
+  --icon-size: calc(var(--spacing, 0.25rem) * 4);
+  width: var(--icon-size);
+  height: var(--icon-size);
 
   svg {
     height: inherit;
@@ -41,27 +40,27 @@
   }
 
   &[size="xs"] {
-    --_icon-size: calc(var(--spacing-xs) * 3);
+    --icon-size: calc(var(--spacing, 0.25rem) * 3);
   }
   &[size="sm"] {
-    --_icon-size: calc(var(--spacing-xs) * 4);
+    --icon-size: calc(var(--spacing, 0.25rem) * 4);
   }
   &[size="md"] {
-    --_icon-size: calc(var(--spacing-xs) * 6);
+    --icon-size: calc(var(--spacing, 0.25rem) * 6);
   }
   &[size="lg"] {
-    --_icon-size: calc(var(--spacing-xs) * 10);
+    --icon-size: calc(var(--spacing, 0.25rem) * 10);
   }
   &[size="xl"] {
-    --_icon-size: calc(var(--spacing-xs) * 14);
+    --icon-size: calc(var(--spacing, 0.25rem) * 14);
   }
   &[size="2xl"] {
-    --_icon-size: calc(var(--spacing-xs) * 24);
+    --icon-size: calc(var(--spacing, 0.25rem) * 24);
   }
   &[size="3xl"] {
-    --_icon-size: calc(var(--spacing-xs) * 36);
+    --icon-size: calc(var(--spacing, 0.25rem) * 36);
   }
   &[size="4xl"] {
-    --_icon-size: calc(var(--spacing-xs) * 48);
+    --icon-size: calc(var(--spacing, 0.25rem) * 48);
   }
 }

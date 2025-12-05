@@ -355,14 +355,37 @@ const registerTheme = (name, loader) => {
   availableThemes[name] = loader;
 };
 
-const loadTheme = async (themeName) => {
-  if (!themeName) {
+/**
+ * APPLY: Apply a theme object directly (for theme generator preview)
+ */
+const applyTheme = (themeData) => {
+  const cssVars = generateThemeVariables(themeData);
+  injectThemeCSS(cssVars);
+
+  if (themeData?.font?.family) loadFont(themeData.font.family);
+};
+
+/**
+ * LOADER: Load a theme by name (string) or apply a theme object directly (object)
+ * @param {string|object} themeInput - The name of a registered theme or a theme object.
+ */
+const loadTheme = async (themeInput) => {
+  if (!themeInput) {
     const styleTag = document.getElementById("dynamic-theme-vars");
     if (styleTag) styleTag.remove();
     console.log("Theme removed.");
     return;
   }
 
+  // 1. If it's an object, apply it directly using the existing logic
+  if (typeof themeInput === "object" && themeInput !== null) {
+    applyTheme(themeInput);
+    console.log("Custom theme object applied successfully.");
+    return;
+  }
+
+  // 2. If it's a string, proceed with loading a registered theme
+  const themeName = themeInput;
   const themeLoader = availableThemes[themeName];
 
   if (!themeLoader) {
@@ -373,9 +396,9 @@ const loadTheme = async (themeName) => {
   try {
     const module = await themeLoader();
     const themeData = module.default || module;
-    const cssVars = generateThemeVariables(themeData);
-    injectThemeCSS(cssVars);
-    if (themeData?.font?.family) loadFont(themeData.font.family);
+
+    // Use applyTheme to reuse the core injection logic
+    applyTheme(themeData);
 
     console.log(`Theme "${themeName}" loaded successfully.`);
   } catch (error) {
@@ -383,20 +406,8 @@ const loadTheme = async (themeName) => {
   }
 };
 
-/**
- * APPLY: Apply a theme object directly (for theme generator preview)
- */
-const applyTheme = (themeData) => {
-  const cssVars = generateThemeVariables(themeData);
-  injectThemeCSS(cssVars);
-
-  // Load font if theme specifies one
-  if (themeData?.font?.family) {
-    loadFont(themeData.font.family);
-  }
-};
-
 // Register default themes
+// NOTE: These imports will need to be correctly resolved in your environment
 registerTheme("gruvbox-dark", () => import("./themes/gruvbox-dark.js"));
 registerTheme("gruvbox-light", () => import("./themes/gruvbox-light.js"));
 
@@ -410,7 +421,7 @@ export default {
 
   // Theme management
   registerTheme,
-  loadTheme,
+  loadTheme, // Refactored
   applyTheme,
   availableThemes,
   fetchCSS,

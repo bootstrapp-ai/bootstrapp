@@ -1,4 +1,5 @@
 :where(.uix-bottom-nav) {
+  --icon-size: 36px;
   /* Layout */
   display: flex;
   flex-direction: row;
@@ -56,7 +57,7 @@
 }
 
 /* Direct children (app-link, a, .nav-item, etc.) */
-.uix-bottom-nav > * {
+:where(.uix-bottom-nav) > * {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -88,22 +89,22 @@
 }
 
 /* Filled variant - active items get background */
-.uix-bottom-nav[variant="filled"] > *.active,
-.uix-bottom-nav[variant="filled"] > *[aria-current] {
+:where(.uix-bottom-nav[variant="filled"]) > *.active,
+:where(.uix-bottom-nav[variant="filled"]) > *[aria-current] {
   background: var(--bottom-nav-item-active-bg, var(--color-primary));
   color: var(--bottom-nav-item-active-color, white);
 }
 
 /* Icon styling */
-.uix-bottom-nav uix-icon,
-.uix-bottom-nav svg {
-  width: var(--bottom-nav-icon-size, 24px);
-  height: var(--bottom-nav-icon-size, 24px);
+:where(.uix-bottom-nav) uix-icon,
+:where(.uix-bottom-nav) svg {
+  width: var(--icon-size);
+  height: var(--icon-size);
   flex-shrink: 0;
 }
 
 /* Text/label styling */
-.uix-bottom-nav span {
+:where(.uix-bottom-nav) span {
   font-size: var(--bottom-nav-text-size, var(--font-size-xs, 0.75rem));
   font-weight: var(--bottom-nav-text-weight, 500);
   text-align: center;

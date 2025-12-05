@@ -16,6 +16,11 @@ function createEventHandler(target = {}, { getter = true } = {}) {
   target.listeners = listeners;
   target.hasListeners = (key) => listeners.has(key);
 
+  /**
+   * Registers an event listener.
+   * @param {string} key - The event key.
+   * @param {Function} callback - The listener function (can be async).
+   */
   target.on = (key, callback) => {
     if (!callback)
       return console.error(
@@ -25,13 +30,27 @@ function createEventHandler(target = {}, { getter = true } = {}) {
     listeners.get(key).add(callback);
   };
 
+  /**
+   * Registers multiple event listeners from an object.
+   * @param {Object<string, Function>} events - Key-value pairs of events and callbacks.
+   */
   target.set = (events) =>
     Object.entries(events).forEach(([key, callback]) =>
       target.on(key, callback),
     );
 
+  /**
+   * Gets all registered callbacks for a specific key.
+   * @param {string} key - The event key.
+   * @returns {Function[]} An array of callback functions.
+   */
   if (getter) target.get = (key) => [...(listeners.get(key) ?? [])];
 
+  /**
+   * Unregisters an event listener.
+   * @param {string} key - The event key.
+   * @param {Function} callback - The listener function to remove.
+   */
   target.off = (key, callback) => {
     const callbackSet = listeners.get(key);
     if (!callbackSet) return;
@@ -39,7 +58,14 @@ function createEventHandler(target = {}, { getter = true } = {}) {
     if (callbackSet.size === 0) listeners.delete(key);
   };
 
-  target.emit = (key, data) => {
+  /**
+   * Executes all listeners for a key and returns a Promise
+   * that resolves when all listeners (sync or async) have completed.
+   * @param {string} key - The event key.
+   * @param {*} data - The data to pass to the listeners.
+   * @returns {Promise<Array<*>>} A promise resolving to an array of results from the listeners.
+   */
+  target.emit = async (key, data) => {
     const results = [];
     listeners.get(key)?.forEach((callback) => {
       try {
@@ -48,7 +74,7 @@ function createEventHandler(target = {}, { getter = true } = {}) {
         console.error(`Error in listener for key "${key}":`, error);
       }
     });
-    return results;
+    return Promise.all(results);
   };
 
   return target;

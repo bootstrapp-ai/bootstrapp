@@ -7,8 +7,7 @@
 import T from "@bootstrapp/types";
 import { render } from "lit-html";
 
-// Global constant for security checks
-const PROTOTYPE_POLLUTION_KEYS = ["__proto__", "constructor", "prototype"];
+const SANITIZE_KEYS = ["__proto__", "constructor", "prototype"];
 
 export const settings = {};
 /**
@@ -88,7 +87,7 @@ class View extends HTMLElement {
     } = definition;
 
     // SECURITY FIX 1: Filter prototypeMethods to prevent pollution
-    for (const key of PROTOTYPE_POLLUTION_KEYS) {
+    for (const key of SANITIZE_KEYS) {
       if (Object.hasOwn(prototypeMethods, key)) {
         // In a real environment, you might log this attempt
         delete prototypeMethods[key];
@@ -144,7 +143,7 @@ class View extends HTMLElement {
 
         // SECURITY FIX 2: Filter properties keys to prevent pollution during merge
         for (const key of Object.keys(properties)) {
-          if (PROTOTYPE_POLLUTION_KEYS.includes(key)) {
+          if (SANITIZE_KEYS.includes(key)) {
             // Skip keys that can access the prototype chain
             continue;
           }
@@ -240,6 +239,7 @@ class View extends HTMLElement {
   }
 
   static define(tag, definition) {
+    if (tag === "app-template") console.error({ tag, definition });
     const component = View.createClass(tag, definition);
     if (!customElements.get(tag)) customElements.define(tag, component);
     return component;
