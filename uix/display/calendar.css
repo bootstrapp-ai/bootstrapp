@@ -1,0 +1,383 @@
+/* UIX Calendar Component Styles */
+/* Light DOM - targets host element and shadow DOM via ::part() */
+
+.uix-calendar {
+  display: block;
+  --calendar-border-width: 2px;
+  --calendar-border-color: black;
+  --calendar-border-radius: 0.75rem;
+  --calendar-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+  --calendar-shadow-sm: 2px 2px 0px 0px rgba(0, 0, 0, 1);
+  --calendar-today-bg: #fef3c7;
+  --calendar-today-border: #eab308;
+  --calendar-selected-bg: var(--color-accent, #f472b6);
+  --calendar-font-family: inherit;
+}
+
+/* View Toggle */
+.uix-calendar::part(view-toggle) {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.uix-calendar::part(toggle-btn) {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  font-weight: 900;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  border: 3px solid var(--calendar-border-color);
+  border-radius: var(--calendar-border-radius);
+  background: white;
+  box-shadow: 3px 3px 0px 0px rgba(0, 0, 0, 1);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.uix-calendar::part(toggle-btn):active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px 0px rgba(0, 0, 0, 1);
+}
+
+.uix-calendar::part(toggle-btn-active) {
+  background: var(--calendar-selected-bg);
+}
+
+/* Grid View Header */
+.uix-calendar::part(header) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.uix-calendar::part(nav-btn) {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: 3px solid var(--calendar-border-color);
+  border-radius: 0.5rem;
+  box-shadow: var(--calendar-shadow);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.uix-calendar::part(nav-btn):active {
+  transform: translate(2px, 2px);
+  box-shadow: var(--calendar-shadow-sm);
+}
+
+.uix-calendar::part(month-label) {
+  font-size: 1.125rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.uix-calendar::part(today-btn) {
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.5rem 1rem;
+  background: #f9a8d4;
+  border: 3px solid var(--calendar-border-color);
+  border-radius: var(--calendar-border-radius);
+  font-weight: 900;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  box-shadow: var(--calendar-shadow);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.uix-calendar::part(today-btn):active {
+  transform: translate(2px, 2px);
+  box-shadow: var(--calendar-shadow-sm);
+}
+
+/* Grid Container */
+.uix-calendar::part(grid) {
+  background: white;
+  border: 3px solid var(--calendar-border-color);
+  border-radius: var(--calendar-border-radius);
+  padding: 0.75rem;
+  box-shadow: 6px 6px 0px 0px rgba(0, 0, 0, 1);
+}
+
+.uix-calendar::part(weekday-header) {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.uix-calendar::part(weekday) {
+  text-align: center;
+  font-weight: 900;
+  font-size: 0.75rem;
+  color: #4b5563;
+}
+
+.uix-calendar::part(days-grid) {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.25rem;
+}
+
+/* Day Cells */
+.uix-calendar::part(day) {
+  aspect-ratio: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0.25rem;
+  border-radius: 0.5rem;
+  border: 2px solid #d1d5db;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.15s ease;
+}
+
+.uix-calendar::part(day):active {
+  transform: translate(1px, 1px);
+}
+
+.uix-calendar::part(day-today) {
+  background: var(--calendar-today-bg);
+  border-color: var(--calendar-today-border);
+  border-width: 3px;
+}
+
+.uix-calendar::part(day-selected) {
+  background: var(--calendar-selected-bg);
+  border-color: var(--calendar-border-color);
+  border-width: 3px;
+  box-shadow: var(--calendar-shadow-sm);
+}
+
+.uix-calendar::part(day-other-month) {
+  opacity: 0.4;
+}
+
+.uix-calendar::part(day-number) {
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-bottom: 0.125rem;
+}
+
+.uix-calendar::part(day-events) {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.uix-calendar::part(event) {
+  font-size: 9px;
+  line-height: 1.1;
+  font-weight: 700;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  border: 1px solid var(--calendar-border-color);
+  background: #e0e7ff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.uix-calendar::part(more-events) {
+  font-size: 8px;
+  font-weight: 700;
+  color: #4b5563;
+  padding: 0 0.25rem;
+}
+
+/* List View */
+.uix-calendar::part(list) {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.uix-calendar::part(list-section-title) {
+  font-size: 0.875rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #4b5563;
+  margin-bottom: 0.75rem;
+}
+
+.uix-calendar::part(list-item) {
+  display: flex;
+  gap: 1rem;
+  background: white;
+  border: 3px solid var(--calendar-border-color);
+  border-radius: var(--calendar-border-radius);
+  padding: 1rem;
+  box-shadow: var(--calendar-shadow);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.uix-calendar::part(list-item):hover {
+  transform: translate(2px, 2px);
+  box-shadow: var(--calendar-shadow-sm);
+}
+
+.uix-calendar::part(list-item-image) {
+  width: 5rem;
+  height: 5rem;
+  object-fit: cover;
+  border-radius: 0.5rem;
+  border: 2px solid var(--calendar-border-color);
+}
+
+.uix-calendar::part(list-item-title) {
+  font-weight: 900;
+  font-size: 0.875rem;
+  line-height: 1.25;
+}
+
+.uix-calendar::part(list-item-meta) {
+  font-size: 0.75rem;
+  color: #4b5563;
+  margin-top: 0.25rem;
+}
+
+.uix-calendar::part(recurring-badge) {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: #ddd6fe;
+  border: 1px solid var(--calendar-border-color);
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
+/* Day Panel */
+.uix-calendar::part(panel-overlay) {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 40;
+}
+
+.uix-calendar::part(panel) {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-top: 3px solid var(--calendar-border-color);
+  border-radius: 1rem 1rem 0 0;
+  z-index: 50;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.uix-calendar::part(panel-header) {
+  position: sticky;
+  top: 0;
+  background: white;
+  border-bottom: 2px solid var(--calendar-border-color);
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.uix-calendar::part(panel-title) {
+  font-weight: 900;
+  font-size: 1.125rem;
+}
+
+.uix-calendar::part(panel-close) {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--calendar-border-color);
+  border-radius: 0.5rem;
+  background: white;
+  cursor: pointer;
+}
+
+.uix-calendar::part(panel-close):hover {
+  background: #f3f4f6;
+}
+
+.uix-calendar::part(panel-content) {
+  padding: 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.uix-calendar::part(panel-item) {
+  display: flex;
+  gap: 0.75rem;
+  background: #f9fafb;
+  border: 2px solid var(--calendar-border-color);
+  border-radius: var(--calendar-border-radius);
+  padding: 0.75rem;
+  cursor: pointer;
+  box-shadow: 3px 3px 0px 0px rgba(0, 0, 0, 1);
+  transition: all 0.15s ease;
+}
+
+.uix-calendar::part(panel-item):hover {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+
+.uix-calendar::part(panel-item-image) {
+  width: 4rem;
+  height: 4rem;
+  object-fit: cover;
+  border-radius: 0.5rem;
+  border: 2px solid var(--calendar-border-color);
+}
+
+.uix-calendar::part(panel-item-title) {
+  font-weight: 700;
+  font-size: 0.875rem;
+  line-height: 1.25;
+}
+
+.uix-calendar::part(panel-item-meta) {
+  font-size: 0.75rem;
+  color: #4b5563;
+  margin-top: 0.25rem;
+}
+
+.uix-calendar::part(panel-empty) {
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #9ca3af;
+  padding: 2rem 0;
+}
+
+/* Empty State */
+.uix-calendar::part(empty) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 0;
+}
+
+.uix-calendar::part(empty) .empty-icon {
+  font-size: 3.75rem;
+  margin-bottom: 1rem;
+}
+
+.uix-calendar::part(empty) .empty-text {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #9ca3af;
+}

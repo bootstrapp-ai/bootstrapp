@@ -17,6 +17,7 @@ export default {
       "tabs",
       "tree",
       "tree-item",
+      "wizard",
     ],
     overlay: [
       "alert-dialog",
@@ -97,6 +98,7 @@ export default {
       "theme-toggle",
     ],
     form: [
+      "auth-form",
       "checkbox",
       "code",
       "file-upload",

@@ -1,0 +1,142 @@
+/* UIX Auth Form Component Styles */
+/* Neutral/minimal defaults - projects can customize via CSS custom properties */
+
+.uix-auth-form {
+  display: block;
+
+  /* Minimal defaults - projects override these */
+  --auth-border-width: 1px;
+  --auth-border-color: #e5e7eb;
+  --auth-border-radius: 0.5rem;
+  --auth-error-bg: #fef2f2;
+  --auth-error-border: #fca5a5;
+  --auth-error-text: #dc2626;
+  --auth-tab-bg: #f9fafb;
+  --auth-tab-active-bg: white;
+  --auth-font-weight: 600;
+  --auth-text-transform: none;
+  --auth-divider-color: #e5e7eb;
+  --auth-muted-text: #6b7280;
+}
+
+/* Tabs */
+.uix-auth-form .tabs {
+  display: flex;
+  border-bottom: var(--auth-border-width) solid var(--auth-border-color);
+}
+
+.uix-auth-form .tab {
+  flex: 1;
+  border-radius: 0;
+  font-weight: var(--auth-font-weight);
+  text-transform: var(--auth-text-transform);
+  font-size: 0.875rem;
+  background: var(--auth-tab-bg);
+  color: var(--auth-muted-text);
+}
+
+.uix-auth-form .tab:not(:first-child) {
+  border-left: var(--auth-border-width) solid var(--auth-border-color);
+}
+
+.uix-auth-form .tab.active {
+  background: var(--auth-tab-active-bg);
+  color: inherit;
+}
+
+/* Form */
+.uix-auth-form .auth-form {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Error Message */
+.uix-auth-form .error-message {
+  background: var(--auth-error-bg);
+  border: var(--auth-border-width) solid var(--auth-error-border);
+  border-radius: var(--auth-border-radius);
+  padding: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: var(--auth-font-weight);
+  color: var(--auth-error-text);
+}
+
+/* Field */
+.uix-auth-form .field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.uix-auth-form .label {
+  font-weight: var(--auth-font-weight);
+  font-size: 0.875rem;
+  text-transform: var(--auth-text-transform);
+}
+
+/* Submit Button */
+.uix-auth-form .submit-btn {
+  margin-top: 0.5rem;
+}
+
+/* OAuth Section */
+.uix-auth-form .oauth-section {
+  padding: 0 1.5rem;
+}
+
+.uix-auth-form .divider {
+  position: relative;
+  padding: 0.5rem 0;
+  text-align: center;
+}
+
+.uix-auth-form .divider::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--auth-divider-color);
+}
+
+.uix-auth-form .divider span {
+  position: relative;
+  padding: 0 0.75rem;
+  background: white;
+  font-weight: var(--auth-font-weight);
+  font-size: 0.75rem;
+  text-transform: var(--auth-text-transform);
+  color: var(--auth-muted-text);
+}
+
+.uix-auth-form .oauth-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.uix-auth-form .oauth-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.uix-auth-form .oauth-btn svg {
+  flex-shrink: 0;
+}
+
+/* Guest Section */
+.uix-auth-form .guest-section {
+  padding: 1rem 1.5rem 1.5rem;
+  text-align: center;
+}
+
+.uix-auth-form .guest-btn {
+  font-size: 0.875rem;
+  color: var(--auth-muted-text);
+}
