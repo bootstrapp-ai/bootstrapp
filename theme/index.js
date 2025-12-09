@@ -410,6 +410,7 @@ const loadTheme = async (themeInput) => {
 // NOTE: These imports will need to be correctly resolved in your environment
 registerTheme("gruvbox-dark", () => import("./themes/gruvbox-dark.js"));
 registerTheme("gruvbox-light", () => import("./themes/gruvbox-light.js"));
+registerTheme("nbs", () => import("./themes/nbs.js"));
 
 // Public API
 export default {

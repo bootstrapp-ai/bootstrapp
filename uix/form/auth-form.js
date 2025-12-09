@@ -29,9 +29,17 @@ export default {
     appleLabel: T.string("Continue with Apple"),
     guestLabel: T.string("Continue as Guest"),
 
+    // Password labels
+    passwordLabel: T.string("Password"),
+    passwordPlaceholder: T.string("Enter password"),
+    confirmPasswordLabel: T.string("Confirm Password"),
+    confirmPasswordPlaceholder: T.string("Re-enter password"),
+
     // State
     name: T.string(""),
     email: T.string(""),
+    password: T.string(""),
+    passwordConfirm: T.string(""),
     error: T.string(""),
     loading: T.boolean(false),
   },
@@ -64,10 +72,25 @@ export default {
       return;
     }
 
+    // Password validation
+    if (!this.password) {
+      this.error = "Please enter a password";
+      this.emit("auth-error", { message: this.error });
+      return;
+    }
+
+    if (this.password.length < 8) {
+      this.error = "Password must be at least 8 characters";
+      this.emit("auth-error", { message: this.error });
+      return;
+    }
+
     this.emit("auth-submit", {
       mode: this.mode,
       name: this.name,
       email: this.email,
+      password: this.password,
+      passwordConfirm: this.password, // Use password as confirmation
     });
   },
 
@@ -116,10 +139,11 @@ export default {
               <div class="field" part="field">
                 <label class="label" part="label">${this.nameLabel}</label>
                 <uix-input
+                  name="name"
                   type="text"
                   placeholder="${this.namePlaceholder}"
-                  .value=${this.name}                  
-                  @input=${(e) => (this.name = e.detail.value)}
+                  value=${this.name}                  
+                  @input=${(e) => ((this.name = e.target.value))}
                   @keypress=${this.handleKeyPress.bind(this)}
                   fullWidth
                 ></uix-input>
@@ -132,10 +156,24 @@ export default {
         <div class="field" part="field">
           <label class="label" part="label">${this.emailLabel}</label>
           <uix-input
+            name="email"
             type="email"
             placeholder="${this.emailPlaceholder}"
-            .value=${this.email}
-            @input=${(e) => (this.email = e.detail.value)}
+            value=${this.email}
+            @input=${(e) => (this.email = e.target.value)}
+            @keypress=${this.handleKeyPress.bind(this)}
+            fullWidth
+          ></uix-input>
+        </div>
+
+        <!-- Password Field -->
+        <div class="field" part="field">
+          <label class="label" part="label">${this.passwordLabel}</label>
+          <uix-input
+            type="password"
+            placeholder="${this.passwordPlaceholder}"
+            .value=${this.password}
+            @input=${(e) => (this.password = e.target.value)}
             @keypress=${this.handleKeyPress.bind(this)}
             fullWidth
           ></uix-input>
@@ -168,20 +206,15 @@ export default {
 
   renderTabs() {
     return html`
-      <div class="tabs" part="tabs">
-        <uix-button
-          class="tab ${this.mode === "login" ? "active" : ""}"
-          @click=${() => this.handleModeChange("login")}
-        >
-          ${this.loginLabel}
-        </uix-button>
-        <uix-button
-          class="tab ${this.mode === "register" ? "active" : ""}"
-          @click=${() => this.handleModeChange("register")}
-        >
-          ${this.registerLabel}
-        </uix-button>
-      </div>
+      <uix-tabs
+        class="auth-tabs"
+        part="tabs"
+        .activeTab=${this.mode === "login" ? 0 : 1}
+        @tab-change=${(e) => this.handleModeChange(e.detail === 0 ? "login" : "register")}
+      >
+        <button slot="tab" ?active=${this.mode === "login"}>${this.loginLabel}</button>
+        <button slot="tab" ?active=${this.mode === "register"}>${this.registerLabel}</button>
+      </uix-tabs>
     `;
   },
 
@@ -225,7 +258,7 @@ export default {
       <div class="guest-section" part="guest">
         <uix-button
           class="guest-btn"
-          ghost
+          w-full
           @click=${this.handleGuest.bind(this)}
         >
           ${this.guestLabel}
@@ -263,7 +296,7 @@ export default {
  * @part guest - Guest section container
  * @part guest-btn - Guest option button
  *
- * @fires auth-submit - When form is submitted. Detail: { mode, name, email }
+ * @fires auth-submit - When form is submitted. Detail: { mode, name, email, password, passwordConfirm }
  * @fires auth-oauth - When OAuth button clicked. Detail: { provider: "google" | "apple" }
  * @fires auth-guest - When guest option clicked
  * @fires auth-error - When validation error occurs. Detail: { message }

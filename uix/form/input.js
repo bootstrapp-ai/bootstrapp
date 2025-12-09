@@ -4,6 +4,7 @@ import { html } from "lit-html";
 export default {
   tag: "uix-input",
   properties: {
+    name: T.string(),
     value: T.string(""),
     placeholder: T.string(""),
     type: T.string({
@@ -36,6 +37,7 @@ export default {
   render() {
     return html`
       <input
+        name=${this.name}
         class="input"
         type=${this.type}
         .value=${this.value}

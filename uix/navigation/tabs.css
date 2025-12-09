@@ -3,6 +3,13 @@
   flex-direction: column;
   width: 100%;
 
+  /* Container styling */
+  --tabs-border-width: 0;
+  --tabs-border-color: transparent;
+  --tabs-border-radius: 0;
+  --tabs-shadow: none;
+
+  /* Tab list styling */
   --tabs-list-bg: transparent;
   --tabs-list-border-color: var(--color-surface-dark);
   --tab-text-hover: var(--color-primary-light);
@@ -15,6 +22,11 @@
   --tab-font-size: var(--typography-fontSize-sm, 0.875rem);
   --tab-font-weight: var(--typography-fontWeight-medium, 500);
   --tab-border-width: 2px;
+
+  /* Apply container styling */
+  border: var(--tabs-border-width) solid var(--tabs-border-color);
+  border-radius: var(--tabs-border-radius);
+  box-shadow: var(--tabs-shadow);
 }
 
 .uix-tabs::part(tab-list) {

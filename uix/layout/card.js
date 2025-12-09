@@ -30,7 +30,8 @@ export default {
   render() {
     return html`
       <slot name="header" part="header"></slot>
-      <slot part="body"></slot>
+      <slot part="body"><slot></slot></slot>
+      
       <slot part="footer" name="footer"></slot>
     `;
   },

@@ -6,7 +6,9 @@
   width: var(--button-width, fit-content);
   white-space: nowrap;
   box-sizing: border-box;
-
+  &::part(anchor) {
+    color: var(--button-color, var(--text-color, inherit));
+  }
   /* Typography */
   font-family: inherit;
   font-weight: var(--button-font-weight, 700);
@@ -24,11 +26,15 @@
   padding: var(--theme-spacing-sm, 0.5rem) var(--theme-spacing-md, 0.75rem);
   color: var(--button-color, #fff);
   cursor: pointer;
-  transition:
+  text-transform: var(--button-text-transform, none);
+  transition: var(
+    --button-transition,
     transform 0.1s ease-in-out,
     background-color 0.2s ease-in-out,
     border-color 0.2s ease-in-out,
-    color 0.2s ease-in-out;
+    box-shadow 0.15s ease-in-out,
+    color 0.2s ease-in-out
+  );
   background: transparent;
   user-select: none;
 
@@ -48,10 +54,6 @@
     outline-offset: 2px;
   }
 
-  &:not([disabled]):not([aria-disabled="true"]):active {
-    transform: scale(0.97);
-  }
-
   /* Generic Hover/Active (overridable by variants) */
   &:not([disabled]):not([aria-disabled="true"]):hover {
     background-color: var(
@@ -63,6 +65,11 @@
       var(--button-border-color, transparent)
     );
     color: var(--button-hover-color, var(--button-color));
+    box-shadow: var(--button-hover-shadow, var(--button-shadow, none));
+    transform: translate(
+      var(--button-hover-translate-x, 0),
+      var(--button-hover-translate-y, 0)
+    );
   }
 
   &:not([disabled]):not([aria-disabled="true"]):active {
@@ -70,6 +77,12 @@
       --button-active-background-color,
       var(--color-primary-darker)
     );
+    box-shadow: var(--button-active-shadow, var(--button-shadow, none));
+    transform: translate(
+        var(--button-active-translate-x, 0),
+        var(--button-active-translate-y, 0)
+      )
+      scale(0.97);
   }
 
   &[primary],
@@ -245,10 +258,11 @@
     --button-gap: 0.75rem;
   }
 
-  /* Full width */
-  &[w-full] {
+  /* Full width - support both wfull (JS property) and w-full */
+  &[w-full],
+  &[wfull] {
     width: 100%;
-    display: block;
+    display: flex;
   }
 }
 

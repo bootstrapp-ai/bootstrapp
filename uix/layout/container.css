@@ -47,7 +47,7 @@
 
   /* Variant: default */
   &[variant="default"] {
-    --container-bg: transparent;
+    --container-bg: inherit;
     --container-border-color: var(--color-surface-dark);
   }
 

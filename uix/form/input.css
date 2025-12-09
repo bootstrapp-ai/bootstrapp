@@ -5,21 +5,22 @@
 
 .uix-input {
   display: inline-block;
-  --input-border-radius: var(--radius-md, 0.375rem);
-  --input-border-width: 1px;
-  background: var(--input-bg, var(--color-primary));
-  border: var(--input-border-width) solid
-    var(--input-border, var(--color-input));
-  border-radius: var(--input-border-radius);
+
+  /* Use theme variables directly with fallbacks (don't re-declare) */
+  background: var(--input-bg, #ffffff);
+  border: var(--input-border-width, 1px) solid var(--input-border-color, #e5e7eb);
+  border-radius: var(--input-border-radius, var(--radius-md, 0.375rem));
+  box-shadow: var(--input-shadow, none);
+  transition: var(--input-transition, border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.15s ease);
 }
 
 /* Base input styles */
 .uix-input input {
   width: 100%;
-  height: 2.3rem;
-  padding: 0.4rem 0.75rem;
+  height: 3rem;
+  padding: 0.5rem 0.75rem;
   font-size: 0.9rem;
-  line-height: 1.5;
+  line-height: 2rem;
   font-family: inherit;
   color: var(--input-text, var(--color-primary));
   outline: none;
@@ -36,10 +37,13 @@
 }
 
 /* Focus state */
+.uix-input:focus-within {
+  box-shadow: var(--input-focus-shadow, 0 0 0 3px rgba(250, 189, 47, 0.1));
+}
+
 .uix-input input:focus {
   background: var(--input-bg-focus, var(--color-surface-darker));
   border-color: var(--input-border-focus, var(--color-primary));
-  box-shadow: 0 0 0 3px rgba(250, 189, 47, 0.1);
 }
 
 /* Disabled state */
@@ -74,10 +78,10 @@
 
 /* Size: md (default) */
 .uix-input[size="md"] input {
-  height: 2.3rem;
-  padding: 0.4rem 0.75rem;
+  height: 3rem;
+  padding: 0.5rem 0.75rem;
   font-size: 0.9rem;
-  line-height: 1.5rem;
+  line-height: 2rem;
 }
 
 /* Size: lg */
@@ -115,9 +119,12 @@
   border-color: var(--color-danger);
 }
 
+.uix-input[error]:focus-within {
+  --input-focus-shadow: 0 0 0 3px rgba(251, 73, 52, 0.1);
+}
+
 .uix-input[error] input:focus {
   border-color: var(--color-danger);
-  box-shadow: 0 0 0 3px rgba(251, 73, 52, 0.1);
 }
 
 /* Full width */
