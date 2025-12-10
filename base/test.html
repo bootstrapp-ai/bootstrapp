@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" style="width: 100%; height: 100%">
+<head>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "/app": "/node_modules/@bootstrapp/base/app.js",
+        "/app/": "/node_modules/@bootstrapp/base/",
+        "/app/types": "/node_modules/@bootstrapp/types/index.js",
+        "/app/controller": "/node_modules/@bootstrapp/base/controller/index.js",
+        "/app/model": "/node_modules/@bootstrapp/model/index.js",
+        "/app/model/": "/node_modules/@bootstrapp/model/",
+        "@bootstrapp/model": "/node_modules/@bootstrapp/model/index.js",
+        "@bootstrapp/model/": "/node_modules/@bootstrapp/model/",
+        "@bootstrapp/auth": "/node_modules/@bootstrapp/auth/index.js",
+        "@bootstrapp/auth/": "/node_modules/@bootstrapp/auth/",
+        "@bootstrapp/sw": "/node_modules/@bootstrapp/sw/index.js",
+        "@bootstrapp/sw/": "/node_modules/@bootstrapp/sw/",
+        "@bootstrapp/base": "/node_modules/@bootstrapp/base/index.js",
+        "/app/view": "/node_modules/@bootstrapp/base/view/index.js",
+        "/app/router": "/node_modules/@bootstrapp/base/router/index.js",        
+        "lit-html": "https://esm.sh/lit-html",
+        "lit-html/": "https://esm.sh/lit-html/"
+      }
+    }
+  </script>
+	<meta charset="utf-8" />
+	<title>Testing Environment</title>
+	<meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0" />
+	<meta name="view-transition" content="same-origin" />
+	<meta name="description" content="Bootstrapp" />
+	<meta name="mobile-web-app-capable" content="yes" />
+	<meta name="mobile-web-app-title" content="PWA Starter" />
+	<meta name="mobile-web-app-status-bar-style" content="black" />
+	<meta name="msapplication-TileColor" content="#da532c">
+	<meta name="theme-color" content="#ffffff">	
+	<script type="module">
+		import $APP from "/app";
+		import T from "/app/types";
+		import Testing from "/app/test/index.js";
+		import assert from "/app/test/assert.js";
+		import mock from "/app/test/mock.js";
+			const params = new URLSearchParams(location.search);
+			const run = params.get("run");
+			const suiteName = params.get("suiteName");
+			const filePath = params.get("filePath");
+			if (run === "suite") {
+				Testing.run(suiteName);
+			} else if (run === "file") {
+				Testing.runFile(filePath, suiteName);
+			} else if (run === "describe") {
+				Testing.runDescribe(filePath, suiteName);
+			}
+			window.$APP = $APP;
+			window.Testing = Testing;
+			window.assert = assert;
+			window.mock = mock;
+			window.T = T;		
+	</script>
+</head>
+<body>
+</body>
+</html>

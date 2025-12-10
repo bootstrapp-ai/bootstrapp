@@ -274,7 +274,7 @@ export default {
     // Called when element removed from DOM
   },
 
-  updated(changedProperties) {
+  updated({changedProps}) {
     // Called after properties change
   },
 
@@ -1104,13 +1104,13 @@ disconnected() {
   this.removeEventListener("click", this._clickHandler);
 }
 
-updated(changedProperties) {
+updated({changedProps}) {
   // Called after properties change
-  if (changedProperties.has("value")) {
+  if (changedProps.has("value")) {
     this.emit("value-changed", { value: this.value });
   }
 
-  if (changedProperties.has("height")) {
+  if (changedProps.has("height")) {
     this.style.setProperty("--component-height", this.height);
   }
 }
@@ -1395,13 +1395,13 @@ disconnected() {
 ### Pattern: CSS Variable Syncing
 
 ```javascript
-updated(changedProperties) {
+updated({changedProps}) {
   // Sync property to CSS variable for flexibility
-  if (changedProperties.has("height")) {
+  if (changedProps.has("height")) {
     this.style.setProperty("--component-height", this.height);
   }
 
-  if (changedProperties.has("width")) {
+  if (changedProps.has("width")) {
     this.style.setProperty("--component-width", this.width);
   }
 }
@@ -1424,8 +1424,8 @@ export default {
     this._internals.setFormValue(this.value);
   },
 
-  updated(changedProperties) {
-    if (changedProperties.has("value")) {
+  updated({changedProps}) {
+    if (changedProps.has("value")) {
       this._updateFormValue();
     }
   }

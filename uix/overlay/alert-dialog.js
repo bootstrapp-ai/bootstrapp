@@ -28,8 +28,8 @@ export default {
     }
   },
 
-  updated(changedProperties) {
-    if (changedProperties.has("open")) {
+  updated({ changedProps }) {
+    if (changedProps.has("open")) {
       if (this.open) {
         this.show();
       } else {

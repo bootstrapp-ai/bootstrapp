@@ -1,0 +1,40 @@
+{
+  "name": "@bootstrapp/model",
+  "version": "0.2.0",
+  "description": "ORM-like data layer with reactive arrays, proxy-based API, and subscription management",
+  "main": "./index.js",
+  "module": "./index.js",
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./frontend": "./frontend.js",
+    "./backend": "./backend.js",
+    "./subscription-manager": "./subscription-manager.js",
+    "./query-builder": "./query-builder.js",
+    "./row-utils": "./row-utils.js",
+    "./factory": "./factory.js"
+  },
+  "keywords": [
+    "orm",
+    "model",
+    "data-layer",
+    "reactive",
+    "proxy",
+    "subscriptions",
+    "bootstrapp"
+  ],
+  "author": "Alan Leal",
+  "license": "AGPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bootstrapp-ai/bootstrapp.git",
+    "directory": "public/model"
+  },
+  "homepage": "https://github.com/bootstrapp-ai/bootstrapp#readme",
+  "bugs": {
+    "url": "https://github.com/bootstrapp-ai/bootstrapp/issues"
+  },
+  "dependencies": {
+    "@bootstrapp/events": "^0.2.0"
+  }
+}

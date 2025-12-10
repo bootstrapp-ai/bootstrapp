@@ -1,0 +1,37 @@
+{
+  "name": "@bootstrapp/sw",
+  "version": "0.2.0",
+  "description": "Service Worker module with caching, messaging, and filesystem API",
+  "main": "./index.js",
+  "module": "./index.js",
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./frontend": "./frontend.js",
+    "./backend": "./backend.js",
+    "./adapter": "./adapter.js",
+    "./filesystem": "./filesystem.js"
+  },
+  "keywords": [
+    "service-worker",
+    "sw",
+    "cache",
+    "offline",
+    "filesystem",
+    "bootstrapp"
+  ],
+  "author": "Alan Leal",
+  "license": "AGPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bootstrapp-ai/bootstrapp.git",
+    "directory": "public/sw"
+  },
+  "homepage": "https://github.com/bootstrapp-ai/bootstrapp#readme",
+  "bugs": {
+    "url": "https://github.com/bootstrapp-ai/bootstrapp/issues"
+  },
+  "dependencies": {
+    "@bootstrapp/events": "^0.2.0"
+  }
+}

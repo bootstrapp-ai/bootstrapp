@@ -482,10 +482,10 @@ export default {
     this.setCursorPosition(this.cursor);
   },
 
-  updated(changedProperties) {
+  updated({ changedProps }) {
     if (
       this.view &&
-      changedProperties.has("content") &&
+      changedProps.has("content") &&
       !this.isUpdatingFromOutside
     ) {
       const currentDoc = this.view.state.doc.toString();
@@ -507,7 +507,7 @@ export default {
 
     if (
       this.view &&
-      changedProperties.has("cursor") &&
+      changedProps.has("cursor") &&
       !this.isUpdatingFromOutside
     ) {
       const currentCursor = this.view.state.selection.main.head;

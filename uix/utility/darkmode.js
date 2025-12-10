@@ -17,7 +17,7 @@ export default {
     this.darkmode = !this.darkmode;
     this.icon = this.darkmode ? "sun" : "moon";
   },
-  willUpdate(changedProps) {
+  willUpdate({ changedProps }) {
     if (changedProps.has("darkmode"))
       document.documentElement.classList.toggle("dark");
   },

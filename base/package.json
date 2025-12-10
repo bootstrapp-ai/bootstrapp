@@ -1,0 +1,50 @@
+{
+  "name": "@bootstrapp/base",
+  "version": "0.2.0",
+  "description": "Bootstrapp MVC Framework - app shell and meta package",
+  "main": "./index.js",
+  "module": "./index.js",
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./app": "./app.js",
+    "./frontend": "./frontend.js",
+    "./backend": "./backend.js",
+    "./config": "./config.js",
+    "./apploader": "./apploader.js",
+    "./bootstrapp": "./bootstrapp.js",
+    "./backend/backend": "./backend/backend.js",
+    "./backend/frontend": "./backend/frontend.js",
+    "./app/*": "./app/*",
+    "./test/*": "./test/*"
+  },
+  "keywords": [
+    "bootstrapp",
+    "framework",
+    "web-components",
+    "pocketbase",
+    "offline-first"
+  ],
+  "author": "Alan Leal",
+  "license": "AGPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bootstrapp-ai/bootstrapp.git",
+    "directory": "public/base"
+  },
+  "homepage": "https://github.com/bootstrapp-ai/bootstrapp#readme",
+  "bugs": {
+    "url": "https://github.com/bootstrapp-ai/bootstrapp/issues"
+  },
+  "dependencies": {
+    "@bootstrapp/types": "^0.2.0",
+    "@bootstrapp/events": "^0.2.0",
+    "@bootstrapp/view": "^0.2.0",
+    "@bootstrapp/router": "^0.1.0",
+    "@bootstrapp/controller": "^0.2.0",
+    "@bootstrapp/theme": "^0.2.0",
+    "@bootstrapp/model": "^0.2.0",
+    "@bootstrapp/auth": "^0.2.0",
+    "@bootstrapp/sw": "^0.2.0"
+  }
+}

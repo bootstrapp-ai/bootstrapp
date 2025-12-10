@@ -111,9 +111,9 @@ View.define('my-component', {
   // Lifecycle hooks
   connected() {},
   disconnected() {},
-  willUpdate(changedProps) {},
-  firstUpdated(changedProps) {},
-  updated(changedProps) {},
+  willUpdate({changedProps}) {},
+  firstUpdated({changedProps}) {},
+  updated({changedProps}) {},
 
   // Custom methods
   render() {

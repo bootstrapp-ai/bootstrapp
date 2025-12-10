@@ -1,0 +1,41 @@
+{
+  "name": "@bootstrapp/model-hybrid",
+  "version": "0.2.0",
+  "description": "Hybrid database adapter combining IndexedDB + PocketBase for offline-first architecture",
+  "main": "./index.js",
+  "module": "./index.js",
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./adapter": "./adapter.js"
+  },
+  "keywords": [
+    "hybrid",
+    "offline-first",
+    "database",
+    "adapter",
+    "indexeddb",
+    "pocketbase",
+    "sync",
+    "bootstrapp"
+  ],
+  "author": "Alan Leal",
+  "license": "AGPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bootstrapp-ai/bootstrapp.git",
+    "directory": "public/model-hybrid"
+  },
+  "homepage": "https://github.com/bootstrapp-ai/bootstrapp#readme",
+  "bugs": {
+    "url": "https://github.com/bootstrapp-ai/bootstrapp/issues"
+  },
+  "dependencies": {
+    "@bootstrapp/model": "^0.2.0",
+    "@bootstrapp/model-indexeddb": "^0.2.0",
+    "@bootstrapp/model-pocketbase": "^0.2.0"
+  },
+  "peerDependencies": {
+    "pocketbase": "^0.21.0"
+  }
+}

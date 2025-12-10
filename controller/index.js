@@ -77,6 +77,9 @@ Controller.installViewPlugin = (View, options = {}) => {
             }
           });
       },
+      willUpdate: ({ instance, component, changedProps }) => {
+        syncUtils.checkDependsOn(instance, component, changedProps);
+      },
     },
   });
 };
@@ -88,6 +91,7 @@ export { createController, createSync };
 export {
   bindAdapterSync,
   bindCustomSync,
+  checkDependsOn,
   cleanupSyncBindings,
   getScopedKey,
   getSyncInfo,

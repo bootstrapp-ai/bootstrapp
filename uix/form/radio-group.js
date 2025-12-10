@@ -33,15 +33,15 @@ export default {
     this._syncRadios();
   },
 
-  updated(changedProperties) {
-    if (changedProperties.has("value") || changedProperties.has("name")) {
+  updated({ changedProps }) {
+    if (changedProps.has("value") || changedProps.has("name")) {
       this._syncRadios();
       this._updateFormValue();
     }
     if (
-      changedProperties.has("size") ||
-      changedProperties.has("variant") ||
-      changedProperties.has("disabled")
+      changedProps.has("size") ||
+      changedProps.has("variant") ||
+      changedProps.has("disabled")
     ) {
       this._syncRadios();
     }

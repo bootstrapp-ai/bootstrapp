@@ -41,8 +41,8 @@ export default {
       link.addEventListener("click", this.close.bind(this));
     });
   },
-  updated(changedProperties) {
-    if (changedProperties.has("open") && this.dialog) {
+  updated({ changedProps }) {
+    if (changedProps.has("open") && this.dialog) {
       if (this.open && !this.dialog.open) {
         this.showModal();
       } else if (!this.open && this.dialog.open) {

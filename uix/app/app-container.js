@@ -74,9 +74,9 @@ export default {
     }
   },
 
-  updated(changedProperties) {
+  updated({ changedProps }) {
     // Sync height property to CSS variable for flexibility
-    if (changedProperties.has("height")) {
+    if (changedProps.has("height")) {
       this.style.setProperty("--app-container-height", this.height);
     }
   },

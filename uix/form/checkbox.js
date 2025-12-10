@@ -30,12 +30,12 @@ export default {
     this._updateFormValue();
   },
 
-  updated(changedProperties) {
-    if (changedProperties.has("checked")) {
+  updated({ changedProps }) {
+    if (changedProps.has("checked")) {
       this._updateFormValue();
     }
     // Handle indeterminate state
-    if (changedProperties.has("indeterminate")) {
+    if (changedProps.has("indeterminate")) {
       const input =
         this.shadowRoot?.querySelector("input") || this.querySelector("input");
       if (input) {

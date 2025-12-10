@@ -41,8 +41,8 @@ export default {
       }
     }
   },
-  willUpdate(changedProperties) {
-    if (changedProperties.has("name")) this.getIcon(this.name);
+  willUpdate({ changedProps }) {
+    if (changedProps.has("name")) this.getIcon(this.name);
   },
   connected() {
     this.getIcon(this.name);

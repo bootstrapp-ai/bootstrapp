@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script type="importmap">
+			{
+       "imports": {
+          "/app/": "/node_modules/@bootstrapp/",
+          "/app": "/node_modules/@bootstrapp/base/app.js",
+          "/app/": "/node_modules/@bootstrapp/base/",
+          "/app/types": "https://esm.sh/@bootstrapp/types",
+          "/app/controller": "/node_modules/@bootstrapp/base/controller/index.js",
+          "/app/model": "/node_modules/@bootstrapp/model/index.js",
+          "/app/model/": "/node_modules/@bootstrapp/model/",
+          "@bootstrapp/model": "/node_modules/@bootstrapp/model/index.js",
+          "@bootstrapp/model/": "/node_modules/@bootstrapp/model/",
+          "@bootstrapp/auth": "/node_modules/@bootstrapp/auth/index.js",
+          "@bootstrapp/auth/": "/node_modules/@bootstrapp/auth/",
+          "@bootstrapp/sw": "/node_modules/@bootstrapp/sw/index.js",
+          "@bootstrapp/sw/": "/node_modules/@bootstrapp/sw/",
+          "@bootstrapp/base": "/node_modules/@bootstrapp/base/index.js",
+          "/app/view": "/node_modules/@bootstrapp/base/view/index.js",
+          "/app/view/loader": "/node_modules/@bootstrapp/view/loader.js",
+          "/app/router": "/node_modules/@bootstrapp/base/router/index.js",
+          "@bootstrapp/icon-lucide": "/icon-lucide/index.js",
+          "@bootstrapp/icon-lucide/": "/icon-lucide/",
+          "lit-html": "https://esm.sh/lit-html",
+          "lit-html/": "https://esm.sh/lit-html",
+          "@modelcontextprotocol/sdk/": "https://cdn.jsdelivr.net/npm/@modelcontextprotocol/sdk@1.18.1/dist/esm/",
+          "zod": "https://esm.sh/zod@3.23.8",
+          "eventsource-parser/stream": "https://esm.sh/eventsource-parser/stream",
+          "pkce-challenge": "https://esm.sh/pkce-challenge",
+          "zod-to-json-schema": "https://esm.sh/zod-to-json-schema@3.24.5",          
+          "ajv": "https://esm.sh/ajv@6.12.6"
+        }
+			}
+	</script>
+	<script src="/bootstrapp.js" type="module"></script>
+  <meta charset="utf-8" />
+  <title>Boostrapp</title>
+  <base href="/" />
+  <meta name="viewport"
+    content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
+  <meta name="description" content="This is a Brazuka app" />
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#181818" />
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f3f3f3" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-title" content="Brazuka" />
+  <meta name="mobile-web-app-status-bar-style" content="black" />
+  <link id="favicon" rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLW1vdW50YWluIj48cGF0aCBkPSJtOCAzIDQgOCA1LTUgNSAxNUgyTDggM3oiLz48L3N2Zz4="/>
+  <link rel="manifest" href="manifest.json" /> 
+</head>
+<body>
+  <app-container></app-container>
+</body>
+</html>

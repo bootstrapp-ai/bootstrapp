@@ -30,7 +30,8 @@ function loadModelTypeAsync({ instance, key, prop, syncObj, updateState }) {
         prop.type === "array"
           ? await syncObj.getAll(query)
           : await syncObj.get(query);
-      val.subscribe((v) => updateState(instance, key, v));
+      console.log({ val, query, syncObj, prop });
+      if (val) val.subscribe((v) => updateState(instance, key, v));
     } catch (e) {
       console.error(`Sync error ${key}:`, e);
     }

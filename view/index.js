@@ -419,13 +419,25 @@ class View extends HTMLElement {
 
     if (this.hasUpdated && !forceUpdate && !this.shouldUpdate(changedProps))
       return;
-    this.emit("willUpdate", changedProps);
+    this.emit("willUpdate", {
+      changedProps,
+      instance: this,
+      component: this.constructor,
+    });
     this.update(changedProps);
     if (!this.hasUpdated) {
       this.hasUpdated = true;
-      this.emit("firstUpdated", changedProps);
+      this.emit("firstUpdated", {
+        changedProps,
+        instance: this,
+        component: this.constructor,
+      });
     }
-    this.emit("updated", changedProps);
+    this.emit("updated", {
+      changedProps,
+      instance: this,
+      component: this.constructor,
+    });
     this._changedProps = new Map();
   }
 

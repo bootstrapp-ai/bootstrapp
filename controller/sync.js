@@ -103,6 +103,8 @@ export function syncUrl(adapter) {
  */
 export function bindCustomSync({ instance, key, prop, syncObj, onAsyncLoad }) {
   instance._customSyncUnsubscribers ||= [];
+  instance._syncReloaders ||= {};
+
   Object.defineProperty(instance, key, {
     get: () => instance.state[key],
     set: (v) => {
@@ -111,15 +113,50 @@ export function bindCustomSync({ instance, key, prop, syncObj, onAsyncLoad }) {
       if (!prop.query && v !== syncObj.get(key)) syncObj.set(key, v);
     },
   });
-  if (onAsyncLoad && prop.query)
+
+  if (onAsyncLoad && prop.query) {
+    // Store reloader function for dependsOn support
+    if (prop.dependsOn) {
+      instance._syncReloaders[key] = () => {
+        // Cleanup old subscription for this key
+        const oldUnsubIdx = instance._customSyncUnsubscribers.findIndex(
+          (fn) => fn._syncKey === key
+        );
+        if (oldUnsubIdx > -1) {
+          instance._customSyncUnsubscribers[oldUnsubIdx]();
+          instance._customSyncUnsubscribers.splice(oldUnsubIdx, 1);
+        }
+        // Re-run async load with new query values
+        onAsyncLoad({ instance, key, prop, syncObj, updateState });
+      };
+    }
     onAsyncLoad({ instance, key, prop, syncObj, updateState });
-  else {
+  } else {
     const val = syncObj.get(key);
     instance._customSyncUnsubscribers.push(
       syncObj.subscribe(key, (v) => updateState(instance, key, v)),
     );
     updateState(instance, key, val ?? prop.defaultValue);
   }
+}
+
+/**
+ * Check if any dependency properties have changed and re-run queries
+ * @param {Object} instance - Component instance
+ * @param {Object} component - Component definition
+ * @param {Map} changedProps - Map of changed property names
+ */
+export function checkDependsOn(instance, component, changedProps) {
+  if (!instance._syncReloaders) return;
+
+  Object.entries(component.properties || {})
+    .filter(([, p]) => p.sync && p.dependsOn)
+    .forEach(([key, prop]) => {
+      const depsChanged = prop.dependsOn.some((dep) => changedProps.has(dep));
+      if (depsChanged && instance._syncReloaders[key]) {
+        instance._syncReloaders[key]();
+      }
+    });
 }
 
 /**

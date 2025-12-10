@@ -24,8 +24,8 @@ export default {
     this.selectedTheme = this.currentTheme || this.themes[0] || "";
   },
 
-  updated(changedProperties) {
-    if (changedProperties.has("currentTheme")) {
+  updated({ changedProps }) {
+    if (changedProps.has("currentTheme")) {
       this.selectedTheme = this.currentTheme;
     }
   },
