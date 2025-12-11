@@ -209,6 +209,36 @@ export function initSWBackend(app, appConfig = {}) {
   self.addEventListener("fetch", (event) => {
     const url = new URL(event.request.url);
 
+    // Handle /npm/ requests - proxy to esm.sh
+    if (url.origin === self.location.origin && url.pathname.startsWith("/npm/")) {
+      event.respondWith(
+        (async () => {
+          // Convert /npm/lit-html to https://esm.sh/lit-html
+          const packagePath = url.pathname.slice(5); // Remove "/npm/"
+          const esmUrl = `https://esm.sh/${packagePath}${url.search}`;
+
+          // Check CDN cache first
+          const cdnCache = await fsCache.open("cdn");
+          const cacheKey = new Request(esmUrl);
+          const cachedResponse = await cdnCache.match(cacheKey);
+          if (cachedResponse) return cachedResponse;
+
+          // Fetch from esm.sh
+          try {
+            const networkResponse = await fetch(esmUrl);
+            if (networkResponse.ok) {
+              cdnCache.put(cacheKey, networkResponse.clone());
+            }
+            return networkResponse;
+          } catch (error) {
+            console.error("SW: ESM.sh fetch failed:", error);
+            return new Response("Network error", { status: 503 });
+          }
+        })()
+      );
+      return;
+    }
+
     // Handle CDN requests
     if (ALLOWED_HOSTNAMES.includes(url.hostname)) {
       event.respondWith(
