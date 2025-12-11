@@ -5,21 +5,15 @@
   <script type="importmap">
     {
       "imports": {
-        "/app": "/node_modules/@bootstrapp/base/app.js",
-        "/app/": "/node_modules/@bootstrapp/base/",
-        "/app/types": "/node_modules/@bootstrapp/types/index.js",
-        "/app/controller": "/node_modules/@bootstrapp/base/controller/index.js",
-        "/app/model": "/node_modules/@bootstrapp/model/index.js",
-        "/app/model/": "/node_modules/@bootstrapp/model/",
+        "@bootstrapp/base": "/node_modules/@bootstrapp/base/index.js",
+        "@bootstrapp/base/": "/node_modules/@bootstrapp/base/",
+        "@bootstrapp/types": "/node_modules/@bootstrapp/types/index.js",
         "@bootstrapp/model": "/node_modules/@bootstrapp/model/index.js",
         "@bootstrapp/model/": "/node_modules/@bootstrapp/model/",
         "@bootstrapp/auth": "/node_modules/@bootstrapp/auth/index.js",
         "@bootstrapp/auth/": "/node_modules/@bootstrapp/auth/",
         "@bootstrapp/sw": "/node_modules/@bootstrapp/sw/index.js",
         "@bootstrapp/sw/": "/node_modules/@bootstrapp/sw/",
-        "@bootstrapp/base": "/node_modules/@bootstrapp/base/index.js",
-        "/app/view": "/node_modules/@bootstrapp/base/view/index.js",
-        "/app/router": "/node_modules/@bootstrapp/base/router/index.js",        
         "lit-html": "https://esm.sh/lit-html",
         "lit-html/": "https://esm.sh/lit-html/"
       }
@@ -36,11 +30,11 @@
 	<meta name="msapplication-TileColor" content="#da532c">
 	<meta name="theme-color" content="#ffffff">	
 	<script type="module">
-		import $APP from "/app";
-		import T from "/app/types";
-		import Testing from "/app/test/index.js";
-		import assert from "/app/test/assert.js";
-		import mock from "/app/test/mock.js";
+		import $APP from "@bootstrapp/base/app.js";
+		import T from "@bootstrapp/types";
+		import Testing from "@bootstrapp/base/test/index.js";
+		import assert from "@bootstrapp/base/test/assert.js";
+		import mock from "@bootstrapp/base/test/mock.js";
 			const params = new URLSearchParams(location.search);
 			const run = params.get("run");
 			const suiteName = params.get("suiteName");

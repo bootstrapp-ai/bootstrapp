@@ -1,12 +1,12 @@
 import { html } from "lit-html";
-import $APP from "/app";
+import $APP from "@bootstrapp/base/app.js";
 
-import "/app/apploader.js";
+import "@bootstrapp/base/apploader.js";
 import Controller from "@bootstrapp/controller";
 import { initSWFrontend } from "@bootstrapp/sw/frontend.js";
 import View, { settings } from "@bootstrapp/view";
 import Loader from "@bootstrapp/view/loader.js";
-import T from "/app/types";
+import T from "@bootstrapp/types";
 
 // Initialize SW frontend with $APP injection
 initSWFrontend($APP);
@@ -17,8 +17,8 @@ import { ModelType } from "@bootstrapp/model";
 import { initModelFrontend } from "@bootstrapp/model/frontend.js";
 import Router from "@bootstrapp/router";
 import initRouterApp from "@bootstrapp/router/app.js";
-import Backend from "/app/backend/frontend.js";
-import "/app/app/index.js";
+import Backend from "@bootstrapp/base/backend/frontend.js";
+import "@bootstrapp/base/app/index.js";
 
 // Initialize model frontend with $APP injection
 initModelFrontend($APP);

@@ -260,19 +260,6 @@ Controller.local.on('cart', (cart) => {
 });
 ```
 
-## Migration from /app/controller
-
-```javascript
-// Old
-import Controller from '/app/controller';
-
-// New
-import Controller from '@bootstrapp/controller';
-
-// Integration (if using with Bootstrapp)
-import initControllerApp from '@bootstrapp/controller/app';
-```
-
 ## TypeScript
 
 ```typescript

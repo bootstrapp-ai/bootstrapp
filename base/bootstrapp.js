@@ -1,5 +1,5 @@
-import $APP from "/app";
-import config from "/app/config.js";
+import $APP from "@bootstrapp/base/app.js";
+import config from "@bootstrapp/base/config.js";
 
 try {
   if (!("serviceWorker" in navigator))

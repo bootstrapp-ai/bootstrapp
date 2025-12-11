@@ -3,7 +3,7 @@
  * @description Bridges the $APP framework events to the Core Loader.
  */
 
-import Loader from "/app/view/loader";
+import Loader from "@bootstrapp/view/loader.js";
 import $APP from "./app.js";
 
 /**

@@ -5,8 +5,8 @@
  */
 
 import Router from "@bootstrapp/router";
+import T from "@bootstrapp/types";
 import { html } from "lit-html";
-import T from "/app/types";
 
 export default {
   tag: "uix-link",
