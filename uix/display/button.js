@@ -17,7 +17,7 @@ export default {
     }),
     wFull: T.boolean(false),
   },
-  extends: "app-link",
+  extends: "uix-link",
   style: true,
 };
 
@@ -29,7 +29,7 @@ export default {
  * @tag uix-button
  *
  * A flexible button component for user actions. Supports multiple variants,
- * sizes, icons, and states. Extends app-link for navigation functionality.
+ * sizes, icons, and states. Extends uix-link for navigation functionality.
  *
  * @example Basic Button
  * ```html

@@ -32,6 +32,7 @@ export default {
     display: [
       "avatar",
       "badge",
+      "link",
       "button",
       "calendar",
       "circle",

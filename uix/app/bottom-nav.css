@@ -56,7 +56,7 @@
   }
 }
 
-/* Direct children (app-link, a, .nav-item, etc.) */
+/* Direct children (uix-link, a, .nav-item, etc.) */
 :where(.uix-bottom-nav) > * {
   display: flex;
   flex-direction: column;

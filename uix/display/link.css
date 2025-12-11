@@ -1,0 +1,46 @@
+:where(.uix-link),
+:where(uix-link) {
+  --direction: row;
+  --justify-content: center;
+
+  font-weight: var(--uix-link-font-weight, var(--font-weight, 600));
+  width: var(--uix-link-width, auto);
+  color: var(--uix-link-text-color, var(--text-color, inherit));
+  cursor: pointer;
+  display: inline-block;
+  &::part(anchor) {
+    width: 100%;
+    text-decoration: none;
+    padding: var(--theme-spacing-sm, 0.5rem) var(--theme-spacing-md, 0.75rem);
+    display: inline-flex;
+    gap: var(--theme-spacing-xs, 0.25rem);
+    color: var(--text-color, inherit);
+    font-size: var(--font-size, 0.875rem);
+    font-weight: var(--font-weight, 600);
+    line-height: var(--line-height, 1);
+    flex-direction: var(--direction);
+    justify-content: var(--justify-content);
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.9;
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+
+    &[disabled],
+    &[aria-disabled="true"] {
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    &[disabled],
+    &[aria-disabled="true"] {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  }
+}

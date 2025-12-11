@@ -173,7 +173,7 @@ export default {
         return;
       }
 
-      // Check if click is on the shadow host (uix-button/app-link)
+      // Check if click is on the shadow host (uix-button/uix-link)
       const shadowHost = this._triggerElement.getRootNode()?.host;
       if (
         shadowHost &&
