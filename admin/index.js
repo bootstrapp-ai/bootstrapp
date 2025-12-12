@@ -1,91 +1,103 @@
-import "/$app/admin/cms/index.js";
-import "/$app/admin/project/index.js";
-import "/$app/bundler/index.js";
-import { html } from "/npm/lit-html";
 import $APP from "/$app.js";
+import { html } from "/npm/lit-html";
 
+// Register admin module
 $APP.addModule({
   name: "admin",
-  path: "apps/admin/views",
+  path: "/$app/admin/views",
+  settings: {
+    appbar: {
+      label: "Admin",
+      icon: "shield",
+    },
+  },
 });
 
+// Admin routes
 const routes = {
+  // Dashboard
   "/admin": {
-    component: () => html`<cms-ui directory="admin/cms"></cms-ui>`,
-    title: "Admin",
-    template: "admin-template",
+    name: "admin-dashboard",
+    component: () => html`<admin-dashboard></admin-dashboard>`,
+    title: "Admin Dashboard",
+    template: "admin-layout",
   },
+
+  // Model CRUD
+  "/admin/models/:model": {
+    name: "admin-model-list",
+    component: ({ model }) => html`
+      <admin-model-list
+        model=${model}
+        .data-query=${{ model, key: "rows" }}
+      ></admin-model-list>
+    `,
+    title: "Admin - Models",
+    template: "admin-layout",
+  },
+
+  "/admin/models/:model/:id": {
+    name: "admin-model-detail",
+    component: ({ model, id }) => html`
+      <admin-model-list
+        model=${model}
+        selectedId=${id}
+        .data-query=${{ model, key: "rows" }}
+      ></admin-model-list>
+    `,
+    title: "Admin - Edit",
+    template: "admin-layout",
+  },
+
+  // Deploy
+  "/admin/deploy": {
+    name: "admin-deploy",
+    component: () => html`<admin-deploy></admin-deploy>`,
+    title: "Admin - Deploy",
+    template: "admin-layout",
+  },
+
+  // Theme
+  "/admin/theme": {
+    name: "admin-theme",
+    component: () => html`<admin-theme></admin-theme>`,
+    title: "Admin - Theme",
+    template: "admin-layout",
+  },
+
+  // Legacy CMS routes (for backward compatibility)
   "/admin/cms": {
-    component: () => html`<cms-ui directory="admin/cms"></cms-ui>`,
-    title: "Data",
-    template: "admin-template",
-  },
-  "/admin/ide": {
-    component: () =>
-      html`<ide-ui full directory="/projects" hasProject></ide-ui>`,
-    title: "IDE",
-    template: "admin-template",
-  },
-  "/admin/bundler": {
-    component: () => html`<bundler-ui></bundler-ui>`,
-    title: "Bundler",
-    template: "admin-template",
-  },
-  "/admin/project": {
-    component: () =>
-      html`<cms-crud
-							view="board"
-							class="p-8"
-							.data-query=${{ model: "tasks", key: "rows" }} 
-							.allowedActions=${["import", "export", "changeViewMode", "changeColumns"]}></cms-crud>`,
-    title: "Data",
-    template: "admin-template",
-  },
-  "/admin/design": {
-    component: () => html`<design-ui></design-ui>`,
-    title: "Design",
-    template: "admin-template",
-  },
-  "/admin/design/:component": {
-    component: ({ component }) =>
-      html`<design-ui component=${component}></design-ui>`,
-    title: "Component Design",
-    template: "admin-template",
-  },
-  "/admin/cms/:model": {
-    component: ({ model }) =>
-      html`<cms-ui directory="admin/cms" model=${model}></cms-ui>`,
+    component: () => html`<admin-dashboard></admin-dashboard>`,
     title: "Admin",
-    template: "admin-template",
+    template: "admin-layout",
   },
+
+  "/admin/cms/:model": {
+    component: ({ model }) => html`
+      <admin-model-list
+        model=${model}
+        .data-query=${{ model, key: "rows" }}
+      ></admin-model-list>
+    `,
+    title: "Admin",
+    template: "admin-layout",
+  },
+
   "/admin/cms/:model/:id": {
     name: "cms_item",
-    component: ({ model, id }) =>
-      html`<cms-ui directory="admin/cms" model=${model} selectedId=${id}></cms-ui>`,
+    component: ({ model, id }) => html`
+      <admin-model-list
+        model=${model}
+        selectedId=${id}
+        .data-query=${{ model, key: "rows" }}
+      ></admin-model-list>
+    `,
     title: "Admin",
-    template: "admin-template",
-  },
-  "/admin/mcp": {
-    component: () => html`<mcp-inspector></mcp-inspector>`,
-    title: "MCP Inspector",
-    template: "admin-template",
-  },
-  "/admin/mcp-dev": {
-    component: () => html`<mcp-dev></mcp-dev>`,
-    title: "Chat",
-    template: "admin-template",
-  },
-  "/admin/mcp-chat": {
-    component: () => html`<mcp-chat></mcp-chat>`,
-    title: "Chat",
-    template: "admin-template",
-  },
-  "/admin/chat": {
-    component: () =>
-      html`<app-chat class="flex-1 flex h-screen bg-gray-100 font-sans"></app-chat>`,
-    title: "Data",
-    template: "admin-template",
+    template: "admin-layout",
   },
 };
 
+// Register routes
 $APP.routes.set(routes);
+
+export default routes;
