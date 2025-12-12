@@ -12,7 +12,8 @@
     "./subscription-manager": "./subscription-manager.js",
     "./query-builder": "./query-builder.js",
     "./row-utils": "./row-utils.js",
-    "./factory": "./factory.js"
+    "./factory": "./factory.js",
+    "./adapter-base": "./adapter-base.js"
   },
   "keywords": [
     "orm",

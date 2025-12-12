@@ -1,7 +1,7 @@
-import T from "/node_modules/@bootstrapp/types/index.js";
+import T from "/$app/types/index.js";
 import { html } from "/npm/lit-html";
-import View from "/node_modules/@bootstrapp/view/index.js";
-import AI from "/node_modules/@bootstrapp/ai/index.js";
+import View from "/$app/view/index.js";
+import AI from "/$app/ai/index.js";
 
 $APP.define("mcp-history-view", {
   properties: {

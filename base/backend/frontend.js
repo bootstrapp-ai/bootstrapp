@@ -1,7 +1,7 @@
-import $APP from "/node_modules/@bootstrapp/base/app.js";
-import Model from "/node_modules/@bootstrapp/model/index.js";
-import T from "/node_modules/@bootstrapp/types/index.js";
-import View from "/node_modules/@bootstrapp/view/index.js";
+import $APP from "/$app.js";
+import Model from "/$app/model/index.js";
+import T from "/$app/types/index.js";
+import View from "/$app/view/index.js";
 
 let appWorker;
 let wwPort;

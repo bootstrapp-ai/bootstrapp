@@ -3,8 +3,8 @@
  * @description Exports auth module with runtime-aware initialization
  */
 
-export { AuthSession, createAuth, initAuthFrontend } from "./frontend.js";
 export { createAuthEventHandlers, initAuthBackend } from "./backend.js";
+export { AuthSession, createAuth, initAuthFrontend } from "./frontend.js";
 
 /**
  * Initialize auth module based on runtime environment

@@ -5,7 +5,7 @@
 
 export default {
   name: "icon-lucide",
-  path: "/node_modules/@bootstrapp/icon-lucide",
+  path: "/$app/icon-lucide",
   icon: true,
   family: "lucide",
   iconCount: 1533,

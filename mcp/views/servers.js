@@ -1,7 +1,7 @@
-import T from "/node_modules/@bootstrapp/types/index.js";
+import T from "/$app/types/index.js";
 import { html } from "/npm/lit-html";
 import { unsafeHTML } from "/npm/lit-html/directives/unsafe-html.js";
-import AI from "/node_modules/@bootstrapp/ai/index.js";
+import AI from "/$app/ai/index.js";
 
 const starIcon = (isFilled = false) => html`
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="${isFilled ? "var(--color-primary)" : "none"}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="${isFilled ? "text-primary" : "text-default/60"}">

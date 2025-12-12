@@ -1,5 +1,5 @@
 import { html } from "/npm/lit-html";
-import Controller from "/node_modules/@bootstrapp/controller/index.js";
+import Controller from "/$app/controller/index.js";
 export default {
   tag: "admin-content",
 

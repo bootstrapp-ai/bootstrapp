@@ -10,32 +10,32 @@
  *   import { View } from "@bootstrapp/view";
  */
 
-export { initAuthBackend } from "/node_modules/@bootstrapp/auth/backend.js";
+export { initAuthBackend } from "/$app/auth/backend.js";
 // Auth - Authentication
-export { initAuthFrontend } from "/node_modules/@bootstrapp/auth/frontend.js";
+export { initAuthFrontend } from "/$app/auth/frontend.js";
 // Controller - Reactive state management
-export { Controller, createController } from "/node_modules/@bootstrapp/controller/index.js";
+export { Controller, createController } from "/$app/controller/index.js";
 // Events - Pub/sub event system
-export { default as createEventHandler } from "/node_modules/@bootstrapp/events/index.js";
+export { default as createEventHandler } from "/$app/events/index.js";
 // Model - ORM-like data layer
-export { createModel, default as Model, ModelType } from "/node_modules/@bootstrapp/model/index.js";
-export { initModelBackend } from "/node_modules/@bootstrapp/model/backend.js";
-export { initModelFrontend } from "/node_modules/@bootstrapp/model/frontend.js";
+export { createModel, default as Model, ModelType } from "/$app/model/index.js";
+export { initModelBackend } from "/$app/model/backend.js";
+export { initModelFrontend } from "/$app/model/frontend.js";
 // Router - Client-side routing
-export { default as Router } from "/node_modules/@bootstrapp/router/index.js";
+export { default as Router } from "/$app/router/index.js";
 // Service Worker - Caching and filesystem
 export {
   createFSHandlers,
   initSWBackend,
   initSWFrontend,
   SWAdapter,
-} from "/node_modules/@bootstrapp/sw/index.js";
+} from "/$app/sw/index.js";
 // Theme - CSS variables and theming
-export { createTheme, Theme } from "/node_modules/@bootstrapp/theme/index.js";
+export { createTheme, Theme } from "/$app/theme/index.js";
 // Types - Schema definitions for models and component properties
-export { default as T } from "/node_modules/@bootstrapp/types/index.js";
+export { default as T } from "/$app/types/index.js";
 // View - Web Components base class
-export { define, View } from "/node_modules/@bootstrapp/view/index.js";
+export { define, View } from "/$app/view/index.js";
 
 /**
  * Initialize all frontend modules

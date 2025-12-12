@@ -1,7 +1,6 @@
 import T from "@bootstrapp/types";
+import $APP from "/$app.js";
 import { html } from "/npm/lit-html";
-import $APP from "@bootstrapp/base/app.js";
-import View from "@bootstrapp/view";
 import Bundler from "./index.js";
 
 $APP.define("credentials-manager", {

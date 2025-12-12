@@ -1,5 +1,5 @@
-import Model from "/node_modules/@bootstrapp/model/index.js";
-import $APP from "/node_modules/@bootstrapp/base/app.js";
+import Model from "/$app/model/index.js";
+import $APP from "/$app.js";
 
 $APP.events.set({
 	"P2P:LOAD_DATA_OP": async ({ payload }) => {

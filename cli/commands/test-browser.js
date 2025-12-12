@@ -10,7 +10,7 @@ import puppeteer from "puppeteer";
  */
 export async function runBrowserTests(adapter, options = {}) {
   const {
-    testUrl = "http://localhost:1315/node_modules/@bootstrapp/base/test.html",
+    testUrl = "http://localhost:1315/$app/base/test.html",
     testFiles = [],
     suite = null,
     headless = true,

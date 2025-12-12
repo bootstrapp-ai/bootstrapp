@@ -282,7 +282,7 @@ export default h;
  *
  * // You can nest native html\`...\` templates inside `h` calls
  *
- * import { html } from "/node_modules/@bootstrapp/base/view/html/index.js";
+ * import { html } from "/$app/base/view/html/index.js";
  *
  * h.div(
  * h.h1("Hiccup Title"),

@@ -1,7 +1,7 @@
-import T from "/node_modules/@bootstrapp/types/index.js";
+import T from "/$app/types/index.js";
 import { html } from "/npm/lit-html";
-import Model from "/node_modules/@bootstrapp/model/index.js";
-import AI from "/node_modules/@bootstrapp/ai/index.js";
+import Model from "/$app/model/index.js";
+import AI from "/$app/ai/index.js";
 
 export default {
   class: "h-full flex flex-col bg-surface-light",
@@ -23,7 +23,7 @@ export default {
     }),
     command: T.string({
       sync: "local",
-      defaultValue: "/node_modules/@bootstrapp/mcp/templates/servers/basic.js",
+      defaultValue: "/$app/mcp/templates/servers/basic.js",
     }),
     args: T.string({ sync: "local" }),
   },

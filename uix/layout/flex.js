@@ -4,7 +4,7 @@
  * No shadow DOM - host element is the flex container
  */
 
-import T from "/node_modules/@bootstrapp/types/index.js";
+import T from "/$app/types/index.js";
 
 export default {
   style: true,

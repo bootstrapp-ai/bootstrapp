@@ -1,4 +1,4 @@
-import Github from "/node_modules/@bootstrapp/github/index.js";
+import Github from "/$app/github/index.js";
 
 export const migration = true;
 

@@ -3,7 +3,7 @@ import { ifDefined } from "/npm/lit-html/directives/if-defined.js";
 const inputTypes = { string: "text" };
 let uniqueIdCounter = 0;
 
-import T from "/node_modules/@bootstrapp/types/index.js";
+import T from "/$app/types/index.js";
 import { html } from "/npm/lit-html";
 export default {
   tag: "uix-form-input",

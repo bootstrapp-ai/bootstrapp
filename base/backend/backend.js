@@ -1,29 +1,26 @@
-import { initAuthBackend } from "/node_modules/@bootstrapp/auth/backend.js";
-import { initModelBackend } from "/node_modules/@bootstrapp/model/backend.js";
-import {
-  createDatabase,
-  registerAdapter,
-} from "/node_modules/@bootstrapp/model/factory.js";
+import { initAuthBackend } from "/$app/auth/backend.js";
+import config from "/$app/base/config.js";
+import { initModelBackend } from "/$app/model/backend.js";
+import { createDatabase, registerAdapter } from "/$app/model/factory.js";
 import {
   buildQueryResult,
   matchesWhere,
   validateQueryOptions,
-} from "/node_modules/@bootstrapp/model/query-builder.js";
+} from "/$app/model/query-builder.js";
 import {
   generateId,
   mergeRowUpdates,
   prepareRow,
   validateRow,
-} from "/node_modules/@bootstrapp/model/row-utils.js";
-import { SubscriptionManager } from "/node_modules/@bootstrapp/model/subscription-manager.js";
-import { IndexedDBAdapter } from "/node_modules/@bootstrapp/model-indexeddb/adapter.js";
+} from "/$app/model/row-utils.js";
+import { SubscriptionManager } from "/$app/model/subscription-manager.js";
+import { IndexedDBAdapter } from "/$app/model-indexeddb/adapter.js";
 import {
   loadRelationships,
   loadRelationshipsForMany,
-} from "/node_modules/@bootstrapp/model-pocketbase/relationship-loader.js";
-import T from "/node_modules/@bootstrapp/types/index.js";
-import $APP from "../app.js";
-import config from "../config.js";
+} from "/$app/model-pocketbase/relationship-loader.js";
+import T from "/$app/types/index.js";
+import $APP from "/$app.js";
 
 // Register IndexedDB adapter with injected dependencies
 registerAdapter(
@@ -387,5 +384,10 @@ if ($APP.settings.runtime === "worker") {
   };
   $APP.addModule({ name: "Backend", base: Backend });
 }
+
+$APP.events.on("APP:INIT", async () => {
+  console.info("Initializing backend application");
+  await Backend.bootstrap();
+});
 
 export default Backend;

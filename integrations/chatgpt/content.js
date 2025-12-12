@@ -1,7 +1,7 @@
-import Model from "/node_modules/@bootstrapp/model/index.js";
-import T from "/node_modules/@bootstrapp/types/index.js";
+import Model from "/$app/model/index.js";
+import T from "/$app/types/index.js";
 import { html } from "/npm/lit-html";
-import Controller from "/node_modules/@bootstrapp/controller/index.js";
+import Controller from "/$app/controller/index.js";
 export default {
   tag: "chatgpt-content",
 

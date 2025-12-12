@@ -1,29 +1,28 @@
+import $APP from "/$app.js";
 import { html } from "/npm/lit-html";
-import $APP from "/node_modules/@bootstrapp/base/app.js";
 
-import "/node_modules/@bootstrapp/base/apploader.js";
-import Controller from "/node_modules/@bootstrapp/controller/index.js";
-import { initSWFrontend } from "/node_modules/@bootstrapp/sw/frontend.js";
-import View, { settings } from "/node_modules/@bootstrapp/view/index.js";
-import Loader from "/node_modules/@bootstrapp/view/loader.js";
-import T from "/node_modules/@bootstrapp/types/index.js";
+import "/$app/base/apploader.js";
+import Controller from "/$app/controller/index.js";
+import { initSWFrontend } from "/$app/sw/frontend.js";
+import T from "/$app/types/index.js";
+import View, { settings } from "/$app/view/index.js";
+import Loader from "/$app/view/loader.js";
 
 // Initialize SW frontend with $APP injection
 initSWFrontend($APP);
-import initControllerApp, {
-  registerModelType,
-} from "/node_modules/@bootstrapp/controller/app.js";
-import { ModelType } from "/node_modules/@bootstrapp/model/index.js";
-import { initModelFrontend } from "/node_modules/@bootstrapp/model/frontend.js";
-import Router from "/node_modules/@bootstrapp/router/index.js";
-import initRouterApp from "/node_modules/@bootstrapp/router/app.js";
-import Backend from "/node_modules/@bootstrapp/base/backend/frontend.js";
-import "/node_modules/@bootstrapp/base/app/index.js";
+
+import Backend from "/$app/base/backend/frontend.js";
+import initControllerApp, { registerModelType } from "/$app/controller/app.js";
+import { initModelFrontend } from "/$app/model/frontend.js";
+import { ModelType } from "/$app/model/index.js";
+import initRouterApp from "/$app/router/app.js";
+import Router from "/$app/router/index.js";
+import "/$app/base/app/index.js";
 
 // Initialize model frontend with $APP injection
 initModelFrontend($APP);
 import "/frontend.js";
-settings.iconFontFamily = `/node_modules/@bootstrapp/icon-${$APP.theme.font.icon.family}/${$APP.theme.font.icon.family}`;
+settings.iconFontFamily = `/$app/icon-${$APP.theme.font.icon.family}/${$APP.theme.font.icon.family}`;
 Controller.add("backend", Backend);
 registerModelType(ModelType);
 initControllerApp($APP, Controller, View);

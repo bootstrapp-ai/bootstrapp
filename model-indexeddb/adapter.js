@@ -3,7 +3,7 @@
  * @description IndexedDB adapter implementing the database interface
  */
 
-import { DatabaseAdapterBase } from "./base.js";
+import { DatabaseAdapterBase } from "/$app/model/adapter-base.js";
 import { SystemModelManager } from "./system-model-manager.js";
 
 /**

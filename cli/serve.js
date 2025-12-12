@@ -216,6 +216,29 @@ const createRequestHandler = (
     const urlWithoutQuery = req.url.split("?")[0];
     const urlHasExtension = adapter.extname(urlWithoutQuery) !== "";
 
+    // Handle /$app.js shortcut -> /node_modules/@bootstrapp/base/app.js
+    if (safeSuffix === "/$app.js" || safeSuffix.startsWith("/$app.js?")) {
+      const filePath = adapter.join(projectDir, "node_modules/@bootstrapp/base/app.js");
+      if (await adapter.exists(filePath)) {
+        serveFile(filePath, res, true);
+        return;
+      }
+    }
+
+    // Handle /$app/ shortcut -> /node_modules/@bootstrapp/
+    if (safeSuffix.startsWith("/$app/")) {
+      const packagePath = safeSuffix.slice(6); // Remove "/$app/"
+      const filePath = adapter.join(projectDir, "node_modules/@bootstrapp/", packagePath.split("?")[0]);
+      if (await adapter.exists(filePath)) {
+        serveFile(filePath, res, urlHasExtension);
+        return;
+      } else {
+        res.writeHead(404);
+        res.end("404 Not Found: /$app/" + packagePath);
+        return;
+      }
+    }
+
     const requestPath = safeSuffix === "/" ? "index.html" : safeSuffix;
     const requestPathWithoutQuery = requestPath.split("?")[0];
     const filePath = adapter.join(projectDir, requestPathWithoutQuery);

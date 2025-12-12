@@ -8,7 +8,6 @@
   "exports": {
     ".": "./index.js",
     "./adapter": "./adapter.js",
-    "./base": "./base.js",
     "./system-model-manager": "./system-model-manager.js"
   },
   "keywords": [

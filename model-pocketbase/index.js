@@ -4,7 +4,7 @@
  */
 
 export { PocketBaseAdapter, default } from "./adapter.js";
-export { DatabaseAdapterBase, validateAdapter } from "./base.js";
+export { DatabaseAdapterBase, validateAdapter } from "/$app/model/adapter-base.js";
 export { AuthManager } from "./auth-manager.js";
 export { RealtimeManager } from "./realtime-manager.js";
 export { buildFilterString, validateWhereClause } from "./filter-builder.js";

@@ -1,9 +1,9 @@
-import Theme from "/node_modules/@bootstrapp/theme/index.js";
+import Theme from "/$app/theme/index.js";
 import { html } from "/npm/lit-html";
-import $APP from "/node_modules/@bootstrapp/base/app.js";
+import $APP from "/$app.js";
 import UIX from "./index.js";
 
 $APP.routes.set({ "/showcase": () => html`<uix-showcase></uix-showcase>` });
-Theme.loadCSS("/node_modules/@bootstrapp/uix/theme.css", true);
+Theme.loadCSS("/$app/uix/theme.css", true);
 
 $APP.addModule(UIX);

@@ -1,6 +1,6 @@
 export default {
   name: "uix",
-  path: "/node_modules/@bootstrapp",
+  path: "/$app",
   root: true,
   i18n: {
     pt: () => import("./locales/pt.js"),

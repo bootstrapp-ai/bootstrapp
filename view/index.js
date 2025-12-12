@@ -4,7 +4,7 @@
  * with lit-html for templating.
  */
 
-import T from "/node_modules/@bootstrapp/types/index.js";
+import T from "/$app/types/index.js";
 import { render } from "/npm/lit-html";
 
 const SANITIZE_KEYS = ["__proto__", "constructor", "prototype"];

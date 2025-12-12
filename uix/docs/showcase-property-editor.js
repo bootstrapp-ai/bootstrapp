@@ -3,9 +3,9 @@
  * Interactive controls to modify component properties in real-time
  */
 
-import T from "/node_modules/@bootstrapp/types/index.js";
+import T from "/$app/types/index.js";
 import { html } from "/npm/lit-html";
-import View from "/node_modules/@bootstrapp/view/index.js";
+import View from "/$app/view/index.js";
 
 const ShowcasePropertyEditorDefinition = {
   tag: "uix-showcase-property-editor",

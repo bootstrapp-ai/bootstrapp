@@ -1,17 +1,11 @@
-import $APP from "../../app.js";
+import $APP from "/$app.js";
 
 if ($APP.settings.runtime === "worker") {
-  let STARTED;
   const bootstrap = async () => {
     console.log("bootstrap() called");
     const APP = await $APP.bootstrap({
       backend: true,
     });
-
-    if (APP && !STARTED) {
-      console.info("Initializing backend application");
-      await $APP.Backend.bootstrap(APP);
-    }
     return APP;
   };
 

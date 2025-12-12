@@ -1,4 +1,4 @@
-import $APP from "/node_modules/@bootstrapp/base/app.js";
+import $APP from "/$app.js";
 export default {
 	tag: "app-dev-only",
 

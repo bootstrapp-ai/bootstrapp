@@ -4,7 +4,7 @@
  * Supports nested routes, dynamic parameters, query strings, and history management
  */
 
-import Controller from "/node_modules/@bootstrapp/controller/index.js";
+import Controller from "/$app/controller/index.js";
 import { createBrowserAdapter } from "./adapters.js";
 import { createRouterCore } from "./core.js";
 

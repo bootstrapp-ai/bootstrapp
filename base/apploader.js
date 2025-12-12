@@ -3,8 +3,8 @@
  * @description Bridges the $APP framework events to the Core Loader.
  */
 
-import Loader from "/node_modules/@bootstrapp/view/loader.js";
-import $APP from "./app.js";
+import Loader from "/$app/view/loader.js";
+import $APP from "/$app.js";
 
 /**
  * Initialize Loader with App settings and start DOM observation

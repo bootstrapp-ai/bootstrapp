@@ -1,8 +1,8 @@
 import { html } from "/npm/lit-html";
-import Model from "/node_modules/@bootstrapp/model/index.js";
-import T from "/node_modules/@bootstrapp/types/index.js";
+import Model from "/$app/model/index.js";
+import T from "/$app/types/index.js";
 import IDE from "/controllers/ide.js";
-import AI from "/node_modules/@bootstrapp/ai/index.js";
+import AI from "/$app/ai/index.js";
 
 export default {
   properties: {

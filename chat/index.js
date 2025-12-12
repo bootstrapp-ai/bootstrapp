@@ -1,9 +1,9 @@
-import $APP from "/node_modules/@bootstrapp/base/app.js";
-import T from "/node_modules/@bootstrapp/types/index.js";
+import $APP from "/$app.js";
+import T from "/$app/types/index.js";
 
 $APP.addModule({
   name: "chat",
-  path: "/node_modules/@bootstrapp/chat/views",
+  path: "/$app/chat/views",
   root: true,
 });
 

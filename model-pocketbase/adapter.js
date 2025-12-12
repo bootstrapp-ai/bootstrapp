@@ -3,7 +3,7 @@
  * @description PocketBase adapter implementing the database interface
  */
 
-import { DatabaseAdapterBase } from "./base.js";
+import { DatabaseAdapterBase } from "/$app/model/adapter-base.js";
 import { AuthManager } from "./auth-manager.js";
 import { buildFilterString } from "./filter-builder.js";
 import { RealtimeManager } from "./realtime-manager.js";

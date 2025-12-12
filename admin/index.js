@@ -1,8 +1,8 @@
-import "/node_modules/@bootstrapp/admin/cms/index.js";
-import "/node_modules/@bootstrapp/admin/project/index.js";
-import "/node_modules/@bootstrapp/bundler/index.js";
+import "/$app/admin/cms/index.js";
+import "/$app/admin/project/index.js";
+import "/$app/bundler/index.js";
 import { html } from "/npm/lit-html";
-import $APP from "/node_modules/@bootstrapp/base/app.js";
+import $APP from "/$app.js";
 
 $APP.addModule({
   name: "admin",

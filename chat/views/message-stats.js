@@ -1,6 +1,6 @@
 import { html } from "/npm/lit-html";
-import Model from "/node_modules/@bootstrapp/model/index.js";
-import T from "/node_modules/@bootstrapp/types/index.js";
+import Model from "/$app/model/index.js";
+import T from "/$app/types/index.js";
 
 const getChatId = (uri) => uri.substring(7);
 

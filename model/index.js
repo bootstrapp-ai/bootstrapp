@@ -3,7 +3,7 @@
  * @description Provides a proxy-based model API with automatic CRUD operations,
  * dynamic finders, relationships, and reactive data synchronization
  */
-import createEventHandler from "/node_modules/@bootstrapp/events/index.js";
+import createEventHandler from "/$app/events/index.js";
 
 export class ModelType {}
 

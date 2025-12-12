@@ -1,4 +1,4 @@
-import $APP from "/node_modules/@bootstrapp/base/app.js";
+import $APP from "/$app.js";
 import chatPlugin from "./plugins/chat.js";
 import conversationsPlugin from "./plugins/conversations.js";
 import clientsPlugin from "./plugins/core/clients.js";

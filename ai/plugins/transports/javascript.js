@@ -1,6 +1,6 @@
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import $APP from "/node_modules/@bootstrapp/base/app.js";
+import $APP from "/$app.js";
 
 export default {
 	name: "transport:javascript",

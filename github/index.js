@@ -1,4 +1,4 @@
-import $APP from "/node_modules/@bootstrapp/base/app.js";
+import $APP from "/$app.js";
 
 const GITHUB_API_URL = "https://api.github.com";
 const GITHUB_GRAPHQL_URL = "https://api.github.com/graphql";

@@ -1,4 +1,4 @@
-import $APP from "../app.js";
+import $APP from "/$app.js";
 
 const mock = {
   fn: (implementation) => {

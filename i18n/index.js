@@ -2,8 +2,8 @@
  * i18n Module
  * Provides internationalization support for Bootstrapp apps
  */
-import Controller from "/node_modules/@bootstrapp/controller/index.js";
-import View from "/node_modules/@bootstrapp/view/index.js";
+import Controller from "/$app/controller/index.js";
+import View from "/$app/view/index.js";
 import { I18n } from "./base.js";
 import i18nViewPlugin from "./view-plugin.js";
 

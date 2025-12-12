@@ -1,4 +1,4 @@
-import $APP from "../app.js";
+import $APP from "/$app.js";
 import config from "../config.js";
 import assert from "./assert.js";
 import mock from "./assert.js";

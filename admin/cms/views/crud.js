@@ -1,8 +1,8 @@
-import Router from "/node_modules/@bootstrapp/router/index.js";
-import T from "/node_modules/@bootstrapp/types/index.js";
+import Router from "/$app/router/index.js";
+import T from "/$app/types/index.js";
 import { html } from "/npm/lit-html";
 import { keyed } from "/npm/lit-html/directives/keyed.js";
-import $APP from "/node_modules/@bootstrapp/base/app.js";
+import $APP from "/$app.js";
 
 const getModelName = (name) => {
   if (!name) return name;

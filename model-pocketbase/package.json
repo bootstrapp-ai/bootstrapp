@@ -8,7 +8,6 @@
   "exports": {
     ".": "./index.js",
     "./adapter": "./adapter.js",
-    "./base": "./base.js",
     "./filter-builder": "./filter-builder.js",
     "./realtime-manager": "./realtime-manager.js",
     "./auth-manager": "./auth-manager.js",

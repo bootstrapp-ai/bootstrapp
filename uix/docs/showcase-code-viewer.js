@@ -3,8 +3,8 @@
  * Displays code examples with syntax highlighting
  */
 
-import T from "/node_modules/@bootstrapp/types/index.js";
-import View from "/node_modules/@bootstrapp/view/index.js";
+import T from "/$app/types/index.js";
+import View from "/$app/view/index.js";
 import { html } from "/npm/lit-html";
 
 const ShowcaseCodeViewerDefinition = {
@@ -46,10 +46,10 @@ const ShowcaseCodeViewerDefinition = {
   generateImportCode() {
     if (!this.category || !this.name) return "";
 
-    return `import "/node_modules/@bootstrapp/uix/app.js";
+    return `import "/$app/uix/app.js";
 
 // Component auto-loaded from:
-// /node_modules/@bootstrapp/uix/${this.category}/${this.name}.js`;
+// /$app/uix/${this.category}/${this.name}.js`;
   },
 
   async copyToClipboard(text, type) {

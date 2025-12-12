@@ -1,5 +1,5 @@
-import Model from "/node_modules/@bootstrapp/model/index.js";
-import T from "/node_modules/@bootstrapp/types/index.js";
+import Model from "/$app/model/index.js";
+import T from "/$app/types/index.js";
 
 if (self.chrome) {
   (async () => {

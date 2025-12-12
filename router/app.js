@@ -30,7 +30,7 @@ export function initRouterApp($APP, Router, Controller = null) {
   // Register as framework module
   $APP.addModule({
     name: "router",
-    path: "/node_modules/@bootstrapp/router",
+    path: "/$app/router",
     exports: Router,
   });
 

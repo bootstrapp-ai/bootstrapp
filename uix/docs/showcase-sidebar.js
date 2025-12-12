@@ -3,9 +3,9 @@
  * Navigation for component categories and components using UIX components
  */
 
-import T from "/node_modules/@bootstrapp/types/index.js";
+import T from "/$app/types/index.js";
 import { html } from "/npm/lit-html";
-import View from "/node_modules/@bootstrapp/view/index.js";
+import View from "/$app/view/index.js";
 
 const resources = [
   { id: "installation", label: "Installation", icon: "download" },

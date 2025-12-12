@@ -1,4 +1,4 @@
-import createEventHandler from "/node_modules/@bootstrapp/events/index.js";
+import createEventHandler from "/$app/events/index.js";
 
 const runtime = (() => {
   if (
@@ -165,15 +165,14 @@ const prototypeAPP = {
       this.settings.set(key, value);
     if (!backend && theme) this.theme.set(theme);
     try {
-      await import(backend ? "./backend/backend.js" : "./frontend.js");
       await import("/index.js");
-      console.error("APP INIT");
+      await import(
+        backend ? "/$app/base/backend/backend.js" : "/$app/base/frontend.js"
+      );
       await this.events.emit("APP:INIT");
-      console.error("AFTER APP INIT");
     } catch (error) {
       console.warn(error);
     }
-    if ($APP.settings.dev) await import("./test/index.js");
     return this;
   },
   addModule(module) {

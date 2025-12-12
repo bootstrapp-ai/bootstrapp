@@ -4,7 +4,7 @@
  */
 
 export { IndexedDBAdapter, default } from "./adapter.js";
-export { DatabaseAdapterBase, validateAdapter } from "./base.js";
+export { DatabaseAdapterBase, validateAdapter } from "/$app/model/adapter-base.js";
 export { SystemModelManager } from "./system-model-manager.js";
 
 /**

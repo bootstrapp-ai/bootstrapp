@@ -3,7 +3,7 @@
  * Provides component list and lazy-loads component modules on-demand
  */
 
-import UIX from "/node_modules/@bootstrapp/uix/index.js";
+import UIX from "/$app/uix/index.js";
 import {
   extractDescription,
   extractExamplesFromComments,
@@ -45,11 +45,11 @@ export async function loadComponent(category, name) {
   try {
     // Dynamically import the component module
     const module = await import(
-      `/node_modules/@bootstrapp/uix/${category}/${name}.js`
+      `/$app/uix/${category}/${name}.js`
     );
 
     // Fetch source code for parsing comments
-    const sourceUrl = `/node_modules/@bootstrapp/uix/${category}/${name}.js`;
+    const sourceUrl = `/$app/uix/${category}/${name}.js`;
     const response = await fetch(sourceUrl);
     const sourceCode = await response.text();
 
