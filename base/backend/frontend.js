@@ -86,7 +86,8 @@ View.plugins.push({
         limit: T.number(),
         offset: T.number(),
         count: T.number(),
-        key: T.string(), // 'key' is where data is stored (e.g., 'this.state.users')
+        key: T.string(),
+        single: T.boolean(), // Fetch single record using where clause
       },
     });
   },
@@ -103,6 +104,7 @@ View.plugins.push({
         where,
         includes,
         key,
+        single,
       } = query;
 
       if (!model) return console.warn("data-query: 'model' is required");
@@ -112,8 +114,8 @@ View.plugins.push({
         );
       if (!$APP.Model || !$APP.Model[model])
         return console.error(`data-query: Model "${model}" does not exist`);
-      const isMany = query.many ?? !id;
-      const opts = { limit, offset, includes, order, where };
+      const isMany = query.many ?? (!id && !single);
+      const opts = { limit: single ? 1 : limit, offset, includes, order, where };
 
       // Define the handler that will be called on subscription updates
       instance._dataQuerySubHandler = (data) => {
@@ -133,27 +135,38 @@ View.plugins.push({
       try {
         if (isMany) {
           const reactiveArray = await $APP.Model[model].getAll(opts);
+          const oldValue = instance.state[key];
           instance.state[key] = [...reactiveArray];
-          instance.requestUpdate();
+          instance.requestUpdate(key, oldValue);
           reactiveArray.subscribe(instance._dataQuerySubHandler);
           instance._dataQuerySub = reactiveArray;
+        } else if (single && where) {
+          // Single record via where clause (e.g., { slug: "my-slug" })
+          const reactiveArray = await $APP.Model[model].getAll(opts);
+          const oldValue = instance.state[key];
+          instance.state[key] = reactiveArray[0] || null;
+          instance.requestUpdate(key, oldValue);
+
+          // Subscribe to array, extract first item on updates
+          reactiveArray.subscribe((data) => {
+            instance._dataQuerySubHandler(data[0] || null);
+          });
+          instance._dataQuerySub = reactiveArray;
         } else {
-          // Use getAll with where clause for single record to get proper subscription support
-          // (row.subscribe() is deprecated and has issues with async callback registration)
-          const reactiveArray = await $APP.Model[model].getAll({
+          // Single record via id
+          const reactiveRow = await $APP.Model[model].get({
             ...opts,
             where: { id },
           });
-          const reactiveRow = reactiveArray[0];
           const oldValue = instance.state[key];
           instance.state[key] = reactiveRow;
           instance.requestUpdate(key, oldValue);
 
           // Subscribe to the array, handler extracts single item
-          reactiveArray.subscribe((data) => {
+          reactiveRow.subscribe((data) => {
             instance._dataQuerySubHandler(data[0]);
           });
-          instance._dataQuerySub = reactiveArray;
+          instance._dataQuerySub = reactiveRow;
         }
         instance.emit("dataLoaded", {
           instance,

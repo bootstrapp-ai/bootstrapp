@@ -357,6 +357,9 @@ export class IndexedDBAdapter extends DatabaseAdapterBase {
    * @returns {Promise<Object>} Created record with ID
    */
   async add(model, data) {
+    // Run beforeAdd hook
+    data = await this.runBeforeAdd(model, data);
+
     const idField = this.models[model]?.id;
     const useStringId = (idField && idField.type === "string") || !idField;
     if (!data.id) data.id = this.generateId(useStringId);
@@ -401,7 +404,9 @@ export class IndexedDBAdapter extends DatabaseAdapterBase {
         },
       );
 
-      return this.get(model, id);
+      const result = await this.get(model, id);
+      // Run afterAdd hook
+      return this.runAfterAdd(model, result);
     } catch (error) {
       console.error(`IndexedDB: Error adding record to "${model}"`, error);
       throw error;
@@ -416,6 +421,12 @@ export class IndexedDBAdapter extends DatabaseAdapterBase {
    * @returns {Promise<Object>} Updated record
    */
   async edit(model, id, data) {
+    // Strip immutable fields
+    data = this.stripImmutableFields(model, data);
+
+    // Run beforeEdit hook
+    data = await this.runBeforeEdit(model, { ...data, id });
+
     const validation = this.validateRow(this.models, model, data, {
       operation: "edit",
     });
@@ -457,7 +468,9 @@ export class IndexedDBAdapter extends DatabaseAdapterBase {
         });
       });
 
-      return this.get(model, id);
+      const result = await this.get(model, id);
+      // Run afterEdit hook
+      return this.runAfterEdit(model, result);
     } catch (error) {
       console.error(`IndexedDB: Error updating record in "${model}"`, error);
       throw error;
@@ -474,6 +487,12 @@ export class IndexedDBAdapter extends DatabaseAdapterBase {
     try {
       const record = await this.get(model, id);
 
+      // Run beforeRemove hook - can return false to cancel
+      const shouldProceed = await this.runBeforeRemove(model, id, record);
+      if (!shouldProceed) {
+        return false;
+      }
+
       await this._executeTransaction(model, "readwrite", (transaction) => {
         return new Promise((resolve, reject) => {
           const store = transaction.objectStore(model);
@@ -489,6 +508,9 @@ export class IndexedDBAdapter extends DatabaseAdapterBase {
           request.onerror = () => reject(request.error);
         });
       });
+
+      // Run afterRemove hook
+      await this.runAfterRemove(model, id, record);
 
       console.log(`IndexedDB: Deleted record ${id} from "${model}"`);
       return true;

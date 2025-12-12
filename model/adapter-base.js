@@ -174,6 +174,143 @@ export class DatabaseAdapterBase {
       system: this.system,
     };
   }
+
+  // ============================================
+  // Hook System - Call these from concrete adapters
+  // ============================================
+
+  /**
+   * Run beforeAdd hook if defined in schema
+   * @param {string} model - Model name
+   * @param {Object} data - Record data
+   * @returns {Promise<Object>} Modified data
+   */
+  async runBeforeAdd(model, data) {
+    const schema = this.models?.[model];
+    if (schema?.$hooks?.beforeAdd) {
+      return await schema.$hooks.beforeAdd(data, {
+        model,
+        adapter: this,
+        operation: "add",
+      });
+    }
+    return data;
+  }
+
+  /**
+   * Run afterAdd hook if defined in schema
+   * @param {string} model - Model name
+   * @param {Object} result - Created record
+   * @returns {Promise<Object>} Result (unchanged)
+   */
+  async runAfterAdd(model, result) {
+    const schema = this.models?.[model];
+    if (schema?.$hooks?.afterAdd) {
+      await schema.$hooks.afterAdd(result, {
+        model,
+        adapter: this,
+        operation: "add",
+      });
+    }
+    return result;
+  }
+
+  /**
+   * Run beforeEdit hook if defined in schema
+   * @param {string} model - Model name
+   * @param {Object} data - Update data (should include id)
+   * @returns {Promise<Object>} Modified data
+   */
+  async runBeforeEdit(model, data) {
+    const schema = this.models?.[model];
+    if (schema?.$hooks?.beforeEdit) {
+      return await schema.$hooks.beforeEdit(data, {
+        model,
+        adapter: this,
+        operation: "edit",
+      });
+    }
+    return data;
+  }
+
+  /**
+   * Run afterEdit hook if defined in schema
+   * @param {string} model - Model name
+   * @param {Object} result - Updated record
+   * @returns {Promise<Object>} Result (unchanged)
+   */
+  async runAfterEdit(model, result) {
+    const schema = this.models?.[model];
+    if (schema?.$hooks?.afterEdit) {
+      await schema.$hooks.afterEdit(result, {
+        model,
+        adapter: this,
+        operation: "edit",
+      });
+    }
+    return result;
+  }
+
+  /**
+   * Run beforeRemove hook if defined in schema
+   * @param {string} model - Model name
+   * @param {string|number} id - Record ID
+   * @param {Object} record - Record being deleted
+   * @returns {Promise<boolean>} False to cancel deletion
+   */
+  async runBeforeRemove(model, id, record) {
+    const schema = this.models?.[model];
+    if (schema?.$hooks?.beforeRemove) {
+      const result = await schema.$hooks.beforeRemove(record, {
+        model,
+        adapter: this,
+        operation: "remove",
+        id,
+      });
+      // Return false to cancel deletion
+      if (result === false) return false;
+    }
+    return true;
+  }
+
+  /**
+   * Run afterRemove hook if defined in schema
+   * @param {string} model - Model name
+   * @param {string|number} id - Deleted record ID
+   * @param {Object} record - Deleted record data
+   */
+  async runAfterRemove(model, id, record) {
+    const schema = this.models?.[model];
+    if (schema?.$hooks?.afterRemove) {
+      await schema.$hooks.afterRemove(record, {
+        model,
+        adapter: this,
+        operation: "remove",
+        id,
+      });
+    }
+  }
+
+  /**
+   * Strip immutable fields from update data
+   * Call this in edit() before validation
+   * @param {string} model - Model name
+   * @param {Object} data - Update data
+   * @returns {Object} Data with immutable fields removed
+   */
+  stripImmutableFields(model, data) {
+    const schema = this.models?.[model];
+    if (!schema) return data;
+
+    const result = { ...data };
+    for (const [field, prop] of Object.entries(schema)) {
+      if (field.startsWith("$")) continue; // Skip special keys like $hooks
+      if (prop?.immutable && field in result && field !== "id") {
+        delete result[field];
+      }
+    }
+    return result;
+  }
 }
 
 /**

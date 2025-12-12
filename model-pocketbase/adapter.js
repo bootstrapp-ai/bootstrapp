@@ -433,6 +433,9 @@ export class PocketBaseAdapter extends DatabaseAdapterBase {
   async add(model, data) {
     await this.init();
 
+    // Run beforeAdd hook
+    data = await this.runBeforeAdd(model, data);
+
     const validation = this.validateRow(this.models, model, data, {
       operation: "add",
     });
@@ -452,7 +455,8 @@ export class PocketBaseAdapter extends DatabaseAdapterBase {
       }
 
       console.log(`PocketBase: Added record to "${model}"`, record.id);
-      return record;
+      // Run afterAdd hook
+      return this.runAfterAdd(model, record);
     } catch (error) {
       console.error(
         `PocketBase: Error adding record to "${model}"`,
@@ -532,6 +536,12 @@ export class PocketBaseAdapter extends DatabaseAdapterBase {
   async edit(model, id, data) {
     await this.init();
 
+    // Strip immutable fields
+    data = this.stripImmutableFields(model, data);
+
+    // Run beforeEdit hook
+    data = await this.runBeforeEdit(model, { ...data, id });
+
     const validation = this.validateRow(this.models, model, data, {
       operation: "edit",
     });
@@ -551,7 +561,8 @@ export class PocketBaseAdapter extends DatabaseAdapterBase {
       }
 
       console.log(`PocketBase: Updated record ${id} in "${model}"`);
-      return record;
+      // Run afterEdit hook
+      return this.runAfterEdit(model, record);
     } catch (error) {
       console.error(`PocketBase: Error updating record in "${model}"`, error);
       throw error;
@@ -568,13 +579,25 @@ export class PocketBaseAdapter extends DatabaseAdapterBase {
     await this.init();
 
     try {
+      // Get record for hooks
       const collection = this._getCollectionName(model);
+      const record = await this.pb.collection(collection).getOne(id).catch(() => null);
+
+      // Run beforeRemove hook - can return false to cancel
+      const shouldProceed = await this.runBeforeRemove(model, id, record);
+      if (!shouldProceed) {
+        return false;
+      }
+
       await this.pb.collection(collection).delete(id);
 
       if (!this.system) {
         this._emit(`ModelRemoveRecord-${model}`, { model, id });
         this._emit("onRemoveRecord", { model, id });
       }
+
+      // Run afterRemove hook
+      await this.runAfterRemove(model, id, record);
 
       console.log(`PocketBase: Deleted record ${id} from "${model}"`);
       return true;
