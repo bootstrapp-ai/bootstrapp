@@ -5,7 +5,7 @@
  */
 import Theme from "/node_modules/@bootstrapp/theme/index.js";
 import T from "/node_modules/@bootstrapp/types/index.js";
-import { html, nothing } from "lit-html";
+import { html, nothing } from "/npm/lit-html";
 
 // Color categories with their default values (Gruvbox-inspired)
 const DEFAULT_COLORS = {

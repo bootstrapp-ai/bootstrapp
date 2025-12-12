@@ -1,5 +1,5 @@
 import T from "/node_modules/@bootstrapp/types/index.js";
-import { html } from "lit-html";
+import { html } from "/npm/lit-html";
 import View from "/node_modules/@bootstrapp/view/index.js";
 import AI from "/node_modules/@bootstrapp/ai/index.js";
 

@@ -1,4 +1,4 @@
-import { html } from "lit-html";
+import { html } from "/npm/lit-html";
 
 $APP.Testing.suite("View", () => {
   let TestView;

@@ -1,7 +1,7 @@
 import "/node_modules/@bootstrapp/admin/cms/index.js";
 import "/node_modules/@bootstrapp/admin/project/index.js";
 import "/node_modules/@bootstrapp/bundler/index.js";
-import { html } from "lit-html";
+import { html } from "/npm/lit-html";
 import $APP from "/node_modules/@bootstrapp/base/app.js";
 
 $APP.addModule({

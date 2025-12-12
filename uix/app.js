@@ -1,5 +1,5 @@
 import Theme from "/node_modules/@bootstrapp/theme/index.js";
-import { html } from "lit-html";
+import { html } from "/npm/lit-html";
 import $APP from "/node_modules/@bootstrapp/base/app.js";
 import UIX from "./index.js";
 

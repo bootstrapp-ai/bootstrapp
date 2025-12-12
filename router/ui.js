@@ -1,7 +1,7 @@
 import T from "/node_modules/@bootstrapp/types/index.js";
-import { html } from "lit-html";
-import { keyed } from "lit-html/directives/keyed.js";
-import { html as staticHTML, unsafeStatic } from "lit-html/static.js";
+import { html } from "/npm/lit-html";
+import { keyed } from "/npm/lit-html/directives/keyed.js";
+import { html as staticHTML, unsafeStatic } from "/npm/lit-html/static.js";
 import Router from "./index.js";
 
 export default {

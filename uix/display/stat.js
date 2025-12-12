@@ -1,5 +1,5 @@
 import T from "/node_modules/@bootstrapp/types/index.js";
-import { html, nothing } from "lit-html";
+import { html, nothing } from "/npm/lit-html";
 
 export default {
   tag: "uix-stat",

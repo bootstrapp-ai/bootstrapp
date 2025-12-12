@@ -1,4 +1,4 @@
-import { html } from "lit-html";
+import { html } from "/npm/lit-html";
 import T from "/node_modules/@bootstrapp/types/index.js";
 import IDE from "/controllers/ide.js";
 

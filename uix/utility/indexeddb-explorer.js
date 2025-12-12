@@ -1,6 +1,6 @@
 import Dexie from "https://esm.sh/dexie@4.0.11";
 import T from "/node_modules/@bootstrapp/types/index.js";
-import { html } from "lit-html";
+import { html } from "/npm/lit-html";
 
 export default {
   tag: "uix-indexeddb-explorer",

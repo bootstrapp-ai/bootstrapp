@@ -12,7 +12,7 @@
 
 // We MUST import the *exact same* 'html' function (which is the
 // `tag` function factory) that your framework is using.
-import { html as litHtmlInternal } from "lit-html";
+import { html as litHtmlInternal } from "/npm/lit-html";
 
 // A global cache for our generated TemplateStringsArrays.
 // The key is a string like "div|class,id|2" (tag|attr_keys|child_count)

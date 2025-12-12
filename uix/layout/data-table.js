@@ -1,6 +1,6 @@
 import T from "/node_modules/@bootstrapp/types/index.js";
-import { html } from "lit-html";
-import { unsafeHTML } from "lit-html/directives/unsafe-html.js";
+import { html } from "/npm/lit-html";
+import { unsafeHTML } from "/npm/lit-html/directives/unsafe-html.js";
 
 export default {
   tag: "data-table",

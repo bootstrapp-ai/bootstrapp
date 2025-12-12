@@ -1,5 +1,5 @@
 import T from "/node_modules/@bootstrapp/types/index.js";
-import { html } from "lit-html";
+import { html } from "/npm/lit-html";
 import AI from "/node_modules/@bootstrapp/ai/index.js";
 export default {
   tag: "mcp-resources",

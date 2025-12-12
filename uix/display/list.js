@@ -4,7 +4,7 @@
  */
 
 import T from "/node_modules/@bootstrapp/types/index.js";
-import { html } from "lit-html";
+import { html } from "/npm/lit-html";
 
 export default {
   properties: {

@@ -1,5 +1,5 @@
 import T from "/node_modules/@bootstrapp/types/index.js";
-import { html, svg } from "lit-html";
+import { html, svg } from "/npm/lit-html";
 
 export default {
   tag: "uix-circular-progress",

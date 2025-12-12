@@ -1,6 +1,6 @@
 import T from "/node_modules/@bootstrapp/types/index.js";
-import { html } from "lit-html";
-import { keyed } from "lit-html/directives/keyed.js";
+import { html } from "/npm/lit-html";
+import { keyed } from "/npm/lit-html/directives/keyed.js";
 export default {
   tag: "cms-ui",
 

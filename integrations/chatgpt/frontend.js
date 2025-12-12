@@ -4,7 +4,7 @@ if ($APP.settings.currentUrl.startsWith("https://chatgpt.com")) {
   })();
 }
 
-import { html } from "lit-html";
+import { html } from "/npm/lit-html";
 
 $APP.mv3Content.add(html`<chatgpt-content></chatgpt-content>`);
 $APP.mv3Connections.add("chatgpt");

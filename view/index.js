@@ -5,7 +5,7 @@
  */
 
 import T from "/node_modules/@bootstrapp/types/index.js";
-import { render } from "lit-html";
+import { render } from "/npm/lit-html";
 
 const SANITIZE_KEYS = ["__proto__", "constructor", "prototype"];
 

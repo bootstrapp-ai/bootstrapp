@@ -1,6 +1,6 @@
 import $APP from "/node_modules/@bootstrapp/base/app.js";
 import T from "/node_modules/@bootstrapp/types/index.js";
-import { html } from "lit-html";
+import { html } from "/npm/lit-html";
 import Trystero from "trystero";
 import Controller from "/node_modules/@bootstrapp/controller/index.js";
 

@@ -1,4 +1,4 @@
-import { html } from "lit-html";
+import { html } from "/npm/lit-html";
 import $APP from "/node_modules/@bootstrapp/base/app.js";
 
 import "/node_modules/@bootstrapp/base/apploader.js";

@@ -1,4 +1,4 @@
-import { html } from "lit-html";
+import { html } from "/npm/lit-html";
 export default {
   tag: "bundler-button",
   extends: "uix-modal",

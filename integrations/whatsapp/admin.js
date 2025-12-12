@@ -1,9 +1,9 @@
-import { keyed } from "lit-html/directives/keyed.js";
+import { keyed } from "/npm/lit-html/directives/keyed.js";
 
 const actions = ["groups", "members"];
 
 import T from "/node_modules/@bootstrapp/types/index.js";
-import { html } from "lit-html";
+import { html } from "/npm/lit-html";
 export default {
   tag: "whatsapp-admin",
 

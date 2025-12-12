@@ -1,4 +1,4 @@
-import { html } from "lit-html";
+import { html } from "/npm/lit-html";
 
 const mv3Events = {
   PLACE_LIST_DATA: (message, popup) => {
