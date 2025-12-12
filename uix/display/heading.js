@@ -3,7 +3,7 @@
  * Semantic headings (h1-h6) with consistent styling
  */
 
-import T from "@bootstrapp/types";
+import T from "/node_modules/@bootstrapp/types/index.js";
 import { html } from "lit-html";
 
 export default {

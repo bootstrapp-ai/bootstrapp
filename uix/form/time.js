@@ -1,6 +1,6 @@
 const datetime = { formatTime: () => {} };
 
-import T from "@bootstrapp/types";
+import T from "/node_modules/@bootstrapp/types/index.js";
 import { html } from "lit-html";
 export default {
   tag: "uix-time",

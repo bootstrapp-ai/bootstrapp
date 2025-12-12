@@ -1,6 +1,6 @@
-import T from "@bootstrapp/types";
+import T from "/node_modules/@bootstrapp/types/index.js";
 import { html } from "lit-html";
-import $APP from "@bootstrapp/base/app.js";
+import $APP from "/node_modules/@bootstrapp/base/app.js";
 export default {
   properties: {
     pageTitle: T.string(),

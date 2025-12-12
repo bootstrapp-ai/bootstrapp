@@ -1,5 +1,5 @@
-import T from "@bootstrapp/types";
-import { settings } from "@bootstrapp/view";
+import T from "/node_modules/@bootstrapp/types/index.js";
+import { settings } from "/node_modules/@bootstrapp/view/index.js";
 import { unsafeHTML } from "lit-html/directives/unsafe-html.js";
 
 const Icons = new Map();

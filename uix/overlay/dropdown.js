@@ -1,4 +1,4 @@
-import T from "@bootstrapp/types";
+import T from "/node_modules/@bootstrapp/types/index.js";
 
 export default {
   style: true,

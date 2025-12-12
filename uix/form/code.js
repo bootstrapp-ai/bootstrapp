@@ -39,7 +39,7 @@ const T = {
   boolean: (defaultValue) => ({ type: "boolean", default: defaultValue }),
   array: (defaultValue) => ({ type: "array", default: defaultValue }),
 };
-// import T from "@bootstrapp/types";
+// import T from "/node_modules/@bootstrapp/types/index.js";
 
 export default {
   tag: "textarea",

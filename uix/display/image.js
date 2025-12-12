@@ -1,4 +1,4 @@
-import T from "@bootstrapp/types";
+import T from "/node_modules/@bootstrapp/types/index.js";
 
 const imageStyleCache = new Map();
 const createBase64Style = async (url, className) => {

@@ -3,7 +3,7 @@
  * Provides component list and lazy-loads component modules on-demand
  */
 
-import UIX from "@bootstrapp/uix";
+import UIX from "/node_modules/@bootstrapp/uix/index.js";
 import {
   extractDescription,
   extractExamplesFromComments,

@@ -1,5 +1,5 @@
-import T from "@bootstrapp/types";
-import Controller from "@bootstrapp/controller";
+import T from "/node_modules/@bootstrapp/types/index.js";
+import Controller from "/node_modules/@bootstrapp/controller/index.js";
 export default {
   tag: "uix-draggable",
   style: true,

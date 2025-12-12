@@ -3,8 +3,8 @@
  * Interactive tool for creating custom themes
  * Uses the new semantic shade format (lighter, light, DEFAULT, dark, darker)
  */
-import Theme from "@bootstrapp/theme";
-import T from "@bootstrapp/types";
+import Theme from "/node_modules/@bootstrapp/theme/index.js";
+import T from "/node_modules/@bootstrapp/types/index.js";
 import { html, nothing } from "lit-html";
 
 // Color categories with their default values (Gruvbox-inspired)

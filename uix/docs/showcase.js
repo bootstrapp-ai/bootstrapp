@@ -3,12 +3,12 @@
  * Interactive component library viewer with lazy loading
  */
 
-import Theme from "@bootstrapp/theme";
-import T from "@bootstrapp/types";
+import Theme from "/node_modules/@bootstrapp/theme/index.js";
+import T from "/node_modules/@bootstrapp/types/index.js";
 import { html, nothing } from "lit-html";
 import { unsafeHTML } from "lit-html/directives/unsafe-html.js";
 import { html as staticHTML, unsafeStatic } from "lit-html/static.js";
-import View from "@bootstrapp/view";
+import View from "/node_modules/@bootstrapp/view/index.js";
 import {
   getComponentList,
   getDefaultValues,

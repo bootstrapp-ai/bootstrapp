@@ -1,4 +1,4 @@
-import T from "@bootstrapp/types";
+import T from "/node_modules/@bootstrapp/types/index.js";
 import { html } from "lit-html";
 
 const TypesRenderers = {

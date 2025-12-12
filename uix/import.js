@@ -1,5 +1,5 @@
-import View from "@bootstrapp/view";
-import Theme from "@bootstrapp/theme";
+import View from "/node_modules/@bootstrapp/view/index.js";
+import Theme from "/node_modules/@bootstrapp/theme/index.js";
 
 // Component registry: category → component names
 const COMPONENTS = {

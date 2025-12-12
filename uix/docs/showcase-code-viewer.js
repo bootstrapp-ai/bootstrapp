@@ -3,8 +3,8 @@
  * Displays code examples with syntax highlighting
  */
 
-import T from "@bootstrapp/types";
-import View from "@bootstrapp/view";
+import T from "/node_modules/@bootstrapp/types/index.js";
+import View from "/node_modules/@bootstrapp/view/index.js";
 import { html } from "lit-html";
 
 const ShowcaseCodeViewerDefinition = {

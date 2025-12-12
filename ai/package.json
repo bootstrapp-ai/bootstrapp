@@ -1,0 +1,15 @@
+{
+  "name": "@bootstrapp/ai",
+  "version": "0.1.0",
+  "description": "Bootstrapp AI Framework",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./plugins/*": "./plugins/*.js",
+    "./servers/*": "./servers/*.js"
+  },
+  "dependencies": {
+    "@bootstrapp/base": "^0.2.0"
+  }
+}

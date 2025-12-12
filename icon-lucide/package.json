@@ -8,5 +8,8 @@
     ".": "./index.js",
     "./lucide/*": "./lucide/*",
     "./app.js": "./app.js"
+  },
+  "dependencies": {
+    "@bootstrapp/base": "^0.2.0"
   }
 }
