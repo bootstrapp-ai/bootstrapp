@@ -3,7 +3,7 @@
  * State management system with reactive adapters
  */
 
-import createEventHandler from "@bootstrapp/events";
+import createEventHandler from "/node_modules/@bootstrapp/events/index.js";
 
 const adapters = {};
 const adapterCache = new Map();

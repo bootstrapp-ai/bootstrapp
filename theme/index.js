@@ -1,4 +1,4 @@
-import View, { settings } from "@bootstrapp/view";
+import View, { settings } from "/node_modules/@bootstrapp/view/index.js";
 
 View.plugins.push({
   name: "theme",

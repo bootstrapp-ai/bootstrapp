@@ -1,4 +1,4 @@
-import T from "@bootstrapp/types";
+import T from "/node_modules/@bootstrapp/types/index.js";
 import { html } from "lit-html";
 import { keyed } from "lit-html/directives/keyed.js";
 import { html as staticHTML, unsafeStatic } from "lit-html/static.js";

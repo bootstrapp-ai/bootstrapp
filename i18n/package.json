@@ -1,0 +1,25 @@
+{
+  "name": "@bootstrapp/i18n",
+  "version": "0.2.0",
+  "description": "Internationalization (i18n) module for Bootstrapp framework",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./base": "./base.js",
+    "./view-plugin": "./view-plugin.js"
+  },
+  "dependencies": {
+    "@bootstrapp/controller": "^0.2.0",
+    "@bootstrapp/view": "^0.2.0"
+  },
+  "keywords": [
+    "bootstrapp",
+    "i18n",
+    "internationalization",
+    "localization",
+    "translation"
+  ],
+  "author": "Alan Leal",
+  "license": "AGPL-3.0"
+}

@@ -1,24 +1,24 @@
 import { html } from "lit-html";
-import $APP from "@bootstrapp/base/app.js";
+import $APP from "/node_modules/@bootstrapp/base/app.js";
 
-import "@bootstrapp/base/apploader.js";
-import Controller from "@bootstrapp/controller";
-import { initSWFrontend } from "@bootstrapp/sw/frontend.js";
-import View, { settings } from "@bootstrapp/view";
-import Loader from "@bootstrapp/view/loader.js";
-import T from "@bootstrapp/types";
+import "/node_modules/@bootstrapp/base/apploader.js";
+import Controller from "/node_modules/@bootstrapp/controller/index.js";
+import { initSWFrontend } from "/node_modules/@bootstrapp/sw/frontend.js";
+import View, { settings } from "/node_modules/@bootstrapp/view/index.js";
+import Loader from "/node_modules/@bootstrapp/view/loader.js";
+import T from "/node_modules/@bootstrapp/types/index.js";
 
 // Initialize SW frontend with $APP injection
 initSWFrontend($APP);
 import initControllerApp, {
   registerModelType,
-} from "@bootstrapp/controller/app.js";
-import { ModelType } from "@bootstrapp/model";
-import { initModelFrontend } from "@bootstrapp/model/frontend.js";
-import Router from "@bootstrapp/router";
-import initRouterApp from "@bootstrapp/router/app.js";
-import Backend from "@bootstrapp/base/backend/frontend.js";
-import "@bootstrapp/base/app/index.js";
+} from "/node_modules/@bootstrapp/controller/app.js";
+import { ModelType } from "/node_modules/@bootstrapp/model/index.js";
+import { initModelFrontend } from "/node_modules/@bootstrapp/model/frontend.js";
+import Router from "/node_modules/@bootstrapp/router/index.js";
+import initRouterApp from "/node_modules/@bootstrapp/router/app.js";
+import Backend from "/node_modules/@bootstrapp/base/backend/frontend.js";
+import "/node_modules/@bootstrapp/base/app/index.js";
 
 // Initialize model frontend with $APP injection
 initModelFrontend($APP);

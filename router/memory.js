@@ -3,7 +3,7 @@
  * Creates independent router instances with in-memory history
  */
 
-import Controller from "@bootstrapp/controller";
+import Controller from "/node_modules/@bootstrapp/controller/index.js";
 import { createRouterCore } from "./core.js";
 import { createMemoryAdapter } from "./adapters.js";
 
