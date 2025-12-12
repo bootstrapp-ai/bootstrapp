@@ -1,0 +1,14 @@
+{
+  "name": "@bootstrapp/generator",
+  "version": "0.1.0",
+  "description": "Bootstrapp Code Generator",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./adapters/*": "./adapters/*",
+    "./commands/*": "./commands/*",
+    "./core/*": "./core/*"
+  },
+  "dependencies": {}
+}

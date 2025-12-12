@@ -7,7 +7,7 @@
   "type": "module",
   "exports": {
     ".": "./index.js",
-    "./themes/*": "./themes/*.js"
+    "./themes/*": "./themes/*"
   },
   "keywords": [
     "theme",

@@ -1,0 +1,8 @@
+.mcp-dashboard {
+	.uix-card {
+		button {
+			color: #111;
+			cursor: pointer;
+		}
+	}
+}

@@ -16,7 +16,7 @@ export function initRouterApp($APP, Router, Controller = null) {
     if (Controller) {
       Controller.registerSyncType(
         (adapter) => adapter === Router,
-        (adapter) => ({ adapter: "router", syncObj: adapter.$sync })
+        (adapter) => ({ adapter: "router", syncObj: adapter.$sync }),
       );
     }
 
@@ -30,7 +30,7 @@ export function initRouterApp($APP, Router, Controller = null) {
   // Register as framework module
   $APP.addModule({
     name: "router",
-    path: "@bootstrapp/router",
+    path: "/node_modules/@bootstrapp/router",
     exports: Router,
   });
 

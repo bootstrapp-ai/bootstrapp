@@ -1,0 +1,13 @@
+{
+  "name": "@bootstrapp/github",
+  "version": "0.1.0",
+  "description": "GitHub API integration for Bootstrapp",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js"
+  },
+  "dependencies": {
+    "@bootstrapp/base": "^0.2.0"
+  }
+}

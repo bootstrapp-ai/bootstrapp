@@ -1,0 +1,17 @@
+{
+  "name": "@bootstrapp/admin",
+  "version": "0.1.0",
+  "description": "Bootstrapp Admin Panel",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./cms/*": "./cms/*",
+    "./project/*": "./project/*",
+    "./views/*": "./views/*"
+  },
+  "dependencies": {
+    "@bootstrapp/base": "^0.2.0",
+    "@bootstrapp/bundler": "^0.1.0"
+  }
+}

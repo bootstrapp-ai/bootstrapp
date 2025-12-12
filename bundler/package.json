@@ -1,0 +1,14 @@
+{
+  "name": "@bootstrapp/bundler",
+  "version": "0.1.0",
+  "description": "Bootstrapp project bundler",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js"
+  },
+  "dependencies": {
+    "@bootstrapp/base": "^0.2.0",
+    "@bootstrapp/github": "^0.1.0"
+  }
+}

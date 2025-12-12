@@ -1,13 +1,14 @@
 {
-  "name": "@bootstrapp/ai",
+  "name": "@bootstrapp/p2p",
   "version": "0.1.0",
-  "description": "Bootstrapp AI Framework",
+  "description": "Bootstrapp P2P Data Sync",
   "type": "module",
   "main": "index.js",
+  "backend": true,
   "exports": {
     ".": "./index.js",
-    "./plugins/*": "./plugins/*",
-    "./servers/*": "./servers/*"
+    "./backend": "./backend.js",
+    "./frontend": "./frontend.js"
   },
   "dependencies": {
     "@bootstrapp/base": "^0.2.0"

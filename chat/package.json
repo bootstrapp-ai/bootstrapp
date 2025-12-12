@@ -1,0 +1,16 @@
+{
+  "name": "@bootstrapp/chat",
+  "version": "0.1.0",
+  "description": "Bootstrapp Chat Module",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./models/*": "./models/*",
+    "./views/*": "./views/*"
+  },
+  "dependencies": {
+    "@bootstrapp/base": "^0.2.0",
+    "@bootstrapp/ai": "^0.1.0"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "@bootstrapp/game",
+  "version": "0.1.0",
+  "description": "Game engine module for Bootstrapp framework",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js"
+  },
+  "dependencies": {
+    "@bootstrapp/base": "^0.2.0"
+  }
+}

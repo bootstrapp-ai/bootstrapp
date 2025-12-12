@@ -1,0 +1,11 @@
+{
+  "name": "@bootstrapp/hiccup",
+  "version": "0.1.0",
+  "description": "Hiccup-style HTML templating for lit-html",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js"
+  },
+  "dependencies": {}
+}

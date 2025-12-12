@@ -1,0 +1,30 @@
+{
+  "name": "@bootstrapp/cli",
+  "version": "0.1.0",
+  "description": "Bootstrapp CLI tool",
+  "main": "./index.js",
+  "bin": {
+    "bootstrapp": "./bin/bootstrapp.js"
+  },
+  "scripts": {
+    "test": "echo \"No tests yet\"",
+    "dev": "node bin/bootstrapp.js"
+  },
+  "dependencies": {
+    "@bootstrapp/generator": "file:../generator",
+    "@bootstrapp/events": "file:../events"
+  },
+  "devDependencies": {
+    "chokidar": "^4.0.3",
+    "glob": "^11.0.3",
+    "dotenv": "^17.2.3",
+    "mime": "^4.1.0",
+    "javascript-obfuscator": "^4.1.1",
+    "sharp": "^0.34.5",
+    "ws": "^8.18.0",
+    "electron": "^39.1.1",
+    "electron-builder": "^26.0.12",
+    "puppeteer": "^24.29.1"
+  },
+  "type": "module"
+}
