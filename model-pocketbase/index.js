@@ -3,15 +3,18 @@
  * @description Main entry point for @bootstrapp/model-pocketbase package
  */
 
-export { PocketBaseAdapter, default } from "./adapter.js";
-export { DatabaseAdapterBase, validateAdapter } from "/$app/model/adapter-base.js";
-export { AuthManager } from "./auth-manager.js";
-export { RealtimeManager } from "./realtime-manager.js";
-export { buildFilterString, validateWhereClause } from "./filter-builder.js";
 export {
+  DatabaseAdapterBase,
+  validateAdapter,
+} from "/$app/model/adapter-base.js";
+export { default, PocketBaseAdapter } from "./adapter.js";
+export { AuthManager } from "./auth-manager.js";
+export { buildFilterString, validateWhereClause } from "./filter-builder.js";
+export { RealtimeManager } from "./realtime-manager.js";
+export {
+  loadNestedRelationships,
   loadRelationships,
   loadRelationshipsForMany,
-  loadNestedRelationships,
   parseIncludes,
 } from "./relationship-loader.js";
 
@@ -24,19 +27,6 @@ export {
  * @param {Object} [config.options] - Additional options
  * @returns {PocketBaseAdapter}
  *
- * @example
- * import PocketBase from "pocketbase";
- * import { createPocketBaseAdapter } from "@bootstrapp/model-pocketbase";
- *
- * const adapter = createPocketBaseAdapter({
- *   url: "http://localhost:8090",
- *   models: $APP.models,
- *   PocketBase,
- *   validateRow: (models, model, data) => ({ valid: true }),
- *   parseOrder: (order) => [{ field: order, direction: "ASC" }],
- * });
- *
- * await adapter.init();
  */
 import { PocketBaseAdapter } from "./adapter.js";
 

@@ -14,6 +14,11 @@ export class ModelType {}
 const SUBSCRIPTION_SYMBOL = Symbol("subscriptions");
 
 /**
+ * Symbol used to store relationship subscription unsubscribers on a row instance.
+ */
+const RELATIONSHIP_SUBS_SYMBOL = Symbol("relationshipSubscriptions");
+
+/**
  * A simple helper to check if a row matches a 'where' clause.
  * This is naive and only supports exact, top-level key-value matches.
  * @param {object} row - The row object to check.
@@ -185,14 +190,6 @@ function createReactiveArrayPrototype(proxifyRow, $APP) {
      * @private
      */
     registerListeners() {
-      // Get SubscriptionManager instance
-      if (typeof $APP === "undefined" || !$APP.SubscriptionManager) {
-        console.warn(
-          "SubscriptionManager not available - reactive array won't update",
-        );
-        return;
-      }
-
       // Subscribe to this specific query (model + where clause)
       $APP.SubscriptionManager.subscribe(
         this.modelName,
@@ -301,7 +298,7 @@ function createInstanceProxyHandler(Model, $APP) {
 
       /**
        * Instance method: Subscribe to updates on this specific row instance.
-       * @deprecated Use query-level subscriptions instead
+       * Uses SubscriptionManager under the hood with a single-row query.
        */
       if (prop === "subscribe") {
         return (callback) => {
@@ -310,13 +307,7 @@ function createInstanceProxyHandler(Model, $APP) {
             return target;
           }
 
-          console.warn(
-            `row.subscribe() is deprecated and will be removed in v2.0. ` +
-              `Use query-level subscriptions instead: ` +
-              `Model.${target._modelName}.getAll({ where: { id: '${target.id}' } }).subscribe(...)`,
-          );
-
-          // Backward compatibility: Use SubscriptionManager with single-row query
+          // Use SubscriptionManager with single-row query
           if ($APP.SubscriptionManager) {
             $APP.SubscriptionManager.subscribe(
               target._modelName,
@@ -400,6 +391,124 @@ export function createModel($APP) {
   let instanceProxyHandler;
   let reactiveArrayPrototype;
 
+  /**
+   * Auto-subscribe to included relationships so changes propagate
+   * @param {object} row - The row with loaded relationships
+   * @param {string} modelName - Name of the model
+   * @param {Array<string>} includes - Relationship names that were included
+   */
+  const autoSubscribeRelationships = (row, modelName, includes) => {
+    if (!row || !includes?.length || !$APP.models?.[modelName]) return;
+
+    const modelDef = $APP.models[modelName];
+    const unsubscribers = [];
+
+    for (const relationName of includes) {
+      const relDef = modelDef[relationName];
+      if (!relDef || !relDef.targetModel) continue;
+
+      const targetModel = relDef.targetModel;
+
+      if (relDef.belongs) {
+        // Single foreign key: subscribe to that record
+        // row[relationName] could be the ID or the loaded object
+        const relData = row[relationName];
+        const relId = typeof relData === "object" ? relData?.id : relData;
+        if (relId) {
+          subscribeToRelated(targetModel, { id: relId }, row, relationName, unsubscribers);
+        }
+      } else if (relDef.belongs_many) {
+        // Array of foreign keys or loaded objects
+        const relArray = row[relationName] || [];
+        for (const item of relArray) {
+          const itemId = typeof item === "object" ? item?.id : item;
+          if (itemId) {
+            subscribeToRelated(targetModel, { id: itemId }, row, relationName, unsubscribers);
+          }
+        }
+      } else if (relDef.many || relDef.one) {
+        // Reverse relationship: subscribe to targetModel where foreignKey = row.id
+        const foreignKey = relDef.targetForeignKey || `${modelName.toLowerCase()}Id`;
+        subscribeToRelated(targetModel, { [foreignKey]: row.id }, row, relationName, unsubscribers);
+      }
+    }
+
+    // Store unsubscribers on the row for cleanup
+    if (unsubscribers.length > 0) {
+      row[RELATIONSHIP_SUBS_SYMBOL] = unsubscribers;
+    }
+  };
+
+  /**
+   * Subscribe to a related model and update parent row when changes occur
+   */
+  const subscribeToRelated = (targetModel, where, parentRow, relationName, unsubscribers) => {
+    if (!$APP.SubscriptionManager) return;
+
+    $APP.SubscriptionManager.subscribe(targetModel, where, (event) => {
+      const { action, record } = event;
+
+      if (action === "update" || action === "edit") {
+        // Update the relationship data in parent row
+        updateRelationshipData(parentRow, relationName, record);
+      } else if (action === "delete" || action === "remove") {
+        // Remove from relationship if it's an array
+        removeFromRelationship(parentRow, relationName, record);
+      }
+    }).then((unsubscribe) => {
+      if (unsubscribe) {
+        unsubscribers.push(unsubscribe);
+      }
+    }).catch((err) => {
+      console.error("Failed to subscribe to relationship:", err);
+    });
+  };
+
+  /**
+   * Update relationship data when a related record changes
+   */
+  const updateRelationshipData = (parentRow, relationName, updatedRecord) => {
+    const currentData = parentRow[relationName];
+
+    if (Array.isArray(currentData)) {
+      // Find and update the record in the array
+      const index = currentData.findIndex(
+        (item) => String(item?.id || item) === String(updatedRecord.id)
+      );
+      if (index > -1) {
+        // Create new array with updated item for change detection
+        const newArray = [...currentData];
+        newArray[index] = updatedRecord;
+        parentRow[relationName] = newArray;
+      }
+    } else if (currentData && typeof currentData === "object") {
+      // Single relationship - replace with updated data
+      if (String(currentData.id) === String(updatedRecord.id)) {
+        parentRow[relationName] = updatedRecord;
+      }
+    }
+  };
+
+  /**
+   * Remove a deleted record from relationship array
+   */
+  const removeFromRelationship = (parentRow, relationName, deletedRecord) => {
+    const currentData = parentRow[relationName];
+
+    if (Array.isArray(currentData)) {
+      const newArray = currentData.filter(
+        (item) => String(item?.id || item) !== String(deletedRecord.id)
+      );
+      if (newArray.length !== currentData.length) {
+        parentRow[relationName] = newArray;
+      }
+    } else if (currentData && typeof currentData === "object") {
+      if (String(currentData.id) === String(deletedRecord.id)) {
+        parentRow[relationName] = null;
+      }
+    }
+  };
+
   const handleModelRequest = async ({ modelName, action, payload }) => {
     const result = await Model.request(action, modelName, payload);
     if (action === "ADD_MANY" && result && Array.isArray(result.results)) {
@@ -416,15 +525,30 @@ export function createModel($APP) {
       const opts = payload.opts || {};
       if (result?.items) {
         result.items = proxifyMultipleRows(result.items, modelName, opts);
+        // Auto-subscribe for each row if includes provided
+        if (opts.includes?.length) {
+          result.items.forEach((row) => autoSubscribeRelationships(row, modelName, opts.includes));
+        }
         return result;
       }
-      return proxifyMultipleRows(result, modelName, opts);
+      const proxified = proxifyMultipleRows(result, modelName, opts);
+      // Auto-subscribe for each row if includes provided
+      if (opts.includes?.length) {
+        proxified.forEach((row) => autoSubscribeRelationships(row, modelName, opts.includes));
+      }
+      return proxified;
     }
     if (["ADD", "EDIT"].includes(action)) {
       if (result[0]) return [result[0], null];
       return [null, proxifyRow(result[1], modelName)];
     }
-    return proxifyRow(result, modelName);
+
+    const proxifiedResult = proxifyRow(result, modelName);
+    // Auto-subscribe if includes provided for single record
+    if (payload.opts?.includes?.length && proxifiedResult) {
+      autoSubscribeRelationships(proxifiedResult, modelName, payload.opts.includes);
+    }
+    return proxifiedResult;
   };
 
   const getMethodRegistry = (modelName) => [
@@ -518,18 +642,23 @@ export function createModel($APP) {
   const proxifyRow = (row, modelName) => {
     if (!row || typeof row !== "object" || row.errors) return row;
 
-    // If row already exists in cache, just update it and return proxy
+    // If row already exists in cache, create NEW object (immutable update for change detection)
     if (Model[modelName].rows[row.id]) {
-      const { id: _, ...newRow } = row;
       const existingRow = Model[modelName].rows[row.id];
-      Object.assign(existingRow, newRow);
+      // Create NEW object with merged data instead of mutating
+      const updatedRow = { ...existingRow, ...row };
+      updatedRow._modelName = modelName;
 
-      // Manually trigger subscriptions since this is an external update
+      // Replace in cache with new object
+      Model[modelName].rows[row.id] = updatedRow;
+
+      // Transfer and trigger subscriptions with the NEW object reference
       const subscriptions = existingRow[SUBSCRIPTION_SYMBOL];
       if (subscriptions && subscriptions.size > 0) {
+        updatedRow[SUBSCRIPTION_SYMBOL] = subscriptions;
         subscriptions.forEach(({ callback }) => {
           try {
-            callback(existingRow);
+            callback(updatedRow);
           } catch (err) {
             console.error(
               "Error in row subscription callback (manual update):",
@@ -538,8 +667,8 @@ export function createModel($APP) {
           }
         });
       }
-      // Return the *existing proxy*
-      return new Proxy(existingRow, instanceProxyHandler);
+      // Return proxy wrapping the NEW object
+      return new Proxy(updatedRow, instanceProxyHandler);
     }
 
     // New row: cache it, set up listener, and return new proxy

@@ -157,10 +157,6 @@ export class SubscriptionManager {
 
       // Create adapter-specific subscription (PocketBase realtime)
       await this.createAdapterSubscription(subscription);
-
-      console.log(
-        `SubscriptionManager: Created subscription for "${queryHash}"`,
-      );
     }
 
     // Return unsubscribe function
@@ -209,21 +205,14 @@ export class SubscriptionManager {
         );
 
         this.adapterUnsubscribers.set(subscription.queryHash, unsubscribe);
-        console.log(
-          `SubscriptionManager: Realtime subscription created for "${model}" with filter: "${filterString || "*"}"`,
-        );
       } catch (error) {
         console.error(
           "SubscriptionManager: Failed to create realtime subscription",
           error,
         );
       }
-    } else {
-      // IndexedDB adapter - no native realtime, will be notified via events
-      console.log(
-        `SubscriptionManager: Local subscription registered for "${model}"`,
-      );
     }
+    // IndexedDB adapter uses event-based notifications (no native realtime)
   }
 
   /**
@@ -252,8 +241,6 @@ export class SubscriptionManager {
         this.modelToQueries.delete(subscription.model);
       }
     }
-
-    console.log(`SubscriptionManager: Cleaned up subscription "${queryHash}"`);
   }
 
   /**
@@ -279,7 +266,6 @@ export class SubscriptionManager {
         !subscription.where ||
         Object.keys(subscription.where).length === 0 ||
         matchesWhere(record, subscription.where);
-      console.log({ shouldNotify, subscription });
       if (shouldNotify) {
         subscription.notify({
           action,
@@ -297,7 +283,6 @@ export class SubscriptionManager {
     for (const queryHash of this.subscriptions.keys()) {
       this.cleanupSubscription(queryHash);
     }
-    console.log("SubscriptionManager: All subscriptions cleaned up");
   }
 
   /**

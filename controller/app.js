@@ -30,12 +30,23 @@ function loadModelTypeAsync({ instance, key, prop, syncObj, updateState }) {
         prop.type === "array"
           ? await syncObj.getAll(query)
           : await syncObj.get(query);
-      console.log({ val, query, syncObj, prop });
-      if (val) val.subscribe((v) => updateState(instance, key, v));
+
+      if (val) {
+        val.subscribe((v) => {
+          // Use array spread for arrays, object spread for objects
+          const copied = Array.isArray(v) ? [...v] : { ...v };
+          updateState(instance, key, copied);
+        });
+      }
     } catch (e) {
       console.error(`Sync error ${key}:`, e);
     }
-    updateState(instance, key, val ?? prop.defaultValue);
+
+    // Use array spread for arrays, object spread for objects
+    const finalVal = val
+      ? (Array.isArray(val) ? [...val] : { ...val })
+      : prop.defaultValue;
+    updateState(instance, key, finalVal);
   })();
 }
 

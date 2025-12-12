@@ -100,7 +100,6 @@ export function createModelEventHandlers($APP) {
       respond(response);
     },
     GET_MANY: async ({ payload: { model, opts = {} }, respond } = {}) => {
-      console.log(model, opts);
       const response = await $APP.Database.getAll(model, opts);
       respond(response);
     },
@@ -113,63 +112,24 @@ export function createModelEventHandlers($APP) {
  * @returns {object} Event handlers for relationship sync
  */
 export function createRelationshipSyncHandlers($APP) {
-  const syncRelationships = ({ model, row, action = "add" }) => {
-    if (!row) return;
-    const props = $APP.models[model];
-    const relationships = Object.entries(props).filter(
-      ([, prop]) => prop.belongs && prop.targetModel !== "*",
-    );
-    if (!relationships.length) return;
-    relationships.forEach(([key, prop]) => {
-      if (row[key]) {
-        $APP.Backend.broadcast({
-          type: "QUERY_DATA_SYNC",
-          payload: {
-            action,
-            model: prop.targetModel,
-            record: row,
-          },
-        });
-      }
-    });
-  };
-
   return {
     onAddRecord({ model, row }) {
-      // New query-level notification system
       $APP.Backend.broadcast({
         type: "QUERY_DATA_SYNC",
-        payload: {
-          action: "add",
-          model,
-          record: row,
-        },
+        payload: { action: "add", model, record: row },
       });
-      syncRelationships({ model, row });
     },
     onEditRecord({ model, row }) {
-      // New query-level notification system
       $APP.Backend.broadcast({
         type: "QUERY_DATA_SYNC",
-        payload: {
-          action: "update",
-          model,
-          record: row,
-        },
+        payload: { action: "update", model, record: row },
       });
-      syncRelationships({ model, row, action: "update" });
     },
     onRemoveRecord({ model, row, id }) {
-      // New query-level notification system
       $APP.Backend.broadcast({
         type: "QUERY_DATA_SYNC",
-        payload: {
-          action: "delete",
-          model,
-          record: row || { id },
-        },
+        payload: { action: "delete", model, record: row || { id } },
       });
-      syncRelationships({ model, row, action: "delete" });
     },
   };
 }

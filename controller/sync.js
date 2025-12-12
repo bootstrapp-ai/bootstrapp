@@ -120,7 +120,7 @@ export function bindCustomSync({ instance, key, prop, syncObj, onAsyncLoad }) {
       instance._syncReloaders[key] = () => {
         // Cleanup old subscription for this key
         const oldUnsubIdx = instance._customSyncUnsubscribers.findIndex(
-          (fn) => fn._syncKey === key
+          (fn) => fn._syncKey === key,
         );
         if (oldUnsubIdx > -1) {
           instance._customSyncUnsubscribers[oldUnsubIdx]();

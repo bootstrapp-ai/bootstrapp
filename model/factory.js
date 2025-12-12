@@ -13,9 +13,6 @@ const ADAPTER_REGISTRY = new Map();
  * Register a database adapter
  * @param {string} type - Adapter type name
  * @param {Class} AdapterClass - Adapter class
- * @example
- * import { IndexedDBAdapter } from "@bootstrapp/model-indexeddb";
- * registerAdapter('indexeddb', IndexedDBAdapter);
  */
 export function registerAdapter(type, AdapterClass) {
   if (ADAPTER_REGISTRY.has(type)) {
@@ -34,18 +31,6 @@ export function registerAdapter(type, AdapterClass) {
  * @param {Object} config.models - Model schemas
  * @returns {Promise<Object>} Adapter instance
  *
- * @example
- * import { createDatabase, registerAdapter } from "@bootstrapp/model/factory";
- * import { IndexedDBAdapter } from "@bootstrapp/model-indexeddb";
- *
- * registerAdapter('indexeddb', IndexedDBAdapter);
- *
- * const db = await createDatabase({
- *   type: 'indexeddb',
- *   name: 'myapp',
- *   version: 1,
- *   models: { user: {...}, post: {...} }
- * });
  */
 export async function createDatabase(config) {
   if (typeof config === "string") {

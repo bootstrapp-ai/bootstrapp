@@ -1,7 +1,6 @@
-import $APP from "/$app.js";
-import Model from "/$app/model/index.js";
 import T from "/$app/types/index.js";
 import View from "/$app/view/index.js";
+import $APP from "/$app.js";
 
 let appWorker;
 let wwPort;
@@ -64,7 +63,6 @@ const postMessageToPort = (port, params, retryFn) => {
     setTimeout(() => retryFn(params), 100);
     return;
   }
-  console.log({ params });
   port.postMessage(params);
 };
 
@@ -112,7 +110,7 @@ View.plugins.push({
         return console.warn(
           "data-query: 'key' is required to know where to store data",
         );
-      if (!Model || !Model[model])
+      if (!$APP.Model || !$APP.Model[model])
         return console.error(`data-query: Model "${model}" does not exist`);
       const isMany = query.many ?? !id;
       const opts = { limit, offset, includes, order, where };
@@ -130,12 +128,11 @@ View.plugins.push({
         });
       };
 
-      console.log({ instance });
       instance._dataQuerySub = null;
 
       try {
         if (isMany) {
-          const reactiveArray = await Model[model].getAll(opts);
+          const reactiveArray = await $APP.Model[model].getAll(opts);
           instance.state[key] = [...reactiveArray];
           instance.requestUpdate();
           reactiveArray.subscribe(instance._dataQuerySubHandler);
@@ -143,19 +140,17 @@ View.plugins.push({
         } else {
           // Use getAll with where clause for single record to get proper subscription support
           // (row.subscribe() is deprecated and has issues with async callback registration)
-          const reactiveArray = await Model[model].getAll({
+          const reactiveArray = await $APP.Model[model].getAll({
             ...opts,
             where: { id },
           });
           const reactiveRow = reactiveArray[0];
           const oldValue = instance.state[key];
-          console.error({ reactiveArray });
           instance.state[key] = reactiveRow;
           instance.requestUpdate(key, oldValue);
 
           // Subscribe to the array, handler extracts single item
           reactiveArray.subscribe((data) => {
-            console.log({ instance, data });
             instance._dataQuerySubHandler(data[0]);
           });
           instance._dataQuerySub = reactiveArray;

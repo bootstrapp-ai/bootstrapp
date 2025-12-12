@@ -29,7 +29,6 @@ export function initModelFrontend($APP, options = {}) {
   // Initialize SubscriptionManager on frontend (without database - notifications come from backend)
   if (!$APP.SubscriptionManager) {
     $APP.SubscriptionManager = new SubscriptionManager(null);
-    console.log("SubscriptionManager: Initialized (frontend)");
   }
 
   // New query-level data sync
@@ -43,7 +42,6 @@ export function initModelFrontend($APP, options = {}) {
 
     // Broadcast to service worker for other tabs
     if ($APP.SW) {
-      console.log({ payload });
       $APP.SW.request("SW:BROADCAST_QUERY_SYNC", payload);
     }
   });
