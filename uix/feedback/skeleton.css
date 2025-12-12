@@ -2,7 +2,7 @@
  * Skeleton Component Styles
  */
 
-:where(.uix-skeleton) {
+:where(.uix-skeleton, uix-skeleton) {
   display: block;
 
   & .skeleton-container {

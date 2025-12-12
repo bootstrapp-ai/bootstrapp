@@ -2,21 +2,21 @@
  * File Upload Component Styles
  */
 
-:where(.uix-file-upload) {
+:where(.uix-file-upload, uix-file-upload) {
   display: block;
 
-  & .file-upload {
+  .file-upload {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-md, 0.75rem);
   }
 
-  & .file-upload-label {
+  .file-upload-label {
     display: inline-block;
     cursor: pointer;
   }
 
-  & .file-upload-input {
+  .file-upload-input {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -28,15 +28,13 @@
     border-width: 0;
   }
 
-  & .file-dropzone {
+  .file-dropzone {
     border: 2px dashed var(--file-upload-border-color, var(--color-primary));
     border-radius: var(--file-upload-border-radius, var(--radius-lg));
     padding: var(--spacing-xl, 1.5rem);
     text-align: center;
     background-color: var(--file-upload-background, var(--color-surface));
-    transition:
-      border-color 0.2s ease,
-      background-color 0.2s ease;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
     cursor: pointer;
 
     &:hover:not(.disabled) {
@@ -55,45 +53,45 @@
     }
   }
 
-  & .file-dropzone-label {
+  .file-dropzone-label {
     display: block;
     cursor: pointer;
   }
 
-  & .file-dropzone-content {
+  .file-dropzone-content {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: var(--spacing-md, 0.75rem);
   }
 
-  & .file-dropzone-text {
+  .file-dropzone-text {
     color: var(--color-primary);
-    font-size: 0.875rem;
+    font-size: var(--text-sm, 0.875rem);
     margin: 0;
   }
 
-  & .file-dropzone-hint {
+  .file-dropzone-hint {
     color: var(--color-muted);
-    font-size: 0.75rem;
+    font-size: var(--text-xs, 0.75rem);
     margin: 0;
   }
 
-  & .file-upload-error {
+  .file-upload-error {
     padding: var(--spacing-sm, 0.5rem) var(--spacing-md, 0.75rem);
     background-color: var(--color-danger);
     color: var(--color-danger);
     border-radius: var(--radius-md);
-    font-size: 0.875rem;
+    font-size: var(--text-sm, 0.875rem);
   }
 
-  & .file-list {
+  .file-list {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-sm, 0.5rem);
   }
 
-  & .file-item {
+  .file-item {
     display: flex;
     align-items: center;
     gap: var(--spacing-md, 0.75rem);
@@ -103,7 +101,7 @@
     border-radius: var(--radius-md);
   }
 
-  & .file-preview {
+  .file-preview {
     width: 3rem;
     height: 3rem;
     object-fit: cover;
@@ -111,32 +109,32 @@
     flex-shrink: 0;
   }
 
-  & .file-icon {
+  .file-icon {
     width: 2rem;
     height: 2rem;
     color: var(--color-secondary);
     flex-shrink: 0;
   }
 
-  & .file-info {
+  .file-info {
     flex: 1;
     min-width: 0;
   }
 
-  & .file-name {
-    font-size: 0.875rem;
+  .file-name {
+    font-size: var(--text-sm, 0.875rem);
     color: var(--color-primary);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
-  & .file-size {
-    font-size: 0.75rem;
+  .file-size {
+    font-size: var(--text-xs, 0.75rem);
     color: var(--color-muted);
   }
 
-  & .file-remove {
+  .file-remove {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -149,9 +147,7 @@
     border-radius: var(--radius-sm);
     cursor: pointer;
     flex-shrink: 0;
-    transition:
-      background-color 0.2s ease,
-      color 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease;
 
     &:hover:not(:disabled) {
       background-color: var(--color-danger);

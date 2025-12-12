@@ -1,150 +1,146 @@
 /* UIX Auth Form Component Styles */
-/* Minimal defaults - inherits NBS styling from theme variables */
 
-.uix-auth-form {
+:where(.uix-auth-form, uix-auth-form) {
   display: block;
-
-  /* Defaults - theme overrides via --auth-* or global vars */
   --auth-border-width: 0;
   --auth-border-color: transparent;
   --auth-border-radius: var(--radius-md, 0.5rem);
   --auth-shadow: none;
-  --auth-error-bg: #fef2f2;
+  --auth-error-background: #fef2f2;
   --auth-error-border: var(--color-danger, #fca5a5);
   --auth-error-text: var(--color-danger-dark, #dc2626);
-  --auth-tab-bg: var(--color-surface-dark, #f5f5f5);
-  --auth-tab-active-bg: var(--color-surface, white);
+  --auth-tab-background: var(--color-surface-dark, #f5f5f5);
+  --auth-tab-active-background: var(--color-surface, white);
   --auth-font-weight: var(--button-font-weight, 700);
   --auth-text-transform: var(--button-text-transform, none);
   --auth-divider-color: var(--color-surface-darker, #e5e5e5);
   --auth-muted-text: var(--text-muted, #6b7280);
 
-  /* Apply container styling */
   border: var(--auth-border-width) solid var(--auth-border-color);
   border-radius: var(--auth-border-radius);
   box-shadow: var(--auth-shadow);
   overflow: hidden;
   background: var(--color-surface, white);
-}
 
-/* Tabs - using uix-tabs, inherit NBS styling */
-.uix-auth-form .auth-tabs {
-  --tabs-border-width: 0;
-  --tabs-border-radius: 0;
-  --tabs-shadow: none;
-  --tabs-list-bg: var(--auth-tab-bg);
-  --tabs-list-border-color: var(--color-inverse, black);
-  --tab-bg-active: var(--auth-tab-active-bg);
-  --tab-text-active: var(--color-inverse, black);
-  --tab-font-weight: var(--auth-font-weight);
-  --tab-text-transform: var(--auth-text-transform);
-  --tab-indicator-color: var(--color-inverse, black);
-}
+  /* Tabs */
+  .auth-tabs {
+    --tabs-border-width: 0;
+    --tabs-border-radius: 0;
+    --tabs-shadow: none;
+    --tabs-list-background: var(--auth-tab-background);
+    --tabs-list-border-color: var(--color-inverse, black);
+    --tab-active-background: var(--auth-tab-active-background);
+    --tab-active-color: var(--color-inverse, black);
+    --tab-font-weight: var(--auth-font-weight);
+    --tab-text-transform: var(--auth-text-transform);
+    --tab-indicator-color: var(--color-inverse, black);
 
-.uix-auth-form .auth-tabs [slot="tab"] {
-  font-weight: var(--auth-font-weight);
-  text-transform: var(--auth-text-transform);
-  font-size: 0.875rem;
-  background: var(--auth-tab-bg);
-  color: var(--auth-muted-text);
-  border-bottom: 3px solid transparent;
-}
+    [slot="tab"] {
+      font-weight: var(--auth-font-weight);
+      text-transform: var(--auth-text-transform);
+      font-size: 0.875rem;
+      background: var(--auth-tab-background);
+      color: var(--auth-muted-text);
+      border-bottom: 3px solid transparent;
 
-.uix-auth-form .auth-tabs [slot="tab"][active] {
-  background: var(--auth-tab-active-bg);
-  color: var(--color-inverse, black);
-  border-bottom-color: var(--color-inverse, black);
-}
+      &[active] {
+        background: var(--auth-tab-active-background);
+        color: var(--color-inverse, black);
+        border-bottom-color: var(--color-inverse, black);
+      }
+    }
+  }
 
-/* Form */
-.uix-auth-form .auth-form {
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
+  /* Form */
+  .auth-form {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
 
-/* Error Message - NBS styled */
-.uix-auth-form .error-message {
-  background: var(--auth-error-bg);
-  border: 3px solid var(--auth-error-border);
-  border-radius: var(--radius-md, 0.75rem);
-  padding: 0.75rem;
-  font-size: 0.875rem;
-  font-weight: var(--auth-font-weight);
-  color: var(--auth-error-text);
-  box-shadow: var(--shadow-sm, 2px 2px 0px 0px rgba(0,0,0,1));
-}
+  /* Error Message */
+  .error-message {
+    background: var(--auth-error-background);
+    border: 3px solid var(--auth-error-border);
+    border-radius: var(--radius-md, 0.75rem);
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: var(--auth-font-weight);
+    color: var(--auth-error-text);
+    box-shadow: var(--shadow-sm, 2px 2px 0px 0px rgba(0,0,0,1));
+  }
 
-/* Field */
-.uix-auth-form .field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
+  /* Field */
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 
-.uix-auth-form .label {
-  font-weight: var(--auth-font-weight);
-  font-size: 0.875rem;
-  text-transform: var(--auth-text-transform);
-  color: var(--color-secondary, #ec4899);
-}
+  .label {
+    font-weight: var(--auth-font-weight);
+    font-size: 0.875rem;
+    text-transform: var(--auth-text-transform);
+    color: var(--color-secondary, #ec4899);
+  }
 
-/* Submit Button - ensure full width */
-.uix-auth-form .submit-btn {
-  margin-top: 0.5rem;
-  width: 100%;
-}
+  /* Submit Button */
+  .submit-btn {
+    margin-top: 0.5rem;
+    width: 100%;
+  }
 
-/* OAuth Section */
-.uix-auth-form .oauth-section {
-  padding: 0 1.5rem;
-}
+  /* OAuth Section */
+  .oauth-section {
+    padding: 0 1.5rem;
+  }
 
-.uix-auth-form .divider {
-  position: relative;
-  padding: 0.5rem 0;
-  text-align: center;
-}
+  .divider {
+    position: relative;
+    padding: 0.5rem 0;
+    text-align: center;
 
-.uix-auth-form .divider::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--auth-divider-color);
-}
+    &::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--auth-divider-color);
+    }
 
-.uix-auth-form .divider span {
-  position: relative;
-  padding: 0 0.75rem;
-  background: var(--color-surface, white);
-  font-weight: var(--auth-font-weight);
-  font-size: 0.75rem;
-  text-transform: var(--auth-text-transform);
-  color: var(--auth-muted-text);
-}
+    span {
+      position: relative;
+      padding: 0 0.75rem;
+      background: var(--color-surface, white);
+      font-weight: var(--auth-font-weight);
+      font-size: 0.75rem;
+      text-transform: var(--auth-text-transform);
+      color: var(--auth-muted-text);
+    }
+  }
 
-/* OAuth buttons - ensure full width */
-.uix-auth-form .oauth-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin-top: 1rem;
-}
+  /* OAuth buttons */
+  .oauth-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
 
-.uix-auth-form .oauth-btn {
-  width: 100%;
-}
+  .oauth-btn {
+    width: 100%;
+  }
 
-/* Guest Section */
-.uix-auth-form .guest-section {
-  padding: 1rem 1.5rem 1.5rem;
-  text-align: center;
-}
+  /* Guest Section */
+  .guest-section {
+    padding: 1rem 1.5rem 1.5rem;
+    text-align: center;
+  }
 
-.uix-auth-form .guest-btn {
-  font-size: 0.875rem;
+  .guest-btn {
+    font-size: 0.875rem;
+  }
 }

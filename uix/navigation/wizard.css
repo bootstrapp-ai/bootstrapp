@@ -1,7 +1,7 @@
 /* UIX Wizard Component Styles */
 /* Light DOM - targets host element and shadow DOM via ::part() */
 
-.uix-wizard {
+:where(.uix-wizard, uix-wizard) {
   display: block;
   --wizard-border-width: 3px;
   --wizard-border-color: black;
@@ -11,128 +11,128 @@
   --wizard-progress-fill: var(--color-primary, #f472b6);
   --wizard-overlay-bg: rgba(0, 0, 0, 0.6);
   --wizard-shadow: 8px 8px 0px 0px rgba(255, 255, 255, 0.5);
-}
 
-/* Modal Overlay */
-.uix-wizard::part(overlay) {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  background: var(--wizard-overlay-bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-  backdrop-filter: blur(4px);
-}
+  /* Modal Overlay */
+  &::part(overlay) {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: var(--wizard-overlay-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    backdrop-filter: blur(4px);
+  }
 
-/* Container */
-.uix-wizard::part(container) {
-  background: white;
-  border: 4px solid var(--wizard-border-color);
-  border-radius: var(--wizard-border-radius);
-  width: 100%;
-  max-width: 28rem;
-  overflow: hidden;
-  box-shadow: var(--wizard-shadow);
-}
+  /* Container */
+  &::part(container) {
+    background: white;
+    border: 4px solid var(--wizard-border-color);
+    border-radius: var(--wizard-border-radius);
+    width: 100%;
+    max-width: 28rem;
+    overflow: hidden;
+    box-shadow: var(--wizard-shadow);
+  }
 
-/* Non-modal container */
-.uix-wizard:not([modal])::part(container) {
-  max-width: 100%;
-}
+  /* Non-modal container */
+  &:not([modal])::part(container) {
+    max-width: 100%;
+  }
 
-/* Header */
-.uix-wizard::part(header) {
-  background: #f3f4f6;
-  border-bottom: var(--wizard-border-width) solid var(--wizard-border-color);
-  padding: 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+  /* Header */
+  &::part(header) {
+    background: #f3f4f6;
+    border-bottom: var(--wizard-border-width) solid var(--wizard-border-color);
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 
-.uix-wizard::part(btn-back) {
-  font-weight: 700;
-  font-size: 0.875rem;
-  text-decoration: underline;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.25rem 0.5rem;
-}
+  &::part(btn-back) {
+    font-weight: 700;
+    font-size: 0.875rem;
+    text-decoration: underline;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
 
-.uix-wizard::part(btn-back):hover {
-  opacity: 0.7;
-}
+    &:hover {
+      opacity: 0.7;
+    }
+  }
 
-.uix-wizard::part(step-counter) {
-  font-weight: 900;
-  text-transform: uppercase;
-  font-size: 0.875rem;
-}
+  &::part(step-counter) {
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+  }
 
-/* Progress Bar */
-.uix-wizard::part(progress) {
-  width: 100%;
-  height: var(--wizard-progress-height);
-  background: var(--wizard-progress-bg);
-  border-bottom: var(--wizard-border-width) solid var(--wizard-border-color);
-}
+  /* Progress Bar */
+  &::part(progress) {
+    width: 100%;
+    height: var(--wizard-progress-height);
+    background: var(--wizard-progress-bg);
+    border-bottom: var(--wizard-border-width) solid var(--wizard-border-color);
+  }
 
-.uix-wizard::part(progress-fill) {
-  height: 100%;
-  background: var(--wizard-progress-fill);
-  transition: width 0.3s ease;
-}
+  &::part(progress-fill) {
+    height: 100%;
+    background: var(--wizard-progress-fill);
+    transition: width 0.3s ease;
+  }
 
-/* Content Area */
-.uix-wizard::part(content) {
-  padding: 1.5rem;
-}
+  /* Content Area */
+  &::part(content) {
+    padding: 1.5rem;
+  }
 
-/* Footer */
-.uix-wizard::part(footer) {
-  padding: 0 1.5rem 1.5rem 1.5rem;
-}
+  /* Footer */
+  &::part(footer) {
+    padding: 0 1.5rem 1.5rem 1.5rem;
+  }
 
-.uix-wizard::part(btn-next) {
-  width: 100%;
-  padding: 1rem 1.5rem;
-  background: black;
-  color: white;
-  border: none;
-  border-radius: 0.75rem;
-  font-weight: 900;
-  font-size: 1rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
+  &::part(btn-next) {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    background: black;
+    color: white;
+    border: none;
+    border-radius: 0.75rem;
+    font-weight: 900;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: background 0.15s ease;
 
-.uix-wizard::part(btn-next):hover {
-  background: #374151;
-}
+    &:hover {
+      background: #374151;
+    }
 
-.uix-wizard::part(btn-next):active {
-  background: #1f2937;
-}
+    &:active {
+      background: #1f2937;
+    }
+  }
 
-/* Alternative primary button style */
-.uix-wizard[primary-btn]::part(btn-next) {
-  background: var(--wizard-progress-fill);
-  color: black;
-  border: var(--wizard-border-width) solid var(--wizard-border-color);
-  box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
-}
+  /* Alternative primary button style */
+  &[primary-btn]::part(btn-next) {
+    background: var(--wizard-progress-fill);
+    color: black;
+    border: var(--wizard-border-width) solid var(--wizard-border-color);
+    box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
 
-.uix-wizard[primary-btn]::part(btn-next):hover {
-  transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 1);
-}
+    &:hover {
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 1);
+    }
 
-.uix-wizard[primary-btn]::part(btn-next):active {
-  transform: translate(4px, 4px);
-  box-shadow: none;
+    &:active {
+      transform: translate(4px, 4px);
+      box-shadow: none;
+    }
+  }
 }

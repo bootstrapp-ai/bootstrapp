@@ -1,11 +1,11 @@
-.uix-app-header {
+:where(.uix-app-header, uix-app-header) {
   width: 100%;
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
   min-height: 56px;
   padding: var(--spacing-sm) var(--spacing-md);
-  background: var(--app-header-bg, var(--color-surface));
+  background: var(--app-header-background, var(--color-surface));
   box-shadow: var(--app-header-shadow, var(--shadow-sm));
 
   /* Safe area support for iOS notch */
@@ -17,6 +17,7 @@
   transition:
     background-color 0.2s ease,
     box-shadow 0.2s ease;
+
   /* Host attributes */
   &[fixed] {
     position: fixed;
@@ -27,7 +28,7 @@
   }
 
   &[transparent] {
-    --app-header-bg: transparent;
+    --app-header-background: transparent;
     --app-header-shadow: none;
   }
 
@@ -46,109 +47,109 @@
   &[elevation="3"] {
     --app-header-shadow: var(--shadow-lg);
   }
-}
 
-/* Start section (left side) */
-.uix-app-header::part(start) {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  flex-shrink: 0;
-}
-
-/* Title section (center) */
-.uix-app-header::part(title) {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  min-width: 0; /* Allow truncation */
-}
-
-.uix-app-header::part(title) h1 {
-  margin: 0;
-  font-size: var(--font-size-lg);
-  font-weight: 600;
-  color: var(--color-text);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* End section (right side) */
-.uix-app-header::part(end) {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  flex-shrink: 0;
-}
-
-/* Back button */
-.uix-app-header::part(back-button) {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  padding: var(--spacing-xs);
-  background: transparent;
-  border: none;
-  border-radius: var(--radius-sm);
-  color: var(--color-text);
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  position: relative;
-
-  /* Chevron icon via CSS */
-  &::before {
-    content: "‹";
-    font-size: 28px;
-    line-height: 1;
-    font-weight: 300;
+  /* Start section (left side) */
+  &::part(start) {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    flex-shrink: 0;
   }
 
-  &:hover {
-    background: var(--color-surface-light);
+  /* Title section (center) */
+  &::part(title) {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    min-width: 0; /* Allow truncation */
+
+    h1 {
+      margin: 0;
+      font-size: var(--text-lg, 1.125rem);
+      font-weight: var(--font-semibold, 600);
+      color: var(--color-text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   }
 
-  &:active {
-    background: var(--color-surface-dark);
-  }
-}
-
-/* Slot content styling */
-.uix-app-header [slot="start"] button,
-.uix-app-header [slot="end"] button,
-.uix-app-header [slot="start"] [role="button"],
-.uix-app-header [slot="end"] [role="button"] {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--spacing-xs);
-  background: transparent;
-  border: none;
-  border-radius: var(--radius-sm);
-  color: var(--color-text);
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background: var(--color-surface-light);
+  /* End section (right side) */
+  &::part(end) {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    flex-shrink: 0;
   }
 
-  &:active {
-    background: var(--color-surface-dark);
-  }
-}
+  /* Back button */
+  &::part(back-button) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: var(--spacing-xs);
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    position: relative;
 
-.uix-app-header [slot="start"] uix-icon,
-.uix-app-header [slot="end"] uix-icon {
-  width: 24px;
-  height: 24px;
+    /* Chevron icon via CSS */
+    &::before {
+      content: "‹";
+      font-size: var(--text-3xl, 28px);
+      line-height: 1;
+      font-weight: var(--font-normal, 300);
+    }
+
+    &:hover {
+      background: var(--color-surface-light);
+    }
+
+    &:active {
+      background: var(--color-surface-dark);
+    }
+  }
+
+  /* Slot content styling */
+  [slot="start"] button,
+  [slot="end"] button,
+  [slot="start"] [role="button"],
+  [slot="end"] [role="button"] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xs);
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background: var(--color-surface-light);
+    }
+
+    &:active {
+      background: var(--color-surface-dark);
+    }
+  }
+
+  [slot="start"] uix-icon,
+  [slot="end"] uix-icon {
+    width: 24px;
+    height: 24px;
+  }
 }
 
 /* Responsive adjustments */
 @media (min-width: 768px) {
-  .uix-app-header {
+  :where(.uix-app-header, uix-app-header) {
     padding: var(--spacing-md) var(--spacing-lg);
     padding-top: calc(var(--spacing-md) + env(safe-area-inset-top));
     padding-left: calc(var(--spacing-lg) + env(safe-area-inset-left));

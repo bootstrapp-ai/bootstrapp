@@ -1,93 +1,175 @@
-.uix-select {
+/**
+ * UIX Select Styles
+ * Follows button.css gold standard pattern
+ */
+
+:where(.uix-select, uix-select) {
+  /* --- 1. Layout & Core Props --- */
   display: inline-block;
-  background: var(
-    --uix-select-background,
-    var(--theme-colors-background-primary, #282828)
-  );
-  border: var(--input-border-width, 1px) solid
-    var(--uix-select-border, var(--theme-colors-border-primary, #504945));
-  border-radius: var(--uix-select-radius, var(--theme-radius-md, 0.375rem));
+  width: var(--select-width, auto);
   position: relative;
-  transition:
+  box-sizing: border-box;
+
+  /* --- 2. Appearance --- */
+  background: var(--select-background, var(--color-surface-light, #ffffff));
+  border: var(--select-border-width, 1px) solid var(--select-border-color, var(--color-surface, #e5e7eb));
+  border-radius: var(--select-border-radius, var(--radius-md, 0.375rem));
+  box-shadow: var(--select-shadow, none);
+
+  /* --- 3. Transitions --- */
+  transition: var(
+    --select-transition,
     border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    background-color 0.2s ease,
+    box-shadow 0.15s ease
+  );
 
-  &:hover:not(:has(select:disabled)) {
-    border-color: var(
-      --uix-select-border-hover,
-      var(--theme-colors-accent-primary, #fabd2f)
-    );
-  }
-
-  &:focus-within {
-    border-color: var(
-      --uix-select-border-focus,
-      var(--theme-colors-accent-primary, #fabd2f)
-    );
-    box-shadow: 0 0 0 2px
-      rgba(var(--theme-colors-accent-primary-rgb, 250, 189, 47), 0.2);
-  }
-
+  /* --- 4. Native Select Element --- */
   select {
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
     width: 100%;
-    height: 100%;
-    padding: var(--theme-spacing-xs, 0.5rem) var(--theme-spacing-sm, 0.5rem);
-    padding-right: calc(var(--theme-spacing-sm, 0.5rem) * 3);
-    color: var(--uix-select-color, var(--theme-colors-text-primary, default));
-    font-size: inherit;
+    height: var(--select-height, 2.5rem);
+    padding: var(--select-padding-y, 0.5rem) var(--select-padding-x, 0.75rem);
+    padding-right: calc(var(--select-padding-x, 0.75rem) + var(--select-arrow-size, 1rem) + 0.5rem);
+    font-size: var(--select-font-size, var(--text-sm, 0.875rem));
+    font-weight: var(--select-font-weight, var(--font-normal, 400));
     font-family: inherit;
-    cursor: pointer;
-    outline: none;
-    border: none;
+    line-height: var(--select-line-height, 1.5);
+    color: var(--select-color, var(--text-color, inherit));
     background: transparent;
-    transition: all 0.2s ease;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: var(--select-transition, background-color 0.2s ease);
+
+    option {
+      background: var(--select-option-background, var(--color-surface-light));
+      color: var(--select-option-color, var(--text-color));
+      padding: var(--spacing-xs, 0.25rem);
+
+      &:checked {
+        background: var(--select-option-checked-background, var(--color-primary));
+        color: var(--select-option-checked-color, var(--color-inverse));
+      }
+    }
 
     &:focus {
       outline: none;
     }
+  }
 
-    &:disabled {
-      opacity: 0.6;
+  /* --- 5. Arrow Indicator --- */
+  .select-arrow,
+  &::part(arrow) {
+    position: absolute;
+    right: var(--select-padding-x, 0.75rem);
+    top: 50%;
+    transform: translateY(-50%);
+    width: var(--select-arrow-size, 1rem);
+    height: var(--select-arrow-size, 1rem);
+    color: var(--select-arrow-color, var(--text-muted));
+    pointer-events: none;
+    opacity: 0.7;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  /* --- 6. Interactive States --- */
+  &:hover:not(:focus-within):not(:has(select:disabled)) {
+    border-color: var(--select-hover-border-color, var(--color-primary-light));
+  }
+
+  &:focus-within {
+    border-color: var(--select-focus-border-color, var(--color-primary));
+    background: var(--select-focus-background, var(--select-background));
+    box-shadow: var(--select-focus-shadow, 0 0 0 3px rgba(250, 189, 47, 0.1));
+
+    .select-arrow,
+    &::part(arrow) {
+      opacity: 1;
+    }
+  }
+
+  &:has(select:disabled) {
+    opacity: var(--select-disabled-opacity, 0.6);
+    cursor: not-allowed;
+
+    select {
       cursor: not-allowed;
     }
 
-    option {
-      background: var(
-        --uix-select-option-background,
-        var(--theme-colors-background-primary, #282828)
-      );
-      color: var(
-        --uix-select-option-color,
-        var(--theme-colors-text-primary, default)
-      );
-      padding: var(--theme-spacing-xs, 0.25rem);
-
-      &:checked {
-        background: var(
-          --uix-select-option-checked-background,
-          var(--theme-colors-accent-primary, #fabd2f)
-        );
-        color: var(
-          --uix-select-option-checked-color,
-          var(--theme-colors-background-primary, #282828)
-        );
-      }
+    .select-arrow,
+    &::part(arrow) {
+      opacity: 0.4;
     }
   }
 
-  .select-arrow {
-    position: absolute;
-    right: var(--theme-spacing-sm, 0.5rem);
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
-    opacity: 0.7;
+  /* --- 7. Size Variants --- */
+  &[size="xs"] {
+    --select-height: 1.5rem;
+    --select-padding-y: 0.2rem;
+    --select-padding-x: 0.5rem;
+    --select-font-size: var(--text-xs, 0.75rem);
+    --select-arrow-size: 0.75rem;
   }
 
-  select:disabled ~ .select-arrow {
-    opacity: 0.4;
+  &[size="sm"] {
+    --select-height: 2rem;
+    --select-padding-y: 0.3rem;
+    --select-padding-x: 0.6rem;
+    --select-font-size: var(--text-sm, 0.875rem);
+    --select-arrow-size: 0.875rem;
+  }
+
+  &[size="md"] {
+    --select-height: 2.5rem;
+    --select-padding-y: 0.5rem;
+    --select-padding-x: 0.75rem;
+    --select-font-size: var(--text-base, 1rem);
+    --select-arrow-size: 1rem;
+  }
+
+  &[size="lg"] {
+    --select-height: 3rem;
+    --select-padding-y: 0.625rem;
+    --select-padding-x: 1rem;
+    --select-font-size: var(--text-lg, 1.125rem);
+    --select-arrow-size: 1.25rem;
+  }
+
+  &[size="xl"] {
+    --select-height: 3.5rem;
+    --select-padding-y: 0.75rem;
+    --select-padding-x: 1.25rem;
+    --select-font-size: var(--text-xl, 1.25rem);
+    --select-arrow-size: 1.5rem;
+  }
+
+  /* --- 8. Required Indicator --- */
+  &[required] {
+    border-left: 3px solid var(--select-required-color, var(--color-warning));
+  }
+
+  /* --- 9. Error State --- */
+  &[error] {
+    --select-border-color: var(--color-danger);
+    --select-focus-border-color: var(--color-danger);
+    --select-focus-shadow: 0 0 0 3px rgba(251, 73, 52, 0.1);
+  }
+
+  /* --- 10. Success State --- */
+  &[success] {
+    --select-border-color: var(--color-success);
+    --select-focus-border-color: var(--color-success);
+    --select-focus-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+  }
+
+  /* --- 11. Full Width --- */
+  &[w-full],
+  &[wfull] {
+    width: 100%;
+    display: block;
   }
 }

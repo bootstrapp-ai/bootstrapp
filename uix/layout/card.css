@@ -4,15 +4,16 @@
  * Inherits base container styles from uix-container
  */
 
-/* Host element - Card-specific layout */
-.uix-card {
+:where(.uix-card, uix-card) {
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* Override container default for cards */
+  overflow: hidden;
 
   &::part(body) {
     display: flex;
     flex-direction: column;
+    flex: 1;
+    background: var(--card-background, inherit);
   }
 
   /* Header Part */
@@ -21,7 +22,7 @@
     display: flex;
     padding: var(
       --card-header-padding,
-      var(--theme-spacing-md, 0.75rem) var(--theme-spacing-lg, 1rem)
+      var(--spacing-md, 0.75rem) var(--spacing-lg, 1rem)
     );
     border-bottom-width: var(--card-header-border-width, 0);
     border-bottom-style: solid;
@@ -37,28 +38,22 @@
     display: flex;
     padding: var(
       --card-footer-padding,
-      var(--theme-spacing-md, 0.75rem) var(--theme-spacing-lg, 1rem)
+      var(--spacing-md, 0.75rem) var(--spacing-lg, 1rem)
     );
     border-top-width: var(--card-footer-border-width, 0);
-    border-top-style: var(--theme-card-footer-borderStyle, solid);
+    border-top-style: var(--card-footer-border-style, solid);
     border-top-color: var(
       --card-footer-border-color,
-      var(--theme-colors-border-primary, #504945)
+      var(--color-surface, #504945)
     );
     background: var(--card-footer-background-color, inherit);
     flex-direction: row;
-    gap: var(--theme-spacing-sm, 0.5rem);
+    gap: var(--spacing-sm, 0.5rem);
     align-items: center;
     justify-content: flex-end;
   }
 
-  /* Body Part */
-  &::part(body) {
-    flex: 1;
-    background: var(--card-background, inherit);
-  }
-
-  /* Gradient background support - use style="--card-gradient-from: color1; --card-gradient-to: color2" */
+  /* Gradient background support */
   &[style*="--card-gradient-from"]::part(body) {
     background: linear-gradient(
       135deg,
@@ -160,9 +155,8 @@
     );
   }
 
-  /* Brutalist Shadow - Hard offset shadow with no blur */
   &[shadow="brutalist"] {
-    box-shadow: var(--theme-card-shadow-brutalist, 4px 4px 0px #1d2021);
+    box-shadow: var(--card-shadow-brutalist, 4px 4px 0px #1d2021);
   }
 
   /* Hover Effects */
@@ -171,15 +165,13 @@
     cursor: pointer;
 
     &:hover {
-      border-color: var(--theme-card-borderHover, #83a598);
+      border-color: var(--card-border-hover, #83a598);
     }
 
-    /* Brutalist shadow hover effect */
     &[shadow="brutalist"]:hover {
-      box-shadow: var(--theme-card-shadow-brutalistHover, 6px 6px 0px #83a598);
+      box-shadow: var(--card-shadow-brutalistHover, 6px 6px 0px #83a598);
     }
 
-    /* Enhanced shadows on hover for other shadow types */
     &[shadow="sm"]:hover {
       box-shadow: var(
         --shadow-md,

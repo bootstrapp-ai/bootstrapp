@@ -1,201 +1,174 @@
-:where(.uix-accordion) {
+:where(.uix-accordion, uix-accordion) {
   /* --- 1. Layout Variables --- */
   display: flex;
   width: 100%;
   --accordion-border-radius: var(--radius-md, 0.375rem);
   --accordion-padding: 0.25rem 0.5rem;
-  --accordion-gap: 0; /* Default to flush items */
+  --accordion-gap: 0;
 
   /* --- 2. Color Variables (Scoped) --- */
-  /* Container */
-  --accordion-bg: transparent;
-  --accordion-border-color: transparent; /* Lighter stop for visibility on dark bg */
+  --accordion-background: transparent;
+  --accordion-border-color: transparent;
 
   /* Headers */
-  --header-bg: transparent;
-  --header-text: var(--color-surface-lighter); /* High readability */
-  --header-border-top: var(--color-surface-dark); /* Subtle separator */
+  --accordion-header-background: transparent;
+  --accordion-header-color: var(--color-surface-lighter);
+  --header-border-top: var(--color-surface-dark);
 
   /* Header Interactions */
-  --header-bg-hover: var(--color-surface-dark); /* Lighter grey */
-  --header-text-hover: var(--color-inverse);
-
-  --header-bg-active: var(--color-surface-darker); /* Distinct active background */
-  --header-text-active: var(--color-inverse);
+  --accordion-header-background-hover: var(--color-surface-dark);
+  --accordion-header-color-hover: var(--color-inverse);
+  --accordion-header-background-active: var(--color-surface-darker);
+  --accordion-header-color-active: var(--color-inverse);
 
   /* Panels */
-  --panel-bg: transparent;
-  --panel-text: var(--color-surface-lighter); /* Slightly muted readable text */
+  --accordion-panel-background: transparent;
+  --accordion-panel-color: var(--color-surface-lighter);
 
   /* Transition */
   --accordion-transition: background-color 0.2s ease, color 0.2s ease,
     border-color 0.2s ease;
-}
 
-/* --- 3. Container Structure --- */
-.uix-accordion::part(container) {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  gap: var(--accordion-gap);
-
-  background: var(--accordion-bg);
-  border: 1px solid var(--accordion-border-color);
-  border-radius: var(--accordion-border-radius);
-  overflow: hidden;
-}
-
-/* --- 4. Headers (Odd Children) --- */
-.uix-accordion > *:nth-child(odd) {
-  display: flex;
-  width: 100%;
-  text-align: left;
-  cursor: pointer;
-  user-select: none;
-
-  padding: var(--accordion-padding);
-  font-size: var(--typography-fontSize-base, 1rem);
-  font-weight: var(--typography-fontWeight-medium, 500);
-
-  background: var(--header-bg);
-
-  border: none;
-  border-top: 1px solid var(--header-border-top);
-  transition: var(--accordion-transition);
-}
-
-/* Remove top border from the very first header */
-.uix-accordion > *:nth-child(1) {
-  border-top: none;
-}
-
-/* Header States */
-.uix-accordion > *:nth-child(odd):hover {
-  background: var(--header-bg-hover);
-}
-
-.uix-accordion > *:nth-child(odd)[active] {
-  &[activeBg] {
-    background: var(--header-bg-active);
+  /* --- 3. Container Structure --- */
+  &::part(container) {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: var(--accordion-gap);
+    background: var(--accordion-background);
+    border: 1px solid var(--accordion-border-color);
+    border-radius: var(--accordion-border-radius);
+    overflow: hidden;
   }
-}
 
-/* --- 5. Panels (Even Children) --- */
-.uix-accordion > *:nth-child(even) {
-  > * {
-    padding-left: 40px;
-    padding-block: 0.5rem;
+  /* --- 4. Headers (Odd Children) --- */
+  > *:nth-child(odd) {
+    display: flex;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    user-select: none;
+    padding: var(--accordion-padding);
+    font-size: var(--text-base, 1rem);
+    font-weight: var(--font-medium, 500);
+    background: var(--accordion-header-background);
+    border: none;
+    border-top: 1px solid var(--header-border-top);
+    transition: var(--accordion-transition);
+
+    &:hover {
+      background: var(--accordion-header-background-hover);
+    }
+
+    &[active][activeBg] {
+      background: var(--accordion-header-background-active);
+    }
   }
-  background: var(--panel-bg);
-  color: var(--panel-text);
 
-  font-size: var(--typography-fontSize-sm, 0.875rem);
-  line-height: var(--typography-lineHeight-relaxed, 1.6);
+  /* Remove top border from the very first header */
+  > *:nth-child(1) {
+    border-top: none;
+  }
 
-  /* Animation handled by JS or height transition, but color needs transition */
-  transition: var(--accordion-transition);
-}
+  /* --- 5. Panels (Even Children) --- */
+  > *:nth-child(even) {
+    background: var(--accordion-panel-background);
+    color: var(--accordion-panel-color);
+    font-size: var(--text-sm, 0.875rem);
+    line-height: var(--leading-relaxed, 1.6);
+    transition: var(--accordion-transition);
 
-.uix-accordion > *:nth-child(even)[hide] {
-  display: none;
-}
+    > * {
+      padding-left: 40px;
+      padding-block: 0.5rem;
+    }
 
-/* --- 6. Variants --- */
+    &[hide] {
+      display: none;
+    }
+  }
 
-/* Variant: Bordered */
-/* Stronger borders, transparent backgrounds */
-.uix-accordion[variant="bordered"] {
-  --accordion-border-color: var(--color-surface-dark);
-  --header-border-top: var(--color-surface-dark);
-  --header-bg-hover: var(--color-surface-dark);
-  --header-bg-active: var(--color-surface-darker);
-}
+  /* --- 6. Variants --- */
 
-.uix-accordion[variant="bordered"]::part(container) {
-  border-width: 2px;
-}
+  /* Variant: Bordered */
+  &[variant="bordered"] {
+    --accordion-border-color: var(--color-surface-dark);
+    --header-border-top: var(--color-surface-dark);
+    --accordion-header-background-hover: var(--color-surface-dark);
+    --accordion-header-background-active: var(--color-surface-darker);
 
-.uix-accordion[variant="bordered"] > *:nth-child(odd) {
-  border-top-width: 1px; /* Keep internal separators thin */
-}
+    &::part(container) {
+      border-width: 2px;
+    }
 
-/* Variant: Filled */
-/* Darker container, lighter active items (Depth effect) */
-.uix-accordion[variant="filled"] {
-  /* Make the container slightly darker than the page background */
-  --accordion-bg: var(--color-surface-lighter);
-  --accordion-border-color: transparent;
+    > *:nth-child(odd) {
+      border-top-width: 1px;
+    }
+  }
 
-  --header-border-top: var(--color-surface-light); /* Very subtle */
+  /* Variant: Filled */
+  &[variant="filled"] {
+    --accordion-background: var(--color-surface-lighter);
+    --accordion-border-color: transparent;
+    --header-border-top: var(--color-surface-light);
+    --accordion-header-background-active: var(--color-surface);
+    --accordion-panel-background: var(--color-surface);
+    --accordion-header-background-hover: var(--color-surface);
 
-  /* Active item "pops" out by becoming the normal surface color */
-  --header-bg-active: var(--color-surface);
-  --panel-bg: var(--color-surface);
+    > *:nth-child(odd)[active] {
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+  }
 
-  --header-bg-hover: var(--color-surface);
-}
+  /* Variant: Flush */
+  &[variant="flush"] {
+    --accordion-background: transparent;
+    --accordion-border-color: transparent;
+    --accordion-padding: 0;
+    --header-border-top: transparent;
+    --accordion-header-background: transparent;
+    --accordion-header-background-hover: var(--color-surface-light);
+    --accordion-header-background-active: var(--color-surface);
+    --accordion-panel-background: transparent;
 
-.uix-accordion[variant="filled"] > *:nth-child(odd)[active] {
-  /* Optional: Add shadow to active filled header */
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
+    &::part(container) {
+      border: none;
+      padding: 0;
+    }
 
-/* Variant: Flush */
-/* No borders, no background, no padding on container - for embedding in sidebars */
-.uix-accordion[variant="flush"] {
-  --accordion-bg: transparent;
-  --accordion-border-color: transparent;
-  --accordion-padding: 0;
-  --header-border-top: transparent;
-  --header-bg: transparent;
-  --header-bg-hover: var(--color-surface-light);
-  --header-bg-active: var(--color-surface);
-  --panel-bg: transparent;
-}
+    > *:nth-child(odd) {
+      border-top: none;
+    }
+  }
 
-.uix-accordion[variant="flush"]::part(container) {
-  border: none;
-  padding: 0;
-}
+  /* Variant: Separated */
+  &[variant="separated"] {
+    --accordion-gap: var(--spacing-sm, 0.5rem);
+    --accordion-border-color: transparent;
+    --header-border-top: transparent;
 
-.uix-accordion[variant="flush"] > *:nth-child(odd) {
-  border-top: none;
-}
+    &::part(container) {
+      border: none;
+      padding: var(--spacing-sm, 0.5rem);
+    }
 
-.uix-accordion[variant="flush"] > *:nth-child(1) {
-  border-top: none;
-}
+    > *:nth-child(odd) {
+      border: 1px solid var(--color-surface-dark);
+      border-radius: var(--accordion-border-radius);
+    }
 
-/* Variant: Separated */
-/* Items have gaps between them, good for card-like accordion */
-.uix-accordion[variant="separated"] {
-  --accordion-gap: var(--spacing-sm, 0.5rem);
-  --accordion-border-color: transparent;
-  --header-border-top: transparent;
-}
+    > *:nth-child(even) {
+      border: 1px solid var(--color-surface-dark);
+      border-top: none;
+      border-radius: 0 0 var(--accordion-border-radius) var(--accordion-border-radius);
+    }
+  }
 
-.uix-accordion[variant="separated"]::part(container) {
-  border: none;
-  padding: var(--spacing-sm, 0.5rem);
-}
+  &:not([rounded]) {
+    --accordion-border-radius: 0;
 
-.uix-accordion[variant="separated"] > *:nth-child(odd) {
-  border: 1px solid var(--color-surface-dark);
-  border-radius: var(--accordion-border-radius);
-  border-top: 1px solid var(--color-surface-dark);
-}
-
-.uix-accordion[variant="separated"] > *:nth-child(even) {
-  border: 1px solid var(--color-surface-dark);
-  border-top: none;
-  border-radius: 0 0 var(--accordion-border-radius)
-    var(--accordion-border-radius);
-}
-
-.uix-accordion:not([rounded]) {
-  --accordion-border-radius: 0;
-}
-
-.uix-accordion:not([rounded])::part(container) {
-  border-radius: 0;
+    &::part(container) {
+      border-radius: 0;
+    }
+  }
 }

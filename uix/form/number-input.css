@@ -2,21 +2,21 @@
  * Number Input Component Styles
  */
 
-:where(.uix-number-input) {
+:where(.uix-number-input, uix-number-input) {
   display: inline-block;
   width: 100%;
 
-  & .number-input-wrapper {
+  .number-input-wrapper {
     position: relative;
     display: flex;
     align-items: center;
   }
 
-  & .number-input {
+  .number-input {
     width: 100%;
     font-family: inherit;
-    font-size: var(--input-font-size, 0.875rem);
-    line-height: var(--input-line-height, 1.5);
+    font-size: var(--input-font-size, var(--text-sm, 0.875rem));
+    line-height: var(--input-line-height, var(--leading-normal, 1.5));
     padding: var(--input-padding-y, 0.5rem) var(--input-padding-x, 0.75rem);
     padding-right: var(--number-input-padding-right, 2.5rem);
     background-color: var(--input-background-color, var(--color-surface));
@@ -24,14 +24,11 @@
     border: 1px solid var(--input-border-color, var(--color-primary));
     border-radius: var(--input-border-radius, var(--radius-md));
     outline: none;
-    transition:
-      border-color 0.2s ease,
-      box-shadow 0.2s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 
     &:focus {
       border-color: var(--input-focus-border-color, var(--color-primary));
-      box-shadow: 0 0 0 3px
-        var(--input-focus-shadow-color, rgba(124, 111, 100, 0.1));
+      box-shadow: 0 0 0 3px var(--input-focus-shadow-color, rgba(124, 111, 100, 0.1));
     }
 
     &:hover:not(:disabled):not(:focus) {
@@ -39,20 +36,14 @@
     }
 
     &:disabled {
-      background-color: var(
-        --input-disabled-background-color,
-        var(--color-subtle)
-      );
+      background-color: var(--input-disabled-background-color, var(--color-subtle));
       color: var(--input-disabled-color, var(--color-muted));
       cursor: not-allowed;
       opacity: 0.6;
     }
 
     &[readonly] {
-      background-color: var(
-        --input-readonly-background-color,
-        var(--color-subtle)
-      );
+      background-color: var(--input-readonly-background-color, var(--color-subtle));
       cursor: default;
     }
 
@@ -68,7 +59,7 @@
     }
   }
 
-  & .number-input-buttons {
+  .number-input-buttons {
     position: absolute;
     right: 0.25rem;
     display: flex;
@@ -76,7 +67,7 @@
     gap: 1px;
   }
 
-  & .number-input-button {
+  .number-input-button {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -88,15 +79,10 @@
     color: var(--number-input-button-color, var(--color-secondary));
     border-radius: var(--radius-sm);
     cursor: pointer;
-    transition:
-      background-color 0.2s ease,
-      color 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease;
 
     &:hover:not(:disabled) {
-      background-color: var(
-        --number-input-button-hover-background,
-        var(--color-surface-darker)
-      );
+      background-color: var(--number-input-button-hover-background, var(--color-surface-darker));
       color: var(--number-input-button-hover-color, var(--color-primary));
     }
 
@@ -109,7 +95,7 @@
       cursor: not-allowed;
     }
 
-    & uix-icon {
+    uix-icon {
       width: 0.75rem;
       height: 0.75rem;
     }
@@ -117,46 +103,48 @@
 
   /* Size variants */
   &[size="xs"] .number-input {
-    --input-font-size: 0.75rem;
+    --input-font-size: var(--text-xs, 0.75rem);
     --input-padding-y: 0.25rem;
     --input-padding-x: 0.5rem;
     --number-input-padding-right: 2rem;
   }
 
   &[size="sm"] .number-input {
-    --input-font-size: 0.8125rem;
+    --input-font-size: var(--text-sm, 0.8125rem);
     --input-padding-y: 0.375rem;
     --input-padding-x: 0.625rem;
     --number-input-padding-right: 2.25rem;
   }
 
   &[size="md"] .number-input {
-    --input-font-size: 0.875rem;
+    --input-font-size: var(--text-sm, 0.875rem);
     --input-padding-y: 0.5rem;
     --input-padding-x: 0.75rem;
     --number-input-padding-right: 2.5rem;
   }
 
   &[size="lg"] .number-input {
-    --input-font-size: 1rem;
+    --input-font-size: var(--text-base, 1rem);
     --input-padding-y: 0.625rem;
     --input-padding-x: 1rem;
     --number-input-padding-right: 3rem;
   }
 
   &[size="xl"] .number-input {
-    --input-font-size: 1.125rem;
+    --input-font-size: var(--text-lg, 1.125rem);
     --input-padding-y: 0.75rem;
     --input-padding-x: 1.25rem;
     --number-input-padding-right: 3.5rem;
   }
 
   /* Hide buttons when show-buttons is false */
-  &[show-buttons="false"] .number-input {
-    padding-right: var(--input-padding-x, 0.75rem);
-  }
+  &[show-buttons="false"] {
+    .number-input {
+      padding-right: var(--input-padding-x, 0.75rem);
+    }
 
-  &[show-buttons="false"] .number-input-buttons {
-    display: none;
+    .number-input-buttons {
+      display: none;
+    }
   }
 }

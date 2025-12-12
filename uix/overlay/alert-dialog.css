@@ -2,8 +2,8 @@
  * Alert Dialog Component Styles
  */
 
-.uix-alert-dialog {
-  & dialog {
+:where(.uix-alert-dialog, uix-alert-dialog) {
+  dialog {
     padding: 0;
     border: none;
     border-radius: var(--alert-dialog-border-radius, var(--radius-lg));
@@ -17,16 +17,48 @@
     }
   }
 
-  & .alert-dialog-content {
+  .alert-dialog-content {
     display: flex;
     flex-direction: column;
     gap: var(--alert-dialog-gap, 1rem);
     padding: var(--alert-dialog-padding, 1.5rem);
     background-color: var(--alert-dialog-background, var(--color-surface));
     border-radius: var(--alert-dialog-border-radius, var(--radius-lg));
+
+    &.success .alert-dialog-icon {
+      background-color: var(--color-success);
+      color: var(--color-success);
+    }
+
+    &.error {
+      .alert-dialog-icon {
+        background-color: var(--color-danger);
+        color: var(--color-danger);
+      }
+
+      .confirm {
+        background-color: var(--color-danger);
+        border-color: var(--color-danger);
+
+        &:hover {
+          background-color: var(--color-danger);
+          opacity: 0.9;
+        }
+      }
+    }
+
+    &.warning .alert-dialog-icon {
+      background-color: var(--color-warning);
+      color: var(--color-warning);
+    }
+
+    &.info .alert-dialog-icon {
+      background-color: var(--color-info);
+      color: var(--color-primary);
+    }
   }
 
-  & .alert-dialog-icon {
+  .alert-dialog-icon {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -40,48 +72,48 @@
     color: var(--alert-dialog-icon-color, var(--color-primary));
     margin: 0 auto;
 
-    & uix-icon {
+    uix-icon {
       width: 1.5rem;
       height: 1.5rem;
     }
   }
 
-  & .alert-dialog-body {
+  .alert-dialog-body {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-sm, 0.5rem);
     text-align: center;
   }
 
-  & .alert-dialog-title {
+  .alert-dialog-title {
     margin: 0;
-    font-size: var(--alert-dialog-title-font-size, 1.25rem);
-    font-weight: var(--alert-dialog-title-font-weight, 700);
+    font-size: var(--alert-dialog-title-font-size, var(--text-xl, 1.25rem));
+    font-weight: var(--alert-dialog-title-font-weight, var(--font-bold, 700));
     color: var(--alert-dialog-title-color, var(--color-primary));
   }
 
-  & .alert-dialog-message {
+  .alert-dialog-message {
     margin: 0;
-    font-size: var(--alert-dialog-message-font-size, 0.875rem);
+    font-size: var(--alert-dialog-message-font-size, var(--text-sm, 0.875rem));
     color: var(--alert-dialog-message-color, var(--color-secondary));
-    line-height: 1.5;
+    line-height: var(--leading-normal, 1.5);
   }
 
-  & .alert-dialog-actions {
+  .alert-dialog-actions {
     display: flex;
     gap: var(--spacing-sm, 0.5rem);
     justify-content: flex-end;
     margin-top: var(--spacing-md, 0.75rem);
   }
 
-  & .alert-dialog-button {
+  .alert-dialog-button {
     flex: 1;
     padding: var(--spacing-sm, 0.5rem) var(--spacing-lg, 1rem);
     border: 1px solid var(--color-primary);
     background-color: var(--color-surface);
     color: var(--color-primary);
-    font-size: 0.875rem;
-    font-weight: 500;
+    font-size: var(--text-sm, 0.875rem);
+    font-weight: var(--font-medium, 500);
     border-radius: var(--radius-md);
     cursor: pointer;
     transition:
@@ -101,45 +133,6 @@
         background-color: var(--color-hover);
         border-color: var(--color-hover);
       }
-    }
-  }
-
-  /* Variant styles */
-  & .alert-dialog-content.success {
-    & .alert-dialog-icon {
-      background-color: var(--color-success);
-      color: var(--color-success);
-    }
-  }
-
-  & .alert-dialog-content.error {
-    & .alert-dialog-icon {
-      background-color: var(--color-danger);
-      color: var(--color-danger);
-    }
-
-    & .confirm {
-      background-color: var(--color-danger);
-      border-color: var(--color-danger);
-
-      &:hover {
-        background-color: var(--color-danger);
-        opacity: 0.9;
-      }
-    }
-  }
-
-  & .alert-dialog-content.warning {
-    & .alert-dialog-icon {
-      background-color: var(--color-warning);
-      color: var(--color-warning);
-    }
-  }
-
-  & .alert-dialog-content.info {
-    & .alert-dialog-icon {
-      background-color: var(--color-info);
-      color: var(--color-primary);
     }
   }
 }

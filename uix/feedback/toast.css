@@ -2,7 +2,7 @@
  * Toast Component Styles
  */
 
-.uix-toast {
+:where(.uix-toast, uix-toast) {
   &::part(container) {
     position: fixed;
     z-index: 9999;

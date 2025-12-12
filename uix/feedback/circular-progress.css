@@ -2,7 +2,7 @@
  * Circular Progress Component Styles
  */
 
-:where(.uix-circular-progress) {
+:where(.uix-circular-progress, uix-circular-progress) {
   display: inline-flex;
   align-items: center;
   justify-content: center;

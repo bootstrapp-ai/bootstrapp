@@ -1,4 +1,4 @@
-.uix-testimonial-card {
+:where(.uix-testimonial-card, uix-testimonial-card) {
   /* Layout */
   display: block;
   width: 100%;
@@ -16,7 +16,7 @@
 }
 
 /* Testimonial card container */
-.uix-testimonial-card::part(card) {
+:where(.uix-testimonial-card, uix-testimonial-card)::part(card) {
   display: flex;
   flex-direction: column;
   gap: var(--testimonial-gap, var(--spacing-md));
@@ -34,41 +34,41 @@
 }
 
 /* Rating stars */
-.uix-testimonial-card::part(rating) {
+:where(.uix-testimonial-card, uix-testimonial-card)::part(rating) {
   display: flex;
   gap: var(--spacing-xs);
   align-items: center;
 }
 
-.uix-testimonial-card::part(rating) uix-icon.filled {
+:where(.uix-testimonial-card, uix-testimonial-card)::part(rating) uix-icon.filled {
   color: var(--color-warning);
 }
 
-.uix-testimonial-card::part(rating) uix-icon.empty {
+:where(.uix-testimonial-card, uix-testimonial-card)::part(rating) uix-icon.empty {
   color: var(--color-text-muted);
   opacity: 0.3;
 }
 
-.uix-testimonial-card::part(rating) uix-icon {
+:where(.uix-testimonial-card, uix-testimonial-card)::part(rating) uix-icon {
   width: 16px;
   height: 16px;
 }
 
 /* Quote */
-.uix-testimonial-card::part(quote) {
+:where(.uix-testimonial-card, uix-testimonial-card)::part(quote) {
   flex: 1;
 }
 
-.uix-testimonial-card::part(quote) blockquote {
+:where(.uix-testimonial-card, uix-testimonial-card)::part(quote) blockquote {
   margin: 0;
-  font-size: var(--font-size-base);
+  font-size: var(--text-base, 1rem);
   line-height: 1.6;
   color: var(--color-text);
   quotes: """ """ "'" "'";
 
   &::before {
     content: open-quote;
-    font-size: var(--font-size-3xl);
+    font-size: var(--text-3xl, 1.875rem);
     line-height: 0;
     color: var(--color-primary);
     opacity: 0.3;
@@ -77,17 +77,17 @@
 }
 
 /* Compact variant */
-.uix-testimonial-card[variant="compact"]::part(quote) blockquote {
-  font-size: var(--font-size-sm);
+:where(.uix-testimonial-card, uix-testimonial-card)[variant="compact"]::part(quote) blockquote {
+  font-size: var(--text-sm, 0.875rem);
 }
 
 /* Detailed variant */
-.uix-testimonial-card[variant="detailed"]::part(quote) blockquote {
-  font-size: var(--font-size-lg);
+:where(.uix-testimonial-card, uix-testimonial-card)[variant="detailed"]::part(quote) blockquote {
+  font-size: var(--text-lg, 1.125rem);
 }
 
 /* Author section */
-.uix-testimonial-card::part(author) {
+:where(.uix-testimonial-card, uix-testimonial-card)::part(author) {
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
@@ -96,13 +96,13 @@
 }
 
 /* Compact variant */
-.uix-testimonial-card[variant="compact"]::part(author) {
+:where(.uix-testimonial-card, uix-testimonial-card)[variant="compact"]::part(author) {
   gap: var(--spacing-sm);
   padding-top: var(--spacing-sm);
 }
 
 /* Author info */
-.uix-testimonial-card::part(author-info) {
+:where(.uix-testimonial-card, uix-testimonial-card)::part(author-info) {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
@@ -110,9 +110,9 @@
   min-width: 0;
 }
 
-.uix-testimonial-card::part(author-name) {
-  font-size: var(--font-size-base);
-  font-weight: 600;
+:where(.uix-testimonial-card, uix-testimonial-card)::part(author-name) {
+  font-size: var(--text-base, 1rem);
+  font-weight: var(--font-semibold, 600);
   color: var(--color-text);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -120,32 +120,32 @@
 }
 
 /* Compact variant */
-.uix-testimonial-card[variant="compact"]::part(author-name) {
-  font-size: var(--font-size-sm);
+:where(.uix-testimonial-card, uix-testimonial-card)[variant="compact"]::part(author-name) {
+  font-size: var(--text-sm, 0.875rem);
 }
 
-.uix-testimonial-card::part(author-details) {
+:where(.uix-testimonial-card, uix-testimonial-card)::part(author-details) {
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
-  font-size: var(--font-size-sm);
+  font-size: var(--text-sm, 0.875rem);
   color: var(--color-text-muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.uix-testimonial-card::part(author-details) .separator {
+:where(.uix-testimonial-card, uix-testimonial-card)::part(author-details) .separator {
   opacity: 0.5;
 }
 
 /* Compact variant */
-.uix-testimonial-card[variant="compact"]::part(author-details) {
-  font-size: var(--font-size-xs);
+:where(.uix-testimonial-card, uix-testimonial-card)[variant="compact"]::part(author-details) {
+  font-size: var(--text-xs, 0.75rem);
 }
 
 /* Footer (detailed variant) */
-.uix-testimonial-card::part(footer) {
+:where(.uix-testimonial-card, uix-testimonial-card)::part(footer) {
   padding-top: var(--spacing-md);
   border-top: 1px solid var(--color-border);
 
@@ -155,49 +155,49 @@
 }
 
 /* Slot content styling */
-.uix-testimonial-card [slot="quote"] {
+:where(.uix-testimonial-card, uix-testimonial-card) [slot="quote"] {
   display: block;
-  font-size: var(--font-size-base);
+  font-size: var(--text-base, 1rem);
   line-height: 1.6;
   color: var(--color-text);
 }
 
-.uix-testimonial-card [slot="footer"] {
+:where(.uix-testimonial-card, uix-testimonial-card) [slot="footer"] {
   display: block;
   margin-top: var(--spacing-md);
 }
 
 /* Responsive adjustments */
 @media (max-width: 767px) {
-  .uix-testimonial-card::part(card) {
+  :where(.uix-testimonial-card, uix-testimonial-card)::part(card) {
     padding: var(--spacing-md);
   }
 
-  .uix-testimonial-card::part(quote) blockquote {
-    font-size: var(--font-size-sm);
+  :where(.uix-testimonial-card, uix-testimonial-card)::part(quote) blockquote {
+    font-size: var(--text-sm, 0.875rem);
   }
 }
 
 /* Dark mode adjustments */
 @media (prefers-color-scheme: dark) {
-  .uix-testimonial-card::part(card) {
+  :where(.uix-testimonial-card, uix-testimonial-card)::part(card) {
     background: var(--color-surface-dark);
   }
 
-  .uix-testimonial-card::part(quote) blockquote::before {
+  :where(.uix-testimonial-card, uix-testimonial-card)::part(quote) blockquote::before {
     color: var(--color-primary-light);
   }
 }
 
 /* Print styles */
 @media print {
-  .uix-testimonial-card::part(card) {
+  :where(.uix-testimonial-card, uix-testimonial-card)::part(card) {
     box-shadow: none;
     break-inside: avoid;
     page-break-inside: avoid;
   }
 
-  .uix-testimonial-card::part(rating) {
+  :where(.uix-testimonial-card, uix-testimonial-card)::part(rating) {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }

@@ -3,105 +3,101 @@
  * Global stylesheet for uix-progress-bar component
  */
 
-.uix-progress-bar {
+:where(.uix-progress-bar, uix-progress-bar) {
   display: block;
   --progress-height: 1rem;
   --progress-height-sm: 0.5rem;
   --progress-height-lg: 1.5rem;
   --progress-border-radius: var(--radius-full, 9999px);
-  --progress-bg: var(--color-secondary);
-  --progress-fill-bg: var(--color-primary);
+  --progress-background: var(--color-secondary);
+  --progress-fill-background: var(--color-primary);
   --progress-transition: width 0.3s ease;
-}
 
-/* Container */
-uix-progress-bar::part(container) {
-  width: 100%;
-}
+  &::part(container) {
+    width: 100%;
+  }
 
-/* Bar */
-uix-progress-bar::part(bar) {
-  width: 100%;
-  height: var(--progress-height);
-  background: var(--progress-bg);
-  border-radius: var(--progress-border-radius);
-  overflow: hidden;
-  position: relative;
-}
+  &::part(bar) {
+    width: 100%;
+    height: var(--progress-height);
+    background: var(--progress-background);
+    border-radius: var(--progress-border-radius);
+    overflow: hidden;
+    position: relative;
+  }
 
-/* Fill */
-uix-progress-bar::part(fill) {
-  height: 100%;
-  background: var(--progress-fill-bg);
-  transition: var(--progress-transition);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-}
+  &::part(fill) {
+    height: 100%;
+    background: var(--progress-fill-background);
+    transition: var(--progress-transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
 
-/* Label */
-uix-progress-bar::part(label) {
-  color: var(--color-inverse);
-  font-size: var(--typography-fontSize-xs, 0.75rem);
-  font-weight: var(--typography-fontWeight-semibold, 600);
-  line-height: 1;
-  white-space: nowrap;
-}
+  &::part(label) {
+    color: var(--color-inverse);
+    font-size: var(--text-xs, 0.75rem);
+    font-weight: var(--font-semibold, 600);
+    line-height: 1;
+    white-space: nowrap;
+  }
 
-/* Size variants */
-uix-progress-bar[size="sm"]::part(bar) {
-  height: var(--progress-height-sm);
-}
+  /* Size variants */
+  &[size="sm"]::part(bar) {
+    height: var(--progress-height-sm);
+  }
 
-uix-progress-bar[size="sm"]::part(label) {
-  font-size: 0.625rem;
-}
+  &[size="sm"]::part(label) {
+    font-size: 0.625rem;
+  }
 
-uix-progress-bar[size="lg"]::part(bar) {
-  height: var(--progress-height-lg);
-}
+  &[size="lg"]::part(bar) {
+    height: var(--progress-height-lg);
+  }
 
-uix-progress-bar[size="lg"]::part(label) {
-  font-size: var(--typography-fontSize-sm, 0.875rem);
-}
+  &[size="lg"]::part(label) {
+    font-size: var(--text-sm, 0.875rem);
+  }
 
-/* Variant colors */
-uix-progress-bar[variant="success"]::part(fill) {
-  --progress-fill-bg: var(--color-success);
-}
+  /* Variant colors */
+  &[variant="success"]::part(fill) {
+    --progress-fill-background: var(--color-success);
+  }
 
-uix-progress-bar[variant="danger"]::part(fill) {
-  --progress-fill-bg: var(--color-danger);
-}
+  &[variant="danger"]::part(fill) {
+    --progress-fill-background: var(--color-danger);
+  }
 
-uix-progress-bar[variant="warning"]::part(fill) {
-  --progress-fill-bg: var(--color-warning);
-}
+  &[variant="warning"]::part(fill) {
+    --progress-fill-background: var(--color-warning);
+  }
 
-uix-progress-bar[variant="info"]::part(fill) {
-  --progress-fill-bg: var(--color-info);
-}
+  &[variant="info"]::part(fill) {
+    --progress-fill-background: var(--color-info);
+  }
 
-/* Striped pattern */
-uix-progress-bar[striped]::part(fill) {
-  background-image: linear-gradient(
-    45deg,
-    rgba(255, 255, 255, 0.15) 25%,
-    transparent 25%,
-    transparent 50%,
-    rgba(255, 255, 255, 0.15) 50%,
-    rgba(255, 255, 255, 0.15) 75%,
-    transparent 75%,
-    transparent
-  );
-  background-size: 1rem 1rem;
-}
+  /* Striped pattern */
+  &[striped]::part(fill) {
+    background-image: linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.15) 25%,
+      transparent 25%,
+      transparent 50%,
+      rgba(255, 255, 255, 0.15) 50%,
+      rgba(255, 255, 255, 0.15) 75%,
+      transparent 75%,
+      transparent
+    );
+    background-size: 1rem 1rem;
+  }
 
-/* Animated stripes */
-uix-progress-bar[animated]::part(fill) {
-  animation: progress-bar-stripes 1s linear infinite;
+  /* Animated stripes */
+  &[animated]::part(fill) {
+    animation: progress-bar-stripes 1s linear infinite;
+  }
 }
 
 @keyframes progress-bar-stripes {

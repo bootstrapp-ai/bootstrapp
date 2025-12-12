@@ -2,7 +2,7 @@
  * Clipboard Component Styles
  */
 
-.uix-clipboard {
+:where(.uix-clipboard, uix-clipboard) {
   display: block;
 
   &::part(container) {

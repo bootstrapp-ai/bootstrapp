@@ -1,52 +1,60 @@
-.uix-divider,
+:where(.uix-divider, uix-divider),
 .split-pane::part(divider) {
-  --uix-divider-color: rgba(0, 0, 0, 0.05);
-  --uix-divider-size: 2px;
+  --divider-color: rgba(0, 0, 0, 0.05);
+  --divider-size: 2px;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   padding: 0;
   width: 100%;
-  height: var(--uix-divider-size);
+  height: var(--divider-size);
+
   span {
     padding: 0 0.75rem;
     font-weight: bold;
-    font-size: var(--uix-divider-font-size, 1.5rem);
+    font-size: var(--divider-font-size, 1.5rem);
   }
 
   &[resizable] {
     cursor: row-resize;
+
     &[vertical] {
       cursor: col-resize;
     }
   }
+
   &::before,
   &::after {
     content: "";
     flex-grow: 1;
-    height: var(--uix-divider-size);
-    background-color: var(--uix-divider-color);
+    height: var(--divider-size);
+    background-color: var(--divider-color);
   }
+
   &[label] {
-    padding: var(--uix-divider-padding, 1rem) 0;
+    padding: var(--divider-padding, 1rem) 0;
+
+    &::before,
+    &::after {
+      flex-grow: 1;
+    }
   }
-  &[label]::before,
-  &[label]::after {
-    flex-grow: 1;
-  }
+
   &[vertical] {
     flex-direction: column;
     width: 1px;
     height: 100%;
     background-color: transparent;
+
     &::before,
     &::after {
       width: 1px;
       height: auto;
     }
+
     &[label] {
-      padding: 0 var(--uix-divider-padding, 1rem);
+      padding: 0 var(--divider-padding, 1rem);
     }
   }
 }

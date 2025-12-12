@@ -1,151 +1,178 @@
 /**
  * UIX Input Styles
- * Global stylesheet for uix-input component
+ * Follows button.css gold standard pattern
  */
 
-.uix-input {
+:where(.uix-input, uix-input) {
+  /* --- 1. Layout & Core Props --- */
   display: inline-block;
+  width: var(--input-width, auto);
+  box-sizing: border-box;
 
-  /* Use theme variables directly with fallbacks (don't re-declare) */
-  background: var(--input-bg, #ffffff);
-  border: var(--input-border-width, 1px) solid var(--input-border-color, #e5e7eb);
+  /* --- 2. Appearance --- */
+  background: var(--input-background, var(--color-surface-light, #ffffff));
+  border: var(--input-border-width, 1px) solid var(--input-border-color, var(--color-surface, #e5e7eb));
   border-radius: var(--input-border-radius, var(--radius-md, 0.375rem));
   box-shadow: var(--input-shadow, none);
-  transition: var(--input-transition, border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.15s ease);
-}
 
-/* Base input styles */
-.uix-input input {
-  width: 100%;
-  height: 3rem;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.9rem;
-  line-height: 2rem;
-  font-family: inherit;
-  color: var(--input-text, var(--color-primary));
-  outline: none;
-  transition:
+  /* --- 3. Transitions --- */
+  transition: var(
+    --input-transition,
     border-color 0.2s ease,
-    background-color 0.2s ease;
-  box-sizing: border-box;
-}
+    background-color 0.2s ease,
+    box-shadow 0.15s ease
+  );
 
-/* Placeholder */
-.uix-input input::placeholder {
-  color: var(--input-placeholder, var(--color-placeholder));
-  opacity: 1;
-}
+  /* --- 4. Native Input Element --- */
+  input {
+    width: 100%;
+    height: var(--input-height, 3rem);
+    padding: var(--input-padding-y, 0.5rem) var(--input-padding-x, 0.75rem);
+    font-size: var(--input-font-size, var(--text-sm, 0.9rem));
+    font-weight: var(--input-font-weight, var(--font-normal, 400));
+    line-height: var(--input-line-height, 2rem);
+    font-family: inherit;
+    color: var(--input-color, var(--text-color, inherit));
+    background: transparent;
+    border: none;
+    outline: none;
+    box-sizing: border-box;
+    transition: var(--input-transition, background-color 0.2s ease);
 
-/* Focus state */
-.uix-input:focus-within {
-  box-shadow: var(--input-focus-shadow, 0 0 0 3px rgba(250, 189, 47, 0.1));
-}
-
-.uix-input input:focus {
-  background: var(--input-bg-focus, var(--color-surface-darker));
-  border-color: var(--input-border-focus, var(--color-primary));
-}
-
-/* Disabled state */
-.uix-input input:disabled {
-  background: var(--input-bg-disabled, var(--color-subtle));
-  color: var(--color-muted);
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-/* Readonly state */
-.uix-input input:read-only {
-  background: var(--input-bg-disabled, var(--color-subtle));
-  cursor: default;
-}
-
-/* Size: xs */
-.uix-input[size="xs"] input {
-  height: 1.4rem;
-  padding: 0.2rem 0.5rem;
-  font-size: 0.6rem;
-  line-height: 1rem;
-}
-
-/* Size: sm */
-.uix-input[size="sm"] input {
-  height: 1.85rem;
-  padding: 0.3rem 0.6rem;
-  font-size: 0.8rem;
-  line-height: 1.25rem;
-}
-
-/* Size: md (default) */
-.uix-input[size="md"] input {
-  height: 3rem;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.9rem;
-  line-height: 2rem;
-}
-
-/* Size: lg */
-.uix-input[size="lg"] input {
-  height: 2.75rem;
-  padding: 0.5rem 1rem;
-  font-size: 1.1rem;
-  line-height: 1.75rem;
-}
-
-/* Size: xl */
-.uix-input[size="xl"] input {
-  height: 3.25rem;
-  padding: 0.625rem 1.25rem;
-  font-size: 1.25rem;
-  line-height: 2rem;
-}
-
-/* Required indicator */
-.uix-input[required] input {
-  border-left: 3px solid var(--color-warning);
-}
-
-/* Hover state (when not disabled) */
-.uix-input input:hover:not(:disabled):not(:focus) {
-  border-color: var(--color-hover, var(--color-secondary));
-}
-
-/* Error state */
-.uix-input[error] {
-  border-color: var(--color-danger);
-}
-
-.uix-input[error] input {
-  border-color: var(--color-danger);
-}
-
-.uix-input[error]:focus-within {
-  --input-focus-shadow: 0 0 0 3px rgba(251, 73, 52, 0.1);
-}
-
-.uix-input[error] input:focus {
-  border-color: var(--color-danger);
-}
-
-/* Full width */
-.uix-input[w-full] {
-  width: 100%;
-  display: block;
-}
-
-.uix-input:has(.uix-icon) {
-  position: relative;
-  .uix-icon {
-    position: absolute;
-    right: 10px;
-    top: 9px;
-    &[left] {
-      left: 10px;
+    &::placeholder {
+      color: var(--input-placeholder-color, var(--text-muted, #9ca3af));
+      opacity: 1;
     }
   }
-}
-.uix-input:has(.uix-icon[left]) {
-  input {
-    padding-left: 27px;
+
+  /* --- 5. Interactive States --- */
+  &:hover:not(:focus-within):not(:has(input:disabled)) {
+    border-color: var(--input-hover-border-color, var(--color-primary-light));
+  }
+
+  &:focus-within {
+    border-color: var(--input-focus-border-color, var(--color-primary));
+    background: var(--input-focus-background, var(--input-background));
+    box-shadow: var(--input-focus-shadow, 0 0 0 3px rgba(250, 189, 47, 0.1));
+  }
+
+  &:has(input:disabled) {
+    opacity: var(--input-disabled-opacity, 0.6);
+    cursor: not-allowed;
+
+    input {
+      background: var(--input-disabled-background, var(--color-surface-dark));
+      color: var(--input-disabled-color, var(--text-muted));
+      cursor: not-allowed;
+    }
+  }
+
+  &:has(input:read-only) input {
+    background: var(--input-readonly-background, var(--color-surface-dark));
+    cursor: default;
+  }
+
+  /* --- 6. Size Variants --- */
+  &[size="xs"] {
+    --input-height: 1.5rem;
+    --input-padding-y: 0.2rem;
+    --input-padding-x: 0.5rem;
+    --input-font-size: var(--text-xs, 0.75rem);
+    --input-line-height: 1rem;
+    --input-icon-size: 0.75rem;
+  }
+
+  &[size="sm"] {
+    --input-height: 2rem;
+    --input-padding-y: 0.3rem;
+    --input-padding-x: 0.6rem;
+    --input-font-size: var(--text-sm, 0.875rem);
+    --input-line-height: 1.25rem;
+    --input-icon-size: 0.875rem;
+  }
+
+  &[size="md"] {
+    --input-height: 2.5rem;
+    --input-padding-y: 0.5rem;
+    --input-padding-x: 0.75rem;
+    --input-font-size: var(--text-base, 1rem);
+    --input-line-height: 1.5rem;
+    --input-icon-size: 1rem;
+  }
+
+  &[size="lg"] {
+    --input-height: 3rem;
+    --input-padding-y: 0.625rem;
+    --input-padding-x: 1rem;
+    --input-font-size: var(--text-lg, 1.125rem);
+    --input-line-height: 1.75rem;
+    --input-icon-size: 1.25rem;
+  }
+
+  &[size="xl"] {
+    --input-height: 3.5rem;
+    --input-padding-y: 0.75rem;
+    --input-padding-x: 1.25rem;
+    --input-font-size: var(--text-xl, 1.25rem);
+    --input-line-height: 2rem;
+    --input-icon-size: 1.5rem;
+  }
+
+  /* --- 7. Required Indicator --- */
+  &[required] {
+    border-left: 3px solid var(--input-required-color, var(--color-warning));
+  }
+
+  /* --- 8. Error State --- */
+  &[error] {
+    --input-border-color: var(--color-danger);
+    --input-focus-border-color: var(--color-danger);
+    --input-focus-shadow: 0 0 0 3px rgba(251, 73, 52, 0.1);
+  }
+
+  /* --- 9. Success State --- */
+  &[success] {
+    --input-border-color: var(--color-success);
+    --input-focus-border-color: var(--color-success);
+    --input-focus-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+  }
+
+  /* --- 10. Full Width --- */
+  &[w-full],
+  &[wfull] {
+    width: 100%;
+    display: block;
+  }
+
+  /* --- 11. Icon Support --- */
+  &:has(.uix-icon) {
+    position: relative;
+
+    .uix-icon {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      right: var(--input-icon-offset, 0.75rem);
+      width: var(--input-icon-size, 1rem);
+      height: var(--input-icon-size, 1rem);
+      color: var(--input-icon-color, var(--text-muted));
+      pointer-events: none;
+    }
+
+    input {
+      padding-right: calc(var(--input-icon-size, 1rem) + var(--input-icon-offset, 0.75rem) * 2);
+    }
+  }
+
+  &:has(.uix-icon[left]) {
+    .uix-icon {
+      left: var(--input-icon-offset, 0.75rem);
+      right: auto;
+    }
+
+    input {
+      padding-left: calc(var(--input-icon-size, 1rem) + var(--input-icon-offset, 0.75rem) * 2);
+      padding-right: var(--input-padding-x, 0.75rem);
+    }
   }
 }

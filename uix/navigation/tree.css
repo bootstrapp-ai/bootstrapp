@@ -1,6 +1,6 @@
-uix-tree {
+:where(.uix-tree, uix-tree) {
   display: block;
-  background: var(--theme-colors-background-primary);
-  color: var(--theme-colors-text-primary);
+  background: var(--color-surface-darker);
+  color: var(--text-color);
   user-select: none;
 }

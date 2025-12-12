@@ -2,9 +2,10 @@
  * Navbar Component Styles
  */
 
-.uix-navbar {
+:where(.uix-navbar, uix-navbar) {
   display: flex;
   flex-grow: 1;
+
   &::part(container) {
     display: flex;
     flex-grow: 1;
@@ -30,8 +31,8 @@
     display: flex;
     align-items: center;
     gap: var(--navbar-brand-gap, 0.75rem);
-    font-size: var(--navbar-brand-font-size, 1.25rem);
-    font-weight: var(--navbar-brand-font-weight, 700);
+    font-size: var(--navbar-brand-font-size, var(--text-xl, 1.25rem));
+    font-weight: var(--navbar-brand-font-weight, var(--font-bold, 700));
     color: var(--navbar-brand-color, var(--color-primary));
   }
 
@@ -119,6 +120,15 @@
     box-shadow: none;
   }
 
+  /* Direction variants */
+  &[direction="horizontal"]::part(start) {
+    margin-left: var(--navbar-start-margin, 2rem);
+  }
+
+  &[direction="vertical"]::part(inner) {
+    flex-direction: column;
+  }
+
   /* Mobile styles */
   @media (max-width: 768px) {
     &::part(toggle) {
@@ -166,16 +176,6 @@
 
     &::part(end) {
       padding-top: var(--spacing-md, 0.75rem);
-    }
-  }
-  &[direction="horizontal"] {
-    &::part(start) {
-      margin-left: var(--navbar-start-margin, 2rem);
-    }
-  }
-  &[direction="vertical"] {
-    &::part(inner) {
-      flex-direction: column;
     }
   }
 }

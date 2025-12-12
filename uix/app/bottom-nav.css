@@ -1,4 +1,4 @@
-:where(.uix-bottom-nav) {
+:where(.uix-bottom-nav, uix-bottom-nav) {
   --icon-size: 36px;
   /* Layout */
   display: flex;
@@ -12,7 +12,7 @@
   min-height: var(--bottom-nav-height, 56px);
   padding: var(--bottom-nav-padding-y, var(--spacing-xs, 0.5rem))
     var(--bottom-nav-padding-x, var(--spacing-sm, 0.75rem));
-  background: var(--bottom-nav-bg, var(--color-surface, white));
+  background: var(--bottom-nav-background, var(--color-surface, white));
 
   /* Safe area support for iOS home indicator */
   padding-bottom: calc(
@@ -39,7 +39,7 @@
 
   /* Floating variant */
   &[variant="floating"] {
-    --bottom-nav-bg: var(--color-surface);
+    --bottom-nav-background: var(--color-surface);
     --bottom-nav-border-radius: var(--radius-xl);
     margin: var(--bottom-nav-margin, var(--spacing-md));
     margin-bottom: calc(
@@ -51,13 +51,13 @@
 
   /* Filled variant */
   &[variant="filled"] {
-    --bottom-nav-item-active-bg: var(--color-primary);
+    --bottom-nav-item-active-background: var(--color-primary);
     --bottom-nav-item-active-color: white;
   }
 }
 
 /* Direct children (uix-link, a, .nav-item, etc.) */
-:where(.uix-bottom-nav) > * {
+:where(.uix-bottom-nav, uix-bottom-nav) > * {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -78,7 +78,7 @@
   cursor: pointer;
 
   &:hover {
-    background: var(--bottom-nav-item-hover-bg, var(--color-primary-lighter));
+    background: var(--bottom-nav-item-hover-background, var(--color-primary-lighter));
     color: var(--bottom-nav-item-hover-color, var(--color-text));
   }
 
@@ -89,23 +89,23 @@
 }
 
 /* Filled variant - active items get background */
-:where(.uix-bottom-nav[variant="filled"]) > *.active,
-:where(.uix-bottom-nav[variant="filled"]) > *[aria-current] {
-  background: var(--bottom-nav-item-active-bg, var(--color-primary));
+:where(.uix-bottom-nav[variant="filled"], uix-bottom-nav[variant="filled"]) > *.active,
+:where(.uix-bottom-nav[variant="filled"], uix-bottom-nav[variant="filled"]) > *[aria-current] {
+  background: var(--bottom-nav-item-active-background, var(--color-primary));
   color: var(--bottom-nav-item-active-color, white);
 }
 
 /* Icon styling */
-:where(.uix-bottom-nav) uix-icon,
-:where(.uix-bottom-nav) svg {
+:where(.uix-bottom-nav, uix-bottom-nav) uix-icon,
+:where(.uix-bottom-nav, uix-bottom-nav) svg {
   width: var(--icon-size);
   height: var(--icon-size);
   flex-shrink: 0;
 }
 
 /* Text/label styling */
-:where(.uix-bottom-nav) span {
-  font-size: var(--bottom-nav-text-size, var(--font-size-xs, 0.75rem));
-  font-weight: var(--bottom-nav-text-weight, 500);
+:where(.uix-bottom-nav, uix-bottom-nav) span {
+  font-size: var(--bottom-nav-text-size, var(--text-xs, 0.75rem));
+  font-weight: var(--bottom-nav-text-weight, var(--font-medium, 500));
   text-align: center;
 }

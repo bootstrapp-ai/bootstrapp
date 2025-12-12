@@ -1,11 +1,12 @@
-.uix-rating {
-	.uix-rating__container {
-		&[filled] {
-			color: yellow;
-		}
-	}
-	.uix-rating__star {
-		width: 1.25rem;
-		height: 1.25rem;
-	}
+:where(.uix-rating, uix-rating) {
+  .uix-rating__container {
+    &[filled] {
+      color: yellow;
+    }
+  }
+
+  .uix-rating__star {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
 }

@@ -2,7 +2,7 @@
  * Section Component Styles
  */
 
-.uix-section {
+:where(.uix-section, uix-section) {
   display: block;
 
   &::part(container) {

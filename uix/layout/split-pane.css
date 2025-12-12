@@ -3,46 +3,11 @@
  * Uses ::part() for customizable styling
  */
 
-/* Host element */
-.uix-split-pane {
+:where(.uix-split-pane, uix-split-pane) {
   display: flex;
   width: 100%;
   height: 100%;
   overflow: hidden;
-
-  /* Panels */
-
-  /* Horizontal divider (vertical resize) */
-
-  /* Divider hover effect (only when resizable) */
-  &[resizable]::part(divider):hover {
-    background: var(
-      --split-pane-divider-hover-bg,
-      var(--theme-colors-accent-primary, #fabd2f)
-    );
-  }
-
-  /* Divider active/dragging effect (only when resizable) */
-  &[resizable]::part(divider):active {
-    background: var(
-      --split-pane-divider-active-bg,
-      var(--theme-colors-accent-primary, #fabd2f)
-    );
-  }
-
-  /* Divider handle (visual indicator on hover, only when resizable) */
-  &[resizable]::part(divider)::before {
-    content: "";
-    position: absolute;
-    background: var(--theme-colors-background-elevated, #3c3836);
-    border-radius: var(--theme-radius-full, 9999px);
-    opacity: 0;
-    transition: opacity 0.2s ease;
-  }
-
-  &[resizable]::part(divider):hover::before {
-    opacity: 1;
-  }
 
   > [slot] {
     width: 100%;
@@ -55,14 +20,14 @@
     overflow: auto;
     background: var(
       --split-pane-panel-bg,
-      var(--theme-colors-background-primary, #282828)
+      var(--color-surface-darker, #282828)
     );
     flex-shrink: 0;
     flex-grow: 0;
   }
 
   &::part(primary) {
-    min-width: 0; /* Allow flexbox to shrink below content size */
+    min-width: 0;
     min-height: 0;
   }
 
@@ -72,100 +37,126 @@
     min-height: 0;
   }
 
-  /* Divider */
   &::part(divider) {
     display: flex;
     align-items: center;
     justify-content: center;
     background: var(
       --split-pane-divider-bg,
-      var(--theme-colors-border-primary, #504945)
+      var(--color-surface, #504945)
     );
     flex-shrink: 0;
     position: relative;
     z-index: 10;
     transition: background 0.15s ease;
   }
+
+  /* Direction variants */
   &[direction="horizontal"],
   &:not([direction]) {
     flex-direction: row;
+
+    &::part(divider) {
+      width: var(--divider-size, 4px);
+      cursor: default;
+
+      &::before {
+        width: var(--divider-size, 4px);
+        height: 48px;
+      }
+    }
   }
 
   &[direction="vertical"] {
     flex-direction: column;
+
+    &::part(divider) {
+      height: var(--divider-size, 4px);
+      cursor: default;
+
+      &::before {
+        width: 48px;
+        height: var(--divider-size, 4px);
+      }
+    }
   }
 
-  &[direction="horizontal"]::part(divider),
-  &:not([direction])::part(divider) {
-    width: var(--divider-size, 4px);
-    cursor: default;
+  /* Resizable states */
+  &[resizable] {
+    &::part(divider):hover {
+      background: var(
+        --split-pane-divider-hover-bg,
+        var(--color-primary, #fabd2f)
+      );
+    }
+
+    &::part(divider):active {
+      background: var(
+        --split-pane-divider-active-bg,
+        var(--color-primary, #fabd2f)
+      );
+    }
+
+    &::part(divider)::before {
+      content: "";
+      position: absolute;
+      background: var(--color-surface-light, #3c3836);
+      border-radius: var(--radius-full, 9999px);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    &::part(divider):hover::before {
+      opacity: 1;
+    }
+
+    &[direction="horizontal"]::part(divider),
+    &:not([direction])::part(divider) {
+      cursor: col-resize;
+    }
+
+    &[direction="vertical"]::part(divider) {
+      cursor: row-resize;
+    }
   }
 
-  /* Vertical divider (horizontal resize) */
-  &[direction="vertical"]::part(divider) {
-    height: var(--divider-size, 4px);
-    cursor: default;
+  /* Dragging state */
+  &[dragging] {
+    user-select: none;
+
+    &[direction="horizontal"],
+    &:not([direction]) {
+      cursor: col-resize;
+
+      * {
+        cursor: col-resize !important;
+      }
+    }
+
+    &[direction="vertical"] {
+      cursor: row-resize;
+
+      * {
+        cursor: row-resize !important;
+      }
+    }
   }
-
-  /* Resize cursor only when resizable */
-  &[resizable][direction="horizontal"]::part(divider),
-  &[resizable]:not([direction])::part(divider) {
-    cursor: col-resize;
-  }
-
-  &[resizable][direction="vertical"]::part(divider) {
-    cursor: row-resize;
-  }
-  /* Horizontal divider handle */
-  &[direction="horizontal"]::part(divider)::before,
-  &:not([direction]) ::part(divider)::before {
-    width: var(--divider-size, 4px);
-    height: 48px;
-  }
-
-  /* Vertical divider handle */
-  &[direction="vertical"]::part(divider)::before {
-    width: 48px;
-    height: var(--divider-size, 4px);
-  }
-}
-
-/* Dragging state - prevent text selection and set cursor */
-.uix-split-pane[dragging] {
-  user-select: none;
-}
-
-.uix-split-pane[dragging][direction="horizontal"],
-.uix-split-pane[dragging]:not([direction]) {
-  cursor: col-resize;
-}
-
-.uix-split-pane[dragging][direction="vertical"] {
-  cursor: row-resize;
-}
-
-/* Apply cursor to body when dragging to prevent cursor flicker */
-.uix-split-pane[dragging][direction="horizontal"] *,
-.uix-split-pane[dragging]:not([direction]) * {
-  cursor: col-resize !important;
-}
-
-.uix-split-pane[dragging][direction="vertical"] * {
-  cursor: row-resize !important;
 }
 
 /* Touch-friendly larger hit area for mobile */
 @media (pointer: coarse) {
-  .uix-split-pane[direction="horizontal"]::part(divider),
-  :host(:not([direction])) ::part(divider) {
-    width: calc(var(--divider-size, 4px) * 2);
-    margin-left: calc(var(--divider-size, 4px) * -0.5);
-    margin-right: calc(var(--divider-size, 4px) * -0.5);
-  }
+  :where(.uix-split-pane, uix-split-pane) {
+    &[direction="horizontal"]::part(divider),
+    &:not([direction])::part(divider) {
+      width: calc(var(--divider-size, 4px) * 2);
+      margin-left: calc(var(--divider-size, 4px) * -0.5);
+      margin-right: calc(var(--divider-size, 4px) * -0.5);
+    }
 
-  .uix-split-pane[direction="vertical"]::part(divider) {
-    height: calc(var(--divider-size, 4px) * 2);
-    margin-top: calc(var(--divider-size, 4px) * -0.5);
-    margin-bottom: calc(var(--divider-size, 4px) * -0.5);
+    &[direction="vertical"]::part(divider) {
+      height: calc(var(--divider-size, 4px) * 2);
+      margin-top: calc(var(--divider-size, 4px) * -0.5);
+      margin-bottom: calc(var(--divider-size, 4px) * -0.5);
+    }
   }
 }

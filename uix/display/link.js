@@ -97,7 +97,7 @@ export default {
   },
   render() {
     const content = html`
-      ${this.icon ? html`<uix-icon name=${this.icon}></uix-icon>` : null}
+      ${this.icon ? html`<uix-icon name=${this.icon} part="icon"></uix-icon>` : null}
       <slot></slot>
       ${this.hideLabel ? null : this.label}
     `;

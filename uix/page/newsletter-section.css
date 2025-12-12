@@ -1,11 +1,11 @@
-.uix-newsletter-section {
+:where(.uix-newsletter-section, uix-newsletter-section) {
   /* Layout */
   display: block;
   width: 100%;
 }
 
 /* Newsletter section */
-.uix-newsletter-section::part(section) {
+:where(.uix-newsletter-section, uix-newsletter-section)::part(section) {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -13,18 +13,18 @@
   background: var(--color-background);
 
   /* Boxed variant */
-  .uix-newsletter-section[variant="boxed"] & {
+  :where(.uix-newsletter-section, uix-newsletter-section)[variant="boxed"] & {
     padding: var(--spacing-2xl) var(--spacing-lg);
   }
 
   /* Inline variant */
-  .uix-newsletter-section[variant="inline"] & {
+  :where(.uix-newsletter-section, uix-newsletter-section)[variant="inline"] & {
     padding: var(--spacing-xl) var(--spacing-lg);
   }
 }
 
 /* Container */
-.uix-newsletter-section::part(container) {
+:where(.uix-newsletter-section, uix-newsletter-section)::part(container) {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xl);
@@ -33,12 +33,12 @@
   width: 100%;
 
   /* Simple variant (default) */
-  .uix-newsletter-section[variant="simple"] & {
+  :where(.uix-newsletter-section, uix-newsletter-section)[variant="simple"] & {
     max-width: 600px;
   }
 
   /* Boxed variant */
-  .uix-newsletter-section[variant="boxed"] & {
+  :where(.uix-newsletter-section, uix-newsletter-section)[variant="boxed"] & {
     max-width: 700px;
     padding: var(--spacing-3xl);
     background: var(--color-surface);
@@ -48,7 +48,7 @@
   }
 
   /* Inline variant */
-  .uix-newsletter-section[variant="inline"] & {
+  :where(.uix-newsletter-section, uix-newsletter-section)[variant="inline"] & {
     flex-direction: row;
     align-items: center;
     max-width: 1000px;
@@ -57,59 +57,59 @@
 }
 
 /* Header */
-.uix-newsletter-section::part(header) {
+:where(.uix-newsletter-section, uix-newsletter-section)::part(header) {
   text-align: center;
 
   /* Inline variant */
-  .uix-newsletter-section[variant="inline"] & {
+  :where(.uix-newsletter-section, uix-newsletter-section)[variant="inline"] & {
     flex: 1;
     text-align: left;
   }
 }
 
 /* Heading */
-.uix-newsletter-section::part(heading) {
+:where(.uix-newsletter-section, uix-newsletter-section)::part(heading) {
   margin: 0 0 var(--spacing-md);
-  font-size: var(--font-size-3xl);
-  font-weight: 700;
+  font-size: var(--text-3xl, 1.875rem);
+  font-weight: var(--font-bold, 700);
   color: var(--color-text);
 
   /* Inline variant */
-  .uix-newsletter-section[variant="inline"] & {
+  :where(.uix-newsletter-section, uix-newsletter-section)[variant="inline"] & {
     margin-bottom: var(--spacing-xs);
-    font-size: var(--font-size-2xl);
+    font-size: var(--text-2xl, 1.5rem);
   }
 }
 
 /* Subheading */
-.uix-newsletter-section::part(subheading) {
+:where(.uix-newsletter-section, uix-newsletter-section)::part(subheading) {
   margin: 0;
-  font-size: var(--font-size-lg);
+  font-size: var(--text-lg, 1.125rem);
   color: var(--color-text-muted);
   line-height: 1.5;
 
   /* Inline variant */
-  .uix-newsletter-section[variant="inline"] & {
-    font-size: var(--font-size-base);
+  :where(.uix-newsletter-section, uix-newsletter-section)[variant="inline"] & {
+    font-size: var(--text-base, 1rem);
   }
 }
 
 /* Form */
-.uix-newsletter-section::part(form) {
+:where(.uix-newsletter-section, uix-newsletter-section)::part(form) {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
   width: 100%;
 
   /* Inline variant */
-  .uix-newsletter-section[variant="inline"] & {
+  :where(.uix-newsletter-section, uix-newsletter-section)[variant="inline"] & {
     flex: 1;
     max-width: 500px;
   }
 }
 
 /* Input wrapper */
-.uix-newsletter-section::part(input-wrapper) {
+:where(.uix-newsletter-section, uix-newsletter-section)::part(input-wrapper) {
   display: flex;
   gap: var(--spacing-sm);
   width: 100%;
@@ -124,17 +124,17 @@
   }
 
   /* Boxed variant - stack on smaller screens */
-  .uix-newsletter-section[variant="boxed"] & {
+  :where(.uix-newsletter-section, uix-newsletter-section)[variant="boxed"] & {
     gap: var(--spacing-md);
   }
 }
 
 /* Message */
-.uix-newsletter-section::part(message) {
+:where(.uix-newsletter-section, uix-newsletter-section)::part(message) {
   padding: var(--spacing-md);
   border-radius: var(--radius-md);
-  font-size: var(--font-size-sm);
-  font-weight: 500;
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--font-medium, 500);
   text-align: center;
   animation: slideIn 0.3s ease;
 
@@ -163,72 +163,72 @@
 }
 
 /* Privacy text */
-.uix-newsletter-section::part(privacy) {
+:where(.uix-newsletter-section, uix-newsletter-section)::part(privacy) {
   margin: 0;
-  font-size: var(--font-size-xs);
+  font-size: var(--text-xs, 0.75rem);
   color: var(--color-text-muted);
   text-align: center;
   line-height: 1.4;
 
   /* Inline variant */
-  .uix-newsletter-section[variant="inline"] & {
+  :where(.uix-newsletter-section, uix-newsletter-section)[variant="inline"] & {
     text-align: left;
   }
 }
 
 /* Responsive adjustments */
 @media (max-width: 767px) {
-  .uix-newsletter-section::part(section) {
+  :where(.uix-newsletter-section, uix-newsletter-section)::part(section) {
     padding: var(--spacing-2xl) var(--spacing-md);
 
-    .uix-newsletter-section[variant="boxed"] & {
+    :where(.uix-newsletter-section, uix-newsletter-section)[variant="boxed"] & {
       padding: var(--spacing-xl) var(--spacing-md);
     }
 
-    .uix-newsletter-section[variant="inline"] & {
+    :where(.uix-newsletter-section, uix-newsletter-section)[variant="inline"] & {
       padding: var(--spacing-lg) var(--spacing-md);
     }
   }
 
-  .uix-newsletter-section::part(container) {
+  :where(.uix-newsletter-section, uix-newsletter-section)::part(container) {
     gap: var(--spacing-lg);
 
-    .uix-newsletter-section[variant="boxed"] & {
+    :where(.uix-newsletter-section, uix-newsletter-section)[variant="boxed"] & {
       padding: var(--spacing-xl);
     }
 
     /* Inline variant becomes column on mobile */
-    .uix-newsletter-section[variant="inline"] & {
+    :where(.uix-newsletter-section, uix-newsletter-section)[variant="inline"] & {
       flex-direction: column;
       align-items: flex-start;
       gap: var(--spacing-lg);
     }
   }
 
-  .uix-newsletter-section::part(header) {
+  :where(.uix-newsletter-section, uix-newsletter-section)::part(header) {
     /* Inline variant becomes centered on mobile */
-    .uix-newsletter-section[variant="inline"] & {
+    :where(.uix-newsletter-section, uix-newsletter-section)[variant="inline"] & {
       text-align: center;
     }
   }
 
-  .uix-newsletter-section::part(heading) {
-    font-size: var(--font-size-2xl);
+  :where(.uix-newsletter-section, uix-newsletter-section)::part(heading) {
+    font-size: var(--text-2xl, 1.5rem);
 
-    .uix-newsletter-section[variant="inline"] & {
-      font-size: var(--font-size-xl);
+    :where(.uix-newsletter-section, uix-newsletter-section)[variant="inline"] & {
+      font-size: var(--text-xl, 1.25rem);
     }
   }
 
-  .uix-newsletter-section::part(subheading) {
-    font-size: var(--font-size-base);
+  :where(.uix-newsletter-section, uix-newsletter-section)::part(subheading) {
+    font-size: var(--text-base, 1rem);
 
-    .uix-newsletter-section[variant="inline"] & {
-      font-size: var(--font-size-sm);
+    :where(.uix-newsletter-section, uix-newsletter-section)[variant="inline"] & {
+      font-size: var(--text-sm, 0.875rem);
     }
   }
 
-  .uix-newsletter-section::part(input-wrapper) {
+  :where(.uix-newsletter-section, uix-newsletter-section)::part(input-wrapper) {
     flex-direction: column;
     gap: var(--spacing-sm);
 
@@ -237,53 +237,53 @@
     }
   }
 
-  .uix-newsletter-section::part(form) {
+  :where(.uix-newsletter-section, uix-newsletter-section)::part(form) {
     /* Inline variant - full width on mobile */
-    .uix-newsletter-section[variant="inline"] & {
+    :where(.uix-newsletter-section, uix-newsletter-section)[variant="inline"] & {
       max-width: none;
     }
   }
 
-  .uix-newsletter-section::part(privacy) {
-    font-size: var(--font-size-xs);
+  :where(.uix-newsletter-section, uix-newsletter-section)::part(privacy) {
+    font-size: var(--text-xs, 0.75rem);
 
     /* Inline variant becomes centered on mobile */
-    .uix-newsletter-section[variant="inline"] & {
+    :where(.uix-newsletter-section, uix-newsletter-section)[variant="inline"] & {
       text-align: center;
     }
   }
 }
 
 @media (min-width: 768px) and (max-width: 1023px) {
-  .uix-newsletter-section::part(container) {
+  :where(.uix-newsletter-section, uix-newsletter-section)::part(container) {
     /* Inline variant adjustments */
-    .uix-newsletter-section[variant="inline"] & {
+    :where(.uix-newsletter-section, uix-newsletter-section)[variant="inline"] & {
       max-width: 900px;
     }
   }
 
-  .uix-newsletter-section::part(heading) {
-    font-size: var(--font-size-2xl);
+  :where(.uix-newsletter-section, uix-newsletter-section)::part(heading) {
+    font-size: var(--text-2xl, 1.5rem);
   }
 }
 
 @media (min-width: 1024px) {
-  .uix-newsletter-section::part(heading) {
-    font-size: var(--font-size-4xl);
+  :where(.uix-newsletter-section, uix-newsletter-section)::part(heading) {
+    font-size: var(--text-4xl, 2.25rem);
 
-    .uix-newsletter-section[variant="inline"] & {
-      font-size: var(--font-size-2xl);
+    :where(.uix-newsletter-section, uix-newsletter-section)[variant="inline"] & {
+      font-size: var(--text-2xl, 1.5rem);
     }
   }
 
-  .uix-newsletter-section::part(input-wrapper) {
+  :where(.uix-newsletter-section, uix-newsletter-section)::part(input-wrapper) {
     gap: var(--spacing-md);
   }
 }
 
 /* Dark mode adjustments */
 @media (prefers-color-scheme: dark) {
-  .uix-newsletter-section[variant="boxed"] .newsletter-container {
+  :where(.uix-newsletter-section, uix-newsletter-section)[variant="boxed"] .newsletter-container {
     background: var(--color-surface-dark);
   }
 
@@ -300,19 +300,19 @@
 
 /* Print styles */
 @media print {
-  .uix-newsletter-section::part(section) {
+  :where(.uix-newsletter-section, uix-newsletter-section)::part(section) {
     padding: var(--spacing-lg);
   }
 
-  .uix-newsletter-section::part(container) {
+  :where(.uix-newsletter-section, uix-newsletter-section)::part(container) {
     page-break-inside: avoid;
   }
 
-  .uix-newsletter-section::part(form) {
+  :where(.uix-newsletter-section, uix-newsletter-section)::part(form) {
     display: none;
   }
 
-  .uix-newsletter-section::part(header) {
+  :where(.uix-newsletter-section, uix-newsletter-section)::part(header) {
     text-align: center;
   }
 }

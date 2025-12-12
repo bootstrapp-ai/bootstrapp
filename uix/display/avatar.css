@@ -1,8 +1,8 @@
 :host {
   display: inline-block;
   --avatar-size: 2.5rem;
-  --avatar-bg: var(--color-surface);
-  --avatar-text: var(--color-inverse);
+  --avatar-background: var(--color-surface);
+  --avatar-color: var(--color-inverse);
   --avatar-border-radius: 50%;
   --status-size: 0.75rem;
   --status-border-width: 2px;
@@ -62,8 +62,8 @@
   justify-content: center;
   overflow: hidden;
   border-radius: var(--avatar-border-radius);
-  background-color: var(--avatar-bg);
-  color: var(--avatar-text);
+  background-color: var(--avatar-background);
+  color: var(--avatar-color);
 }
 
 /* Image */
@@ -77,11 +77,11 @@
 /* Initials */
 .uix-avatar__initials {
   font-size: calc(var(--avatar-size) / 2.5);
-  font-weight: 600;
+  font-weight: var(--font-semibold, 600);
   line-height: 1;
   text-transform: uppercase;
   user-select: none;
-  color: var(--avatar-text);
+  color: var(--avatar-color);
 }
 
 /* Status Indicator */

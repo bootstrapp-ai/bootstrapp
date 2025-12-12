@@ -3,13 +3,13 @@
  * Base styles for popover-based components
  */
 
-.uix-popover-controller {
+:where(.uix-popover-controller, uix-popover-controller) {
   position: fixed;
   z-index: 10000;
   display: none;
-}
 
-.uix-popover-controller[data-open] {
-  display: flex;
-  flex-direction: column;
+  &[data-open] {
+    display: flex;
+    flex-direction: column;
+  }
 }

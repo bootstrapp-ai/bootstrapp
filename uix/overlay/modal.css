@@ -3,7 +3,7 @@
  * Global stylesheet for uix-modal component
  */
 
-.uix-modal {
+:where(.uix-modal, uix-modal) {
   display: inline-block;
   --modal-shadow: var(--modal-shadow, 0 25px 50px -12px rgb(0 0 0 / 0.5));
   --modal-overlay: var(--modal-overlay, rgba(0, 0, 0, 0.75));
@@ -12,66 +12,63 @@
   --modal-border-radius: var(--radius-lg, 0.5rem);
   --modal-min-width: 400px;
   --modal-max-width: 600px;
-}
 
-/* Dialog element */
-uix-modal::part(dialog) {
-  background: var(--modal-bg, #282828);
-  border: 1px solid var(--modal-border, #504945);
-  border-radius: var(--modal-border-radius);
-  box-shadow: var(--modal-shadow);
-  padding: 0;
-  min-width: var(--modal-min-width);
-  max-width: var(--modal-max-width);
-  color: var(--color-primary, default);
-}
+  /* Dialog element */
+  &::part(dialog) {
+    background: var(--modal-background, #282828);
+    border: 1px solid var(--modal-border, #504945);
+    border-radius: var(--modal-border-radius);
+    box-shadow: var(--modal-shadow);
+    padding: 0;
+    min-width: var(--modal-min-width);
+    max-width: var(--modal-max-width);
+    color: var(--color-primary, default);
 
-/* Dialog backdrop */
-uix-modal::part(dialog)::backdrop {
-  background: var(--modal-overlay);
-  backdrop-filter: blur(2px);
-}
+    &::backdrop {
+      background: var(--modal-overlay);
+      backdrop-filter: blur(2px);
+    }
+  }
 
-/* Modal header */
-uix-modal::part(header) {
-  padding: var(--modal-padding);
-  border-bottom: var(--modal-header-border-size, 0) solid var(--modal-border);
-  color: var(--color-primary, default);
-  font-size: var(--typography-fontSize-lg, 1.125rem);
-  font-weight: var(--typography-fontWeight-semibold, 600);
-}
+  /* Modal header */
+  &::part(header) {
+    padding: var(--modal-padding);
+    border-bottom: var(--modal-header-border-size, 0) solid var(--modal-border);
+    color: var(--color-primary, default);
+    font-size: var(--text-lg, 1.125rem);
+    font-weight: var(--font-semibold, 600);
 
-/* Empty header - no border */
-uix-modal::part(header):empty {
-  display: none;
-}
+    &:empty {
+      display: none;
+    }
+  }
 
-/* Modal body */
-uix-modal::part(body) {
-  padding: var(--modal-padding);
-  color: var(--color-secondary, #bdae93);
-  font-size: var(--typography-fontSize-base, 1rem);
-  line-height: var(--typography-lineHeight-normal, 1.5);
-  overflow-y: auto;
-  max-height: 60vh;
-}
+  /* Modal body */
+  &::part(body) {
+    padding: var(--modal-padding);
+    color: var(--color-secondary, #bdae93);
+    font-size: var(--text-base, 1rem);
+    line-height: var(--leading-normal, 1.5);
+    overflow-y: auto;
+    max-height: 60vh;
+  }
 
-/* Modal footer */
-uix-modal::part(footer) {
-  padding: var(--modal-padding);
-  border-top: var(--modal-footer-border-size, 0) solid var(--modal-border);
-  display: flex;
-  gap: var(--modal-gap);
-  justify-content: flex-end;
-  align-items: center;
-}
+  /* Modal footer */
+  &::part(footer) {
+    padding: var(--modal-padding);
+    border-top: var(--modal-footer-border-size, 0) solid var(--modal-border);
+    display: flex;
+    gap: var(--modal-gap);
+    justify-content: flex-end;
+    align-items: center;
 
-/* Empty footer - no border */
-uix-modal::part(footer):empty {
-  display: none;
-}
+    &:empty {
+      display: none;
+    }
+  }
 
-/* Trigger slot - inline display */
-uix-modal [slot="trigger"] {
-  cursor: pointer;
+  /* Trigger slot - inline display */
+  [slot="trigger"] {
+    cursor: pointer;
+  }
 }

@@ -2,7 +2,7 @@
  * Radio Group Component Styles
  */
 
-.uix-radio-group {
+:where(.uix-radio-group, uix-radio-group) {
   display: inline-flex;
 
   &::part(container) {

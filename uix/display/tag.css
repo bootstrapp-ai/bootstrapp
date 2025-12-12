@@ -2,7 +2,7 @@
  * Tag Component Styles
  */
 
-.uix-tag {
+:where(.uix-tag, uix-tag) {
   display: inline-flex;
 
   &::part(container) {
@@ -12,8 +12,8 @@
     padding: var(--tag-padding-y, 0.25rem) var(--tag-padding-x, 0.625rem);
     background-color: var(--tag-background, var(--color-surface-darker));
     color: var(--tag-color, var(--color-primary));
-    font-size: var(--tag-font-size, 0.75rem);
-    font-weight: var(--tag-font-weight, 500);
+    font-size: var(--tag-font-size, var(--text-xs, 0.75rem));
+    font-weight: var(--tag-font-weight, var(--font-medium, 500));
     line-height: 1.5;
     border: 1px solid var(--tag-border-color, transparent);
     border-radius: var(--tag-border-radius, var(--radius-md));
@@ -65,22 +65,29 @@
   }
 
   /* Size variants */
+  &[size="xs"] {
+    --tag-font-size: var(--text-xs, 0.625rem);
+    --tag-padding-y: 0.0625rem;
+    --tag-padding-x: 0.375rem;
+    --tag-gap: 0.1875rem;
+  }
+
   &[size="sm"] {
-    --tag-font-size: 0.6875rem;
+    --tag-font-size: var(--text-xs, 0.6875rem);
     --tag-padding-y: 0.125rem;
     --tag-padding-x: 0.5rem;
     --tag-gap: 0.25rem;
   }
 
   &[size="md"] {
-    --tag-font-size: 0.75rem;
+    --tag-font-size: var(--text-xs, 0.75rem);
     --tag-padding-y: 0.25rem;
     --tag-padding-x: 0.625rem;
     --tag-gap: 0.375rem;
   }
 
   &[size="lg"] {
-    --tag-font-size: 0.875rem;
+    --tag-font-size: var(--text-sm, 0.875rem);
     --tag-padding-y: 0.375rem;
     --tag-padding-x: 0.75rem;
     --tag-gap: 0.5rem;

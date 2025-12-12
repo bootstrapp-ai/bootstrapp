@@ -1,7 +1,6 @@
-:where(.uix-icon) {
+:where(.uix-icon, uix-icon) {
   display: inline-block;
   vertical-align: middle;
-  /* Default size if none is specified (optional, defaulting to md) */
   --icon-size: calc(var(--spacing, 0.25rem) * 4);
   width: var(--icon-size);
   height: var(--icon-size);
@@ -20,46 +19,60 @@
   &[color="primary"] {
     color: var(--color-primary);
   }
+
   &[color="secondary"] {
     color: var(--color-secondary);
   }
+
   &[color="success"] {
     color: var(--color-success);
   }
+
   &[color="danger"] {
     color: var(--color-danger);
   }
+
   &[color="warning"] {
     color: var(--color-warning);
   }
+
   &[color="info"] {
     color: var(--color-info);
   }
+
   &[color="inverse"] {
     color: var(--color-inverse);
   }
 
+  /* --- Size Variants --- */
   &[size="xs"] {
     --icon-size: calc(var(--spacing, 0.25rem) * 3);
   }
+
   &[size="sm"] {
     --icon-size: calc(var(--spacing, 0.25rem) * 4);
   }
+
   &[size="md"] {
     --icon-size: calc(var(--spacing, 0.25rem) * 6);
   }
+
   &[size="lg"] {
     --icon-size: calc(var(--spacing, 0.25rem) * 10);
   }
+
   &[size="xl"] {
     --icon-size: calc(var(--spacing, 0.25rem) * 14);
   }
+
   &[size="2xl"] {
     --icon-size: calc(var(--spacing, 0.25rem) * 24);
   }
+
   &[size="3xl"] {
     --icon-size: calc(var(--spacing, 0.25rem) * 36);
   }
+
   &[size="4xl"] {
     --icon-size: calc(var(--spacing, 0.25rem) * 48);
   }

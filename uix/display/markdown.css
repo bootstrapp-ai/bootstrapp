@@ -1,155 +1,158 @@
-:where(.uix-markdown) {
-	display: block;
-	overflow-y: auto;
-	height: 100%;
-	font-size: 1.125rem;
-	line-height: 1rem;
-	& > :first-child {
-		margin-top: 0;
-	}
-	& > :last-child {
-		margin-bottom: 0;
-	}
+:where(.uix-markdown, uix-markdown) {
+  display: block;
+  overflow-y: auto;
+  height: 100%;
+  font-size: 1.125rem;
+  line-height: 1rem;
 
-	h1,
-	h2,
-	h3,
-	h4,
-	h5,
-	h6 {
-		font-weight: 600;
-	}
+  & > :first-child {
+    margin-top: 0;
+  }
 
-	h1 {
-		font-size: 1.8em;
-		padding-bottom: 0.3em;
-		line-height: 2.5rem;
-	}
+  & > :last-child {
+    margin-bottom: 0;
+  }
 
-	h2 {
-		font-size: 1.6em;
-		line-height: 1.9rem;
-		padding-bottom: 0.3em;
-	}
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: 600;
+  }
 
-	h3 {
-		font-size: 1.4em;
-		line-height: 1.4rem;
-	}
+  h1 {
+    font-size: 1.8em;
+    padding-bottom: 0.3em;
+    line-height: 2.5rem;
+  }
 
-	h4 {
-		font-size: 1.2em;
-	}
+  h2 {
+    font-size: 1.6em;
+    line-height: 1.9rem;
+    padding-bottom: 0.3em;
+  }
 
-	h5 {
-		font-size: 1em;
-	}
+  h3 {
+    font-size: 1.4em;
+    line-height: 1.4rem;
+  }
 
-	h6 {
-		font-size: 0.9em;
-	}
+  h4 {
+    font-size: 1.2em;
+  }
 
-	p {
-		line-height: 1.4rem;
-		margin-bottom: 0.5em;
-	}
+  h5 {
+    font-size: 1em;
+  }
 
-	a {
-		font-weight: 500;
-		text-decoration: none;
-		color: var(--prose-link-color);
+  h6 {
+    font-size: 0.9em;
+  }
 
-		&:hover {
-			text-decoration: underline;
-		}
-	}
+  p {
+    line-height: 1.4rem;
+    margin-bottom: 0.5em;
+  }
 
-	/* --- Lists --- */
-	ul,
-	ol {
-		margin: 0 0 0.5em 0.5em;
-		padding-left: 1em;
-	}
+  a {
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--prose-link-color);
 
-	ul {
-		list-style-type: square;
-	}
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 
-	ol {
-		list-style-type: decimal;
-	}
+  /* --- Lists --- */
+  ul,
+  ol {
+    margin: 0 0 0.5em 0.5em;
+    padding-left: 1em;
+  }
 
-	hr {
-		border: 0;
-		border-top: 1px solid var(--border-color);
-		margin-block: 0.5rem;
-		margin-inline: 30%;
-	}
+  ul {
+    list-style-type: square;
+  }
 
-	blockquote {
-		margin: 0 0 1em;
-		padding: 0em 1em;
-		border-left: 4px solid var(--border-color);
-		color: var(--prose-muted-text-color);
-		& > :last-child {
-			margin-bottom: 0;
-			padding-bottom: 0;
-		}
-	}
+  ol {
+    list-style-type: decimal;
+  }
 
-	code {
-		background-color: var(--prose-code-bg-color);
-		padding: 0.2em 0.4em;
-		margin: 0 0.1rem;
-		border-radius: 6px;
-		font-family: monospace;
-		font-size: 0.9em;
-	}
+  hr {
+    border: 0;
+    border-top: 1px solid var(--border-color);
+    margin-block: 0.5rem;
+    margin-inline: 30%;
+  }
 
-	pre {
-		background-color: #2d3748;
-		color: #e2e8f0;
-		padding: 1em;
-		margin-block: 1em;
-		border-radius: 8px;
-		overflow-x: auto;
-		white-space: pre-wrap;
+  blockquote {
+    margin: 0 0 1em;
+    padding: 0em 1em;
+    border-left: 4px solid var(--border-color);
+    color: var(--prose-muted-text-color);
 
-		code {
-			background-color: transparent;
-			padding: 0;
-			margin: 0;
-			font-size: 1em;
-			line-height: 1.5;
-		}
-	}
+    & > :last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+  }
 
-	/* --- Tables --- */
-	table {
-		width: 100%;
-		border-collapse: collapse;
-		margin: 0 0 1.5em;
-		font-size: 0.95em;
-	}
+  code {
+    background-color: var(--prose-code-bg-color);
+    padding: 0.2em 0.4em;
+    margin: 0 0.1rem;
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 0.9em;
+  }
 
-	th,
-	td {
-		border: 1px solid var(--border-color);
-		padding: 0.75em 1em;
-		text-align: left;
-	}
+  pre {
+    background-color: #2d3748;
+    color: #e2e8f0;
+    padding: 1em;
+    margin-block: 1em;
+    border-radius: 8px;
+    overflow-x: auto;
+    white-space: pre-wrap;
 
-	thead {
-		background-color: #f7fafc;
+    code {
+      background-color: transparent;
+      padding: 0;
+      margin: 0;
+      font-size: 1em;
+      line-height: 1.5;
+    }
+  }
 
-		th {
-			font-weight: 600;
-		}
-	}
+  /* --- Tables --- */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 0 1.5em;
+    font-size: 0.95em;
+  }
 
-	tbody {
-		tr:nth-child(odd) {
-			background-color: #f9fafb;
-		}
-	}
+  th,
+  td {
+    border: 1px solid var(--border-color);
+    padding: 0.75em 1em;
+    text-align: left;
+  }
+
+  thead {
+    background-color: #f7fafc;
+
+    th {
+      font-weight: 600;
+    }
+  }
+
+  tbody {
+    tr:nth-child(odd) {
+      background-color: #f9fafb;
+    }
+  }
 }

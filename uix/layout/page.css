@@ -2,7 +2,7 @@
  * Page Component Styles
  */
 
-.uix-page {
+:where(.uix-page, uix-page) {
   display: block;
   min-height: 100vh;
 

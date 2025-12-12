@@ -2,7 +2,7 @@
  * Panel Component Styles
  */
 
-.uix-panel {
+:where(.uix-panel, uix-panel) {
   display: block;
 
   &::part(container) {

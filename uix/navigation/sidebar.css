@@ -2,7 +2,7 @@
  * Sidebar Component Styles
  */
 
-.uix-sidebar {
+:where(.uix-sidebar, uix-sidebar) {
   display: block;
 
   &::part(container) {

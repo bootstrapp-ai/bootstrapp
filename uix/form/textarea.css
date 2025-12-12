@@ -2,15 +2,15 @@
  * Textarea Component Styles
  */
 
-:where(.uix-textarea) {
+:where(.uix-textarea, uix-textarea) {
   display: inline-block;
   width: 100%;
 
   & .textarea {
     width: 100%;
     font-family: inherit;
-    font-size: var(--input-font-size, 0.875rem);
-    line-height: var(--input-line-height, 1.5);
+    font-size: var(--textarea-font-size, var(--text-sm, 0.875rem));
+    line-height: var(--textarea-line-height, var(--leading-normal, 1.5));
     padding: var(--input-padding-y, 0.5rem) var(--input-padding-x, 0.75rem);
     background-color: var(--input-background-color, var(--color-surface));
     color: var(--input-color, var(--color-primary));
@@ -57,31 +57,31 @@
 
   /* Size variants */
   &[size="xs"] .textarea {
-    --input-font-size: 0.75rem;
+    --textarea-font-size: var(--text-xs, 0.75rem);
     --input-padding-y: 0.25rem;
     --input-padding-x: 0.5rem;
   }
 
   &[size="sm"] .textarea {
-    --input-font-size: 0.8125rem;
+    --textarea-font-size: var(--text-sm, 0.8125rem);
     --input-padding-y: 0.375rem;
     --input-padding-x: 0.625rem;
   }
 
   &[size="md"] .textarea {
-    --input-font-size: 0.875rem;
+    --textarea-font-size: var(--text-sm, 0.875rem);
     --input-padding-y: 0.5rem;
     --input-padding-x: 0.75rem;
   }
 
   &[size="lg"] .textarea {
-    --input-font-size: 1rem;
+    --textarea-font-size: var(--text-base, 1rem);
     --input-padding-y: 0.625rem;
     --input-padding-x: 1rem;
   }
 
   &[size="xl"] .textarea {
-    --input-font-size: 1.125rem;
+    --textarea-font-size: var(--text-lg, 1.125rem);
     --input-padding-y: 0.75rem;
     --input-padding-x: 1.25rem;
   }

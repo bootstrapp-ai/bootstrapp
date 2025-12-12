@@ -1,4 +1,4 @@
-:where(.uix-badge) {
+:where(.uix-badge, uix-badge) {
   /* Layout & Typography */
   display: inline-flex;
   align-items: center;
@@ -7,59 +7,53 @@
   width: fit-content;
   box-sizing: border-box;
 
-  font-weight: var(--badge-font-weight, 600);
-  font-size: var(--badge-font-size, 0.75rem);
+  font-weight: var(--badge-font-weight, var(--font-semibold, 600));
+  font-size: var(--badge-font-size, var(--text-xs, 0.75rem));
   line-height: var(--badge-line-height, 1rem);
   padding: var(--badge-padding-y, 0.15rem) var(--badge-padding-x, 0.5rem);
 
   /* Shape */
   border-radius: var(--badge-border-radius, var(--radius-md, 0.375rem));
 
-  /* Default Borders (Transparent by default) */
-  border: var(--badge-border-size, 0) solid
-    var(--badge-border-color, transparent);
+  /* Default Borders */
+  border: var(--badge-border-size, 0) solid var(--badge-border-color, transparent);
 
-  /* Default Colors (Fallbacks) */
-  background-color: var(--badge-bg);
+  /* Default Colors */
+  background-color: var(--badge-background);
   color: var(--badge-color);
 
-  /* -------------------- SOLID VARIANTS (Default) -------------------- */
-  /* Logic: Background is the color, Text is the high-contrast inverse */
-
+  /* -------------------- SOLID VARIANTS -------------------- */
   &[variant="default"] {
-    --badge-bg: var(--color-surface-dark); /* Lighter gray */
-    --badge-color: var(--color-surface-lighter); /* Dark gray text */
+    --badge-background: var(--color-surface-dark);
+    --badge-color: var(--color-surface-lighter);
     --badge-border-color: var(--color-surface-dark);
   }
 
   &[variant="success"] {
-    --badge-bg: var(--color-success);
-    --badge-color: var(--color-inverse); /* Ensures contrast */
-    --badge-border-color: var(--color-success-light); /* Subtle border definition */
+    --badge-background: var(--color-success);
+    --badge-color: var(--color-inverse);
+    --badge-border-color: var(--color-success-light);
   }
 
   &[variant="danger"] {
-    --badge-bg: var(--color-danger);
+    --badge-background: var(--color-danger);
     --badge-color: var(--color-inverse);
     --badge-border-color: var(--color-danger-light);
   }
 
   &[variant="warning"] {
-    --badge-bg: var(--color-warning);
-    --badge-color: var(--color-inverse); /* Or black if warning is bright yellow */
+    --badge-background: var(--color-warning);
+    --badge-color: var(--color-inverse);
     --badge-border-color: var(--color-warning-light);
   }
 
   &[variant="info"] {
-    --badge-bg: var(--color-info);
+    --badge-background: var(--color-info);
     --badge-color: var(--color-inverse);
     --badge-border-color: var(--color-info-light);
   }
 
   /* -------------------- OUTLINE VARIANTS -------------------- */
-  /* Logic: Transparent BG. Use Lightness Stops (e.g. 60/70) for text/border 
-     to ensure visibility on dark backgrounds */
-
   &[outline] {
     background-color: transparent;
 
@@ -69,7 +63,6 @@
     }
 
     &[variant="success"] {
-      /* Use dark variant to make it lighter/brighter than the base color */
       --badge-border-color: var(--color-success-dark);
       --badge-color: var(--color-success-dark);
     }
@@ -90,18 +83,12 @@
     }
   }
 
-  /* -------------------- SOFT VARIANTS (Modern Look) -------------------- */
-  /* Logic: Low opacity background, bright text */
-
+  /* -------------------- SOFT VARIANTS -------------------- */
   &[soft] {
     border: 1px solid transparent;
 
     &[variant="success"] {
-      background-color: color-mix(
-        in srgb,
-        var(--color-success),
-        transparent 85%
-      );
+      background-color: color-mix(in srgb, var(--color-success), transparent 85%);
       color: var(--color-success-darker);
     }
 
@@ -111,11 +98,7 @@
     }
 
     &[variant="warning"] {
-      background-color: color-mix(
-        in srgb,
-        var(--color-warning),
-        transparent 85%
-      );
+      background-color: color-mix(in srgb, var(--color-warning), transparent 85%);
       color: var(--color-warning-darker);
     }
 
@@ -124,23 +107,29 @@
       color: var(--color-info-darker);
     }
   }
-}
 
-/* -------------------- SIZES -------------------- */
-:where(.uix-badge)[size="sm"] {
-  --badge-padding-y: 0.1rem;
-  --badge-padding-x: 0.375rem;
-  --badge-font-size: 0.7rem;
-}
+  /* -------------------- SIZES -------------------- */
+  &[size="xs"] {
+    --badge-padding-y: 0.0625rem;
+    --badge-padding-x: 0.25rem;
+    --badge-font-size: var(--text-xs, 0.65rem);
+  }
 
-:where(.uix-badge)[size="md"] {
-  --badge-padding-y: 0.15rem;
-  --badge-padding-x: 0.5rem;
-  --badge-font-size: 0.75rem;
-}
+  &[size="sm"] {
+    --badge-padding-y: 0.1rem;
+    --badge-padding-x: 0.375rem;
+    --badge-font-size: var(--text-xs, 0.7rem);
+  }
 
-:where(.uix-badge)[size="lg"] {
-  --badge-padding-y: 0.25rem;
-  --badge-padding-x: 0.75rem;
-  --badge-font-size: 0.875rem;
+  &[size="md"] {
+    --badge-padding-y: 0.15rem;
+    --badge-padding-x: 0.5rem;
+    --badge-font-size: var(--text-xs, 0.75rem);
+  }
+
+  &[size="lg"] {
+    --badge-padding-y: 0.25rem;
+    --badge-padding-x: 0.75rem;
+    --badge-font-size: var(--text-sm, 0.875rem);
+  }
 }

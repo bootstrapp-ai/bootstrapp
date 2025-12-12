@@ -2,7 +2,7 @@
  * Theme Toggle Component Styles
  */
 
-.uix-theme-toggle {
+:where(.uix-theme-toggle, uix-theme-toggle) {
   display: inline-block;
 
   &::part(icons) {

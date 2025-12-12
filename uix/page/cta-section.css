@@ -1,11 +1,11 @@
-.uix-cta-section {
+:where(.uix-cta-section, uix-cta-section) {
   /* Layout */
   display: block;
   width: 100%;
 }
 
-/* CTA section */
-.uix-cta-section::part(section) {
+  /* CTA section */
+  &::part(section) {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -43,10 +43,9 @@
     min-height: auto;
     padding: var(--spacing-xl) var(--spacing-lg);
   }
-}
 
-/* Overlay */
-.uix-cta-section::part(overlay) {
+  /* Overlay */
+  &::part(overlay) {
   position: absolute;
   top: 0;
   left: 0;
@@ -54,10 +53,10 @@
   bottom: 0;
   background: black;
   z-index: 1;
-}
+  }
 
-/* Container */
-.uix-cta-section::part(container) {
+  /* Container */
+  &::part(container) {
   position: relative;
   z-index: 2;
   display: flex;
@@ -93,10 +92,9 @@
     gap: var(--spacing-xl);
     max-width: 1400px;
   }
-}
 
-/* Content */
-.uix-cta-section::part(content) {
+  /* Content */
+  &::part(content) {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
@@ -136,30 +134,28 @@
     text-align: left;
     align-items: flex-start;
   }
-}
 
-/* Heading */
-.uix-cta-section::part(heading) {
+  /* Heading */
+  &::part(heading) {
   margin: 0;
-  font-size: var(--font-size-4xl);
-  font-weight: 700;
+  font-size: var(--text-4xl, 2.25rem);
+  font-weight: var(--font-bold, 700);
   line-height: 1.2;
 
   /* Boxed variant */
   .uix-cta-section[variant="boxed"] & {
-    font-size: var(--font-size-3xl);
+    font-size: var(--text-3xl, 1.875rem);
   }
 
   /* Banner variant */
   .uix-cta-section[variant="banner"] & {
-    font-size: var(--font-size-2xl);
+    font-size: var(--text-2xl, 1.5rem);
   }
-}
 
-/* Subheading */
-.uix-cta-section::part(subheading) {
+  /* Subheading */
+  &::part(subheading) {
   margin: 0;
-  font-size: var(--font-size-xl);
+  font-size: var(--text-xl, 1.25rem);
   opacity: 0.95;
   line-height: 1.5;
 
@@ -171,13 +167,12 @@
 
   /* Banner variant */
   .uix-cta-section[variant="banner"] & {
-    font-size: var(--font-size-base);
+    font-size: var(--text-base, 1rem);
     color: var(--color-text-muted);
   }
-}
 
-/* Actions */
-.uix-cta-section::part(actions) {
+  /* Actions */
+  &::part(actions) {
   display: flex;
   gap: var(--spacing-md);
   flex-wrap: wrap;
@@ -202,10 +197,9 @@
     flex-shrink: 0;
     gap: var(--spacing-sm);
   }
-}
 
-/* Media (split variant) */
-.uix-cta-section::part(media) {
+  /* Media (split variant) */
+  &::part(media) {
   flex: 1;
   display: flex;
   align-items: center;
@@ -218,25 +212,25 @@
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-xl);
   }
-}
 
-/* Slot content styling */
-.uix-cta-section [slot="media"] {
+  /* Slot content styling */
+  [slot="media"] {
   width: 100%;
   height: auto;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-xl);
-}
+  }
 
-.uix-cta-section [slot="actions"] {
-  display: flex;
-  gap: var(--spacing-md);
-  flex-wrap: wrap;
+  [slot="actions"] {
+    display: flex;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+  }
 }
 
 /* Responsive adjustments */
 @media (max-width: 767px) {
-  .uix-cta-section::part(section) {
+  :where(.uix-cta-section, uix-cta-section)::part(section) {
     min-height: 300px;
     padding: var(--spacing-2xl) var(--spacing-md);
 
@@ -250,7 +244,7 @@
     }
   }
 
-  .uix-cta-section::part(container) {
+  :where(.uix-cta-section, uix-cta-section)::part(container) {
     gap: var(--spacing-xl);
 
     /* Split variant becomes column on mobile */
@@ -271,7 +265,7 @@
     }
   }
 
-  .uix-cta-section::part(content) {
+  :where(.uix-cta-section, uix-cta-section)::part(content) {
     /* All variants become center-aligned on mobile for better readability */
     text-align: center;
     align-items: center;
@@ -283,24 +277,24 @@
     }
   }
 
-  .uix-cta-section::part(heading) {
-    font-size: var(--font-size-2xl);
+  :where(.uix-cta-section, uix-cta-section)::part(heading) {
+    font-size: var(--text-2xl, 1.5rem);
 
     .uix-cta-section[variant="boxed"] &,
     .uix-cta-section[variant="banner"] & {
-      font-size: var(--font-size-xl);
+      font-size: var(--text-xl, 1.25rem);
     }
   }
 
-  .uix-cta-section::part(subheading) {
-    font-size: var(--font-size-base);
+  :where(.uix-cta-section, uix-cta-section)::part(subheading) {
+    font-size: var(--text-base, 1rem);
 
     .uix-cta-section[variant="banner"] & {
-      font-size: var(--font-size-sm);
+      font-size: var(--text-sm, 0.875rem);
     }
   }
 
-  .uix-cta-section::part(actions) {
+  :where(.uix-cta-section, uix-cta-section)::part(actions) {
     justify-content: center;
     width: 100%;
 
@@ -310,35 +304,35 @@
     }
   }
 
-  .uix-cta-section::part(media) {
+  :where(.uix-cta-section, uix-cta-section)::part(media) {
     max-width: 100%;
   }
 }
 
 @media (min-width: 768px) and (max-width: 1023px) {
-  .uix-cta-section::part(heading) {
-    font-size: var(--font-size-3xl);
+  :where(.uix-cta-section, uix-cta-section)::part(heading) {
+    font-size: var(--text-3xl, 1.875rem);
   }
 
-  .uix-cta-section::part(subheading) {
-    font-size: var(--font-size-lg);
+  :where(.uix-cta-section, uix-cta-section)::part(subheading) {
+    font-size: var(--text-lg, 1.125rem);
   }
 
-  .uix-cta-section::part(media) {
+  :where(.uix-cta-section, uix-cta-section)::part(media) {
     max-width: 45%;
   }
 }
 
 @media (min-width: 1024px) {
-  .uix-cta-section::part(heading) {
-    font-size: var(--font-size-5xl);
+  :where(.uix-cta-section, uix-cta-section)::part(heading) {
+    font-size: var(--text-5xl, 3rem);
 
     .uix-cta-section[variant="boxed"] & {
-      font-size: var(--font-size-4xl);
+      font-size: var(--text-4xl, 2.25rem);
     }
 
     .uix-cta-section[variant="banner"] & {
-      font-size: var(--font-size-3xl);
+      font-size: var(--text-3xl, 1.875rem);
     }
   }
 }
@@ -356,22 +350,22 @@
 
 /* Print styles */
 @media print {
-  .uix-cta-section::part(section) {
+  :where(.uix-cta-section, uix-cta-section)::part(section) {
     min-height: auto;
     padding: var(--spacing-lg);
     background: white !important;
     color: black !important;
   }
 
-  .uix-cta-section::part(overlay) {
+  :where(.uix-cta-section, uix-cta-section)::part(overlay) {
     display: none;
   }
 
-  .uix-cta-section::part(container) {
+  :where(.uix-cta-section, uix-cta-section)::part(container) {
     page-break-inside: avoid;
   }
 
-  .uix-cta-section::part(actions) {
+  :where(.uix-cta-section, uix-cta-section)::part(actions) {
     display: none;
   }
 }

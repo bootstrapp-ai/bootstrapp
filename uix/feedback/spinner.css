@@ -1,4 +1,4 @@
-:where(.uix-spinner) {
+:where(.uix-spinner, uix-spinner) {
   display: inline-flex;
   align-items: center;
   justify-content: center;

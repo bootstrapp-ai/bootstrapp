@@ -9,13 +9,28 @@ const fontFamily = "Manrope";
 export default {
   font: {
     family: fontFamily,
-    icon: {
-      family: "lucide",
-    },
+    icon: { family: "lucide" },
+    // Font weights
+    normal: "400",
+    medium: "500",
+    semibold: "600",
+    bold: "700",
+    black: "900",
   },
 
   link: { color: "var(--color-primary)" },
-  text: { color: "#1a1a1a", muted: "#6b7280" },
+  text: {
+    color: "#1a1a1a",
+    muted: "#6b7280",
+    // Font sizes
+    xs: "0.75rem",
+    sm: "0.875rem",
+    base: "1rem",
+    lg: "1.125rem",
+    xl: "1.25rem",
+    "2xl": "1.5rem",
+    "3xl": "1.875rem",
+  },
   background: { color: "#faf5f0" },
 
   color: {
@@ -82,28 +97,11 @@ export default {
     "4xl": "5rem",
   },
 
-  typography: {
-    "font-size": {
-      xs: "0.75rem",
-      sm: "0.875rem",
-      base: "1rem",
-      lg: "1.125rem",
-      xl: "1.25rem",
-      "2xl": "1.5rem",
-      "3xl": "1.875rem",
-    },
-    "font-weight": {
-      normal: "400",
-      medium: "500",
-      semibold: "600",
-      bold: "700",
-      black: "900",
-    },
-    "line-height": {
-      tight: "1.2",
-      normal: "1.5",
-      relaxed: "1.75",
-    },
+  // Line heights (generates --leading-tight, --leading-normal, etc.)
+  leading: {
+    tight: "1.2",
+    normal: "1.5",
+    relaxed: "1.75",
   },
 
   // NBS uses larger border radii

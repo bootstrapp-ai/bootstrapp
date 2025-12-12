@@ -2,7 +2,7 @@
  * Grid Component Styles
  */
 
-.uix-grid {
+:where(.uix-grid, uix-grid) {
   display: block;
 
   &::part(container) {
