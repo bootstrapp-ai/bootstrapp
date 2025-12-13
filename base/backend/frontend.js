@@ -72,6 +72,125 @@ const postMessageToWW = (params) =>
 // The requestDataSync function is no longer needed and has been removed.
 // The View plugin 'connected' event now handles all data fetching and subscription.
 
+// Extracted fetch logic for dataQuery plugin
+const fetchDataQuery = async (instance) => {
+  const query = instance["data-query"];
+  if (!query) return;
+
+  const {
+    model,
+    id,
+    limit,
+    offset = 0,
+    order,
+    where,
+    includes,
+    key,
+    single,
+  } = query;
+
+  if (!model) return console.warn("data-query: 'model' is required");
+  if (!key)
+    return console.warn(
+      "data-query: 'key' is required to know where to store data",
+    );
+  if (!$APP.Model || !$APP.Model[model])
+    return console.error(`data-query: Model "${model}" does not exist`);
+
+  const isMany = query.many ?? (!id && !single);
+  const opts = { limit: single ? 1 : limit, offset, includes, order, where };
+
+  // Unsubscribe from previous subscription if exists
+  if (instance._dataQuerySub && instance._dataQuerySubHandler) {
+    instance._dataQuerySub.unsubscribe(instance._dataQuerySubHandler);
+    instance._dataQuerySub = null;
+  }
+
+  // Store pagination info for dataLoaded events
+  instance._paginationInfo = null;
+
+  // Define the handler that will be called on subscription updates
+  instance._dataQuerySubHandler = (data) => {
+    const oldValue = instance.state[key];
+    instance.state[key] = data;
+    instance.requestUpdate(key, oldValue);
+    console.error(instance._paginationInfo);
+    instance.emit("dataLoaded", {
+      instance,
+      rows: isMany ? data : undefined,
+      row: !isMany ? data : undefined,
+      ...(instance._paginationInfo || {}),
+      component: instance.constructor,
+    });
+  };
+
+  try {
+    if (isMany) {
+      // getAll now returns reactive array directly (with pagination props attached)
+      const result = await $APP.Model[model].getAll(opts);
+      const oldValue = instance.state[key];
+      console.error(result, result.total, result);
+      instance.state[key] = result;
+      // Read pagination info from reactive array (set by proxifyMultipleRows)
+      instance._paginationInfo =
+        result.limit !== undefined
+          ? {
+              total: result.total,
+              limit: result.limit,
+              offset: result.offset,
+              count: result.count,
+            }
+          : null;
+      instance.requestUpdate(key, oldValue);
+      result.subscribe?.(instance._dataQuerySubHandler);
+      instance._dataQuerySub = result;
+    } else if (single && where) {
+      // Single record via where clause (e.g., { slug: "my-slug" })
+      const result = await $APP.Model[model].getAll(opts);
+      console.error(result);
+      const oldValue = instance.state[key];
+      instance.state[key] = result[0] || null;
+      instance.requestUpdate(key, oldValue);
+
+      // Subscribe to array, extract first item on updates
+      result.subscribe?.((data) => {
+        instance._dataQuerySubHandler(data[0] || null);
+      });
+      instance._dataQuerySub = result;
+    } else {
+      // Single record via id
+      const reactiveRow = await $APP.Model[model].get({
+        ...opts,
+        where: { id },
+      });
+      const oldValue = instance.state[key];
+      instance.state[key] = reactiveRow;
+      instance.requestUpdate(key, oldValue);
+
+      // Subscribe to the array, handler extracts single item
+      reactiveRow.subscribe?.((data) => {
+        instance._dataQuerySubHandler(data[0]);
+      });
+      instance._dataQuerySub = reactiveRow;
+    }
+    instance.emit("dataLoaded", {
+      instance,
+      rows: isMany ? instance.state[key] : undefined,
+      row: !isMany ? instance.state[key] : undefined,
+      ...(instance._paginationInfo || {}),
+      component: instance.constructor,
+    });
+  } catch (error) {
+    console.error(
+      `data-query: Failed to load data for model "${model}":`,
+      error,
+    );
+    instance.emit("dataError", { instance, error, model, id });
+  }
+
+  instance.syncable = true;
+};
+
 View.plugins.push({
   name: "dataQuery",
   test: ({ component }) => !!component.dataQuery,
@@ -93,102 +212,27 @@ View.plugins.push({
   },
   events: {
     connected: async ({ instance }) => {
-      const query = instance["data-query"];
-      if (!query) return;
-      const {
-        model,
-        id,
-        limit,
-        offset = 0,
-        order,
-        where,
-        includes,
-        key,
-        single,
-      } = query;
+      // Initial data fetch
+      await fetchDataQuery(instance);
 
-      if (!model) return console.warn("data-query: 'model' is required");
-      if (!key)
-        return console.warn(
-          "data-query: 'key' is required to know where to store data",
-        );
-      if (!$APP.Model || !$APP.Model[model])
-        return console.error(`data-query: Model "${model}" does not exist`);
-      const isMany = query.many ?? (!id && !single);
-      const opts = { limit: single ? 1 : limit, offset, includes, order, where };
-
-      // Define the handler that will be called on subscription updates
-      instance._dataQuerySubHandler = (data) => {
-        const oldValue = instance.state[key];
-        instance.state[key] = data;
-        instance.requestUpdate(key, oldValue);
-        instance.emit("dataLoaded", {
-          instance,
-          rows: isMany ? data : undefined,
-          row: !isMany ? data : undefined,
-          component: instance.constructor,
-        });
+      // Listen for data-query prop changes to re-fetch
+      instance._dataQueryChangeHandler = async () => {
+        await fetchDataQuery(instance);
       };
-
-      instance._dataQuerySub = null;
-
-      try {
-        if (isMany) {
-          const reactiveArray = await $APP.Model[model].getAll(opts);
-          const oldValue = instance.state[key];
-          instance.state[key] = [...reactiveArray];
-          instance.requestUpdate(key, oldValue);
-          reactiveArray.subscribe(instance._dataQuerySubHandler);
-          instance._dataQuerySub = reactiveArray;
-        } else if (single && where) {
-          // Single record via where clause (e.g., { slug: "my-slug" })
-          const reactiveArray = await $APP.Model[model].getAll(opts);
-          const oldValue = instance.state[key];
-          instance.state[key] = reactiveArray[0] || null;
-          instance.requestUpdate(key, oldValue);
-
-          // Subscribe to array, extract first item on updates
-          reactiveArray.subscribe((data) => {
-            instance._dataQuerySubHandler(data[0] || null);
-          });
-          instance._dataQuerySub = reactiveArray;
-        } else {
-          // Single record via id
-          const reactiveRow = await $APP.Model[model].get({
-            ...opts,
-            where: { id },
-          });
-          const oldValue = instance.state[key];
-          instance.state[key] = reactiveRow;
-          instance.requestUpdate(key, oldValue);
-
-          // Subscribe to the array, handler extracts single item
-          reactiveRow.subscribe((data) => {
-            instance._dataQuerySubHandler(data[0]);
-          });
-          instance._dataQuerySub = reactiveRow;
-        }
-        instance.emit("dataLoaded", {
-          instance,
-          rows: isMany ? instance.state[key] : undefined,
-          row: !isMany ? instance.state[key] : undefined,
-          component: instance.constructor,
-        });
-      } catch (error) {
-        console.error(
-          `data-query: Failed to load data for model "${model}":`,
-          error,
-        );
-        instance.emit("dataError", { instance, error, model, id });
-      }
-
-      instance.syncable = true;
+      instance.on("data-queryChanged", instance._dataQueryChangeHandler);
     },
     disconnected: ({ instance }) => {
+      // Clean up subscription
       if (instance._dataQuerySub && instance._dataQuerySubHandler)
         instance._dataQuerySub.unsubscribe(instance._dataQuerySubHandler);
       instance._dataQuerySub = null;
       instance._dataQuerySubHandler = null;
+
+      // Clean up change listener
+      if (instance._dataQueryChangeHandler) {
+        instance.off("data-queryChanged", instance._dataQueryChangeHandler);
+        instance._dataQueryChangeHandler = null;
+      }
     },
   },
 });

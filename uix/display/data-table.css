@@ -1,0 +1,15 @@
+:where(.uix-data-table, uix-data-table) {
+  display: block;
+  width: var(--data-table-width, 100%);
+
+  uix-pagination {
+    margin-top: var(--data-table-pagination-margin, 1rem);
+    justify-content: var(--data-table-pagination-justify, flex-end);
+  }
+}
+
+.uix-data-table__empty {
+  padding: var(--data-table-empty-padding, 2rem);
+  text-align: center;
+  color: var(--data-table-empty-color, #6b7280);
+}

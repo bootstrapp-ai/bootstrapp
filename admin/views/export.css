@@ -1,0 +1,28 @@
+/* Admin Export */
+
+.admin-export-options {
+  padding: var(--admin-export-options-padding, 0.25rem);
+}
+
+.admin-export-option {
+  display: block;
+  width: 100%;
+  padding: var(--admin-export-option-padding, 0.5rem 1rem);
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.admin-export-option:hover {
+  background: var(--admin-export-option-hover, #f3f4f6);
+}
+
+.admin-export-option:first-child {
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.admin-export-option:last-child {
+  border-radius: 0 0 0.5rem 0.5rem;
+}

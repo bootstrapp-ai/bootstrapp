@@ -46,6 +46,12 @@ const simpleMatcher = (row, where) => {
  */
 function createReactiveArrayPrototype(proxifyRow, $APP) {
   const reactiveArrayPrototype = {
+    // Pagination metadata (set by proxifyMultipleRows when available)
+    total: 0,
+    limit: undefined,
+    offset: 0,
+    count: 0,
+
     /**
      * Subscribes to changes in the row set.
      * @param {function(Array): void} callback - Fired with the new array.
@@ -225,7 +231,7 @@ function createReactiveArrayPrototype(proxifyRow, $APP) {
 
   // Make our prototype inherit from Array.prototype
   Object.setPrototypeOf(reactiveArrayPrototype, Array.prototype);
-
+  console.error({ reactiveArrayPrototype });
   return reactiveArrayPrototype;
 }
 
@@ -415,7 +421,13 @@ export function createModel($APP) {
         const relData = row[relationName];
         const relId = typeof relData === "object" ? relData?.id : relData;
         if (relId) {
-          subscribeToRelated(targetModel, { id: relId }, row, relationName, unsubscribers);
+          subscribeToRelated(
+            targetModel,
+            { id: relId },
+            row,
+            relationName,
+            unsubscribers,
+          );
         }
       } else if (relDef.belongs_many) {
         // Array of foreign keys or loaded objects
@@ -423,13 +435,26 @@ export function createModel($APP) {
         for (const item of relArray) {
           const itemId = typeof item === "object" ? item?.id : item;
           if (itemId) {
-            subscribeToRelated(targetModel, { id: itemId }, row, relationName, unsubscribers);
+            subscribeToRelated(
+              targetModel,
+              { id: itemId },
+              row,
+              relationName,
+              unsubscribers,
+            );
           }
         }
       } else if (relDef.many || relDef.one) {
         // Reverse relationship: subscribe to targetModel where foreignKey = row.id
-        const foreignKey = relDef.targetForeignKey || `${modelName.toLowerCase()}Id`;
-        subscribeToRelated(targetModel, { [foreignKey]: row.id }, row, relationName, unsubscribers);
+        const foreignKey =
+          relDef.targetForeignKey || `${modelName.toLowerCase()}Id`;
+        subscribeToRelated(
+          targetModel,
+          { [foreignKey]: row.id },
+          row,
+          relationName,
+          unsubscribers,
+        );
       }
     }
 
@@ -442,7 +467,13 @@ export function createModel($APP) {
   /**
    * Subscribe to a related model and update parent row when changes occur
    */
-  const subscribeToRelated = (targetModel, where, parentRow, relationName, unsubscribers) => {
+  const subscribeToRelated = (
+    targetModel,
+    where,
+    parentRow,
+    relationName,
+    unsubscribers,
+  ) => {
     if (!$APP.SubscriptionManager) return;
 
     $APP.SubscriptionManager.subscribe(targetModel, where, (event) => {
@@ -455,13 +486,15 @@ export function createModel($APP) {
         // Remove from relationship if it's an array
         removeFromRelationship(parentRow, relationName, record);
       }
-    }).then((unsubscribe) => {
-      if (unsubscribe) {
-        unsubscribers.push(unsubscribe);
-      }
-    }).catch((err) => {
-      console.error("Failed to subscribe to relationship:", err);
-    });
+    })
+      .then((unsubscribe) => {
+        if (unsubscribe) {
+          unsubscribers.push(unsubscribe);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to subscribe to relationship:", err);
+      });
   };
 
   /**
@@ -473,7 +506,7 @@ export function createModel($APP) {
     if (Array.isArray(currentData)) {
       // Find and update the record in the array
       const index = currentData.findIndex(
-        (item) => String(item?.id || item) === String(updatedRecord.id)
+        (item) => String(item?.id || item) === String(updatedRecord.id),
       );
       if (index > -1) {
         // Create new array with updated item for change detection
@@ -497,7 +530,7 @@ export function createModel($APP) {
 
     if (Array.isArray(currentData)) {
       const newArray = currentData.filter(
-        (item) => String(item?.id || item) !== String(deletedRecord.id)
+        (item) => String(item?.id || item) !== String(deletedRecord.id),
       );
       if (newArray.length !== currentData.length) {
         parentRow[relationName] = newArray;
@@ -519,22 +552,41 @@ export function createModel($APP) {
       });
       return result;
     }
-
     if (action.includes("MANY")) {
+      console.error({ result });
       if (payload.opts.object) return result;
       const opts = payload.opts || {};
       if (result?.items) {
-        result.items = proxifyMultipleRows(result.items, modelName, opts);
+        // Extract pagination info from result
+        const paginationInfo = {
+          total: result.total,
+          limit: result.limit,
+          offset: result.offset,
+          count: result.count,
+        };
+        console.error({ paginationInfo });
+        // Proxify items with pagination metadata attached to the array
+        const reactiveItems = proxifyMultipleRows(
+          result.items,
+          modelName,
+          opts,
+          paginationInfo,
+        );
         // Auto-subscribe for each row if includes provided
         if (opts.includes?.length) {
-          result.items.forEach((row) => autoSubscribeRelationships(row, modelName, opts.includes));
+          reactiveItems.forEach((row) =>
+            autoSubscribeRelationships(row, modelName, opts.includes),
+          );
         }
-        return result;
+        // Return the reactive array directly (pagination info is on the array itself)
+        return reactiveItems;
       }
       const proxified = proxifyMultipleRows(result, modelName, opts);
       // Auto-subscribe for each row if includes provided
       if (opts.includes?.length) {
-        proxified.forEach((row) => autoSubscribeRelationships(row, modelName, opts.includes));
+        proxified.forEach((row) =>
+          autoSubscribeRelationships(row, modelName, opts.includes),
+        );
       }
       return proxified;
     }
@@ -546,7 +598,11 @@ export function createModel($APP) {
     const proxifiedResult = proxifyRow(result, modelName);
     // Auto-subscribe if includes provided for single record
     if (payload.opts?.includes?.length && proxifiedResult) {
-      autoSubscribeRelationships(proxifiedResult, modelName, payload.opts.includes);
+      autoSubscribeRelationships(
+        proxifiedResult,
+        modelName,
+        payload.opts.includes,
+      );
     }
     return proxifiedResult;
   };
@@ -731,9 +787,15 @@ export function createModel($APP) {
    * @param {Array<object>} rows - The array of row data.
    * @param {string} modelName - The name of the model.
    * @param {object} [opts={}] - The original query options.
+   * @param {object} [paginationInfo=null] - Pagination metadata {total, limit, offset, count}.
    * @returns {ReactiveRowSet | Array}
    */
-  const proxifyMultipleRows = (rows, modelName, opts = {}) => {
+  const proxifyMultipleRows = (
+    rows,
+    modelName,
+    opts = {},
+    paginationInfo = null,
+  ) => {
     if (!Array.isArray(rows)) return rows;
 
     // Create the individual proxified rows
@@ -747,6 +809,14 @@ export function createModel($APP) {
     proxifiedRows.opts = opts;
     proxifiedRows.subscriptions = new Set();
     proxifiedRows.queryUnsubscribe = null;
+
+    // Attach pagination info if provided
+    if (paginationInfo) {
+      proxifiedRows.total = paginationInfo.total;
+      proxifiedRows.limit = paginationInfo.limit;
+      proxifiedRows.offset = paginationInfo.offset;
+      proxifiedRows.count = paginationInfo.count;
+    }
 
     return proxifiedRows;
   };

@@ -1,0 +1,33 @@
+/* Admin Model Form */
+
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--admin-form-gap, 1.5rem);
+}
+
+.admin-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--admin-form-field-gap, 0.5rem);
+}
+
+.admin-form-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+.admin-form-required {
+  color: var(--admin-form-required-color, #ef4444);
+}
+
+.admin-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--admin-form-actions-padding, 1.5rem);
+  border-top: 2px solid var(--admin-form-actions-border, #e5e7eb);
+}

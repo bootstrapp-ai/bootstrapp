@@ -343,6 +343,11 @@ export class IndexedDBAdapter extends DatabaseAdapterBase {
         );
       }
 
+      // Return full pagination object if limit was requested
+      if (options.limit !== undefined) {
+        result.items = items; // items may have relationships loaded
+        return result;
+      }
       return items;
     } catch (error) {
       console.error(`IndexedDB: Error getting records from "${model}"`, error);

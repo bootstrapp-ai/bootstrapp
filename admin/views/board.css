@@ -1,0 +1,175 @@
+/* Admin Board - Kanban View */
+
+admin-board {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  width: 100%;
+}
+
+.admin-board {
+  display: flex;
+  height: 100%;
+  gap: var(--admin-board-gap, 1.5rem);
+  overflow-x: auto;
+  padding: var(--admin-board-padding, 1rem);
+}
+
+/* Board Lane (Column) */
+.admin-board-lane {
+  display: flex;
+  flex-direction: column;
+  width: var(--admin-board-lane-width, 18rem);
+  flex-shrink: 0;
+  gap: var(--admin-board-lane-gap, 1rem);
+}
+
+/* Board Header */
+.admin-board-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--admin-board-header-padding, 0.75rem);
+  background: var(--admin-board-header-bg, var(--color-surface, #fff));
+  border: var(--admin-board-header-border, 3px solid #000);
+  border-radius: var(--admin-board-header-radius, 0.75rem);
+}
+
+.admin-board-header:hover .admin-board-actions {
+  opacity: 1;
+}
+
+.admin-board-title {
+  font-weight: 700;
+  font-size: var(--admin-board-title-size, 1.125rem);
+}
+
+.admin-board-title-fixed {
+  font-weight: 900;
+  font-size: var(--admin-board-title-size, 1.125rem);
+  text-transform: uppercase;
+}
+
+.admin-board-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+/* Board Column (Drop Area) */
+.admin-board-column {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: var(--admin-board-column-padding, 0.75rem);
+  gap: var(--admin-board-column-gap, 0.75rem);
+  min-height: var(--admin-board-column-min-height, 200px);
+  background: var(--admin-board-column-bg, var(--color-surface-light, #f3f4f6));
+  border: var(--admin-board-column-border, 3px dashed #000);
+  border-radius: var(--admin-board-column-radius, 0.75rem);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+/* Drop Area Hover State */
+uix-droparea.over.admin-board-column,
+.admin-board-column.over {
+  background: var(--admin-board-drop-highlight, #dbeafe);
+  border-color: var(--admin-board-drop-border, #3b82f6);
+  border-style: solid;
+}
+
+/* Board Card */
+.admin-board-card {
+  cursor: pointer;
+}
+
+.admin-board-card-title {
+  font-weight: 500;
+}
+
+/* Dragging State */
+uix-draggable.dragging {
+  opacity: 0.5;
+}
+
+uix-draggable {
+  cursor: grab;
+}
+
+uix-draggable:active {
+  cursor: grabbing;
+}
+
+/* Add Board Section */
+.admin-board-add {
+  width: var(--admin-board-lane-width, 18rem);
+}
+
+.admin-board-add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.admin-board-add-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.admin-board-add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  width: 100%;
+  border: 3px dashed var(--admin-board-add-border, #000);
+  border-radius: var(--admin-board-add-radius, 0.75rem);
+  color: var(--admin-board-add-color, #6b7280);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.admin-board-add-btn:hover {
+  background: var(--admin-board-add-hover-bg, #f9fafb);
+  color: var(--admin-board-add-hover-color, #000);
+}
+
+/* Minimized Boards Section */
+.admin-board-minimized {
+  display: flex;
+  flex-direction: column;
+  width: var(--admin-board-minimized-width, 12rem);
+  flex-shrink: 0;
+  gap: var(--admin-board-minimized-gap, 0.75rem);
+  padding: var(--admin-board-minimized-padding, 0.75rem);
+}
+
+.admin-board-minimized-label {
+  font-weight: 900;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--admin-board-minimized-label-color, #6b7280);
+}
+
+.admin-board-minimized-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background: var(--admin-board-minimized-item-bg, #e5e7eb);
+  border: 2px solid var(--admin-board-minimized-item-border, #000);
+  border-radius: 0.5rem;
+  text-align: left;
+  transition: background-color 0.15s ease;
+}
+
+.admin-board-minimized-item:hover {
+  background: var(--admin-board-minimized-item-hover-bg, #d1d5db);
+}
+
+.admin-board-minimized-item span {
+  font-weight: 500;
+  font-size: 0.875rem;
+}

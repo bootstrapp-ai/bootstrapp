@@ -10,6 +10,7 @@ import {
 
 export default {
   tag: "admin-model-form",
+  style: true,
   properties: {
     model: T.string(),
     row: T.object(),
@@ -54,7 +55,6 @@ export default {
       }
     }
 
-    // Include ID for edits
     if (this.row?.id) {
       data.id = this.row.id;
     }
@@ -66,27 +66,22 @@ export default {
   },
 
   renderField(field, value) {
-    const baseClasses = `w-full px-4 py-3 border-3 border-black rounded-xl
-                         focus:outline-none focus:ring-2 focus:ring-black
-                         disabled:bg-gray-100 disabled:cursor-not-allowed`;
-
     switch (field.type) {
       case "textarea":
         return html`
-          <textarea
+          <uix-textarea
             name=${field.name}
             .value=${value || ""}
             ?required=${field.required}
             placeholder=${field.placeholder || ""}
             rows=${field.rows || 3}
-            class=${baseClasses + " resize-y"}
-          ></textarea>
+          ></uix-textarea>
         `;
 
       case "select":
         const options = field.options || this.relationshipOptions[field.name] || [];
         return html`
-          <select name=${field.name} ?required=${field.required} class=${baseClasses}>
+          <uix-select name=${field.name} ?required=${field.required} .value=${value || ""}>
             <option value="">Select...</option>
             ${Array.isArray(options)
               ? options.map((opt) => {
@@ -99,19 +94,14 @@ export default {
                   `;
                 })
               : ""}
-          </select>
+          </uix-select>
         `;
 
       case "multi-select":
         const multiOptions = this.relationshipOptions[field.name] || [];
         const selectedValues = Array.isArray(value) ? value : [];
         return html`
-          <select
-            name=${field.name}
-            multiple
-            ?required=${field.required}
-            class=${baseClasses + " min-h-[120px]"}
-          >
+          <uix-select name=${field.name} multiple ?required=${field.required}>
             ${multiOptions.map(
               (opt) => html`
                 <option
@@ -122,127 +112,114 @@ export default {
                 </option>
               `,
             )}
-          </select>
+          </uix-select>
         `;
 
       case "switch":
       case "checkbox":
         return html`
-          <label class="flex items-center gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              name=${field.name}
-              ?checked=${value === true}
-              class="w-5 h-5 border-3 border-black rounded"
-            />
-            <span class="text-sm text-gray-600">Enable ${field.label}</span>
-          </label>
+          <uix-checkbox
+            name=${field.name}
+            ?checked=${value === true}
+            label="Enable ${field.label}"
+          ></uix-checkbox>
         `;
 
       case "number":
         return html`
-          <input
+          <uix-input
             type="number"
             name=${field.name}
             .value=${value ?? ""}
             ?required=${field.required}
             placeholder=${field.placeholder || ""}
             step="any"
-            class=${baseClasses}
-          />
+          ></uix-input>
         `;
 
       case "date":
         return html`
-          <input
+          <uix-input
             type="date"
             name=${field.name}
             .value=${value || ""}
             ?required=${field.required}
-            class=${baseClasses}
-          />
+          ></uix-input>
         `;
 
       case "datetime-local":
         return html`
-          <input
+          <uix-input
             type="datetime-local"
             name=${field.name}
             .value=${value || ""}
             ?required=${field.required}
-            class=${baseClasses}
-          />
+          ></uix-input>
         `;
 
       case "time":
         return html`
-          <input
+          <uix-input
             type="time"
             name=${field.name}
             .value=${value || ""}
             ?required=${field.required}
-            class=${baseClasses}
-          />
+          ></uix-input>
         `;
 
       case "email":
         return html`
-          <input
+          <uix-input
             type="email"
             name=${field.name}
             .value=${value || ""}
             ?required=${field.required}
             placeholder=${field.placeholder || "email@example.com"}
-            class=${baseClasses}
-          />
+          ></uix-input>
         `;
 
       case "url":
         return html`
-          <input
+          <uix-input
             type="url"
             name=${field.name}
             .value=${value || ""}
             ?required=${field.required}
             placeholder=${field.placeholder || "https://"}
-            class=${baseClasses}
-          />
+          ></uix-input>
         `;
 
       case "password":
         return html`
-          <input
+          <uix-input
             type="password"
             name=${field.name}
             .value=${value || ""}
             ?required=${field.required}
             placeholder=${field.placeholder || ""}
-            class=${baseClasses}
-          />
+          ></uix-input>
         `;
 
       case "tel":
         return html`
-          <input
+          <uix-input
             type="tel"
             name=${field.name}
             .value=${value || ""}
             ?required=${field.required}
             placeholder=${field.placeholder || ""}
-            class=${baseClasses}
-          />
+          ></uix-input>
         `;
 
       default:
         return html`
-          <input
+          <uix-input
             type="text"
             name=${field.name}
             .value=${value || ""}
             ?required=${field.required}
             placeholder=${field.placeholder || ""}
-            class=${baseClasses}
-          />
+          ></uix-input>
         `;
     }
   },
@@ -254,14 +231,14 @@ export default {
     const formData = isEdit ? deserializeForForm(row, fields) : {};
 
     return html`
-      <form @submit=${this.handleSubmit} class="space-y-6">
+      <form @submit=${this.handleSubmit} class="admin-form">
         ${fields.map(
           (field) => html`
-            <div class="space-y-2">
-              <label class="flex items-center gap-2 font-bold text-sm">
+            <div class="admin-form-field">
+              <label class="admin-form-label">
                 ${field.label}
                 ${field.required
-                  ? html`<span class="text-red-500">*</span>`
+                  ? html`<span class="admin-form-required">*</span>`
                   : ""}
               </label>
               ${this.renderField(field, formData[field.name])}
@@ -270,37 +247,27 @@ export default {
         )}
 
         <!-- Form Actions -->
-        <div class="flex items-center justify-between pt-6 border-t-2 border-gray-200">
+        <div class="admin-form-actions">
           ${isEdit
             ? html`
-                <button
+                <uix-button
                   type="button"
+                  ghost
+                  danger
                   @click=${() => this.emit("delete")}
-                  class="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50
-                         rounded-lg transition-colors"
                 >
                   <uix-icon name="trash" size="18"></uix-icon>
                   Delete
-                </button>
+                </uix-button>
               `
             : html`<div></div>`}
 
-          <button
-            type="submit"
-            ?disabled=${loading}
-            class="flex items-center gap-2 px-8 py-3 bg-black text-white font-bold
-                   rounded-xl border-3 border-black
-                   shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]
-                   hover:translate-x-[2px] hover:translate-y-[2px]
-                   hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.3)]
-                   transition-all duration-150
-                   disabled:opacity-50 disabled:cursor-not-allowed"
-          >
+          <uix-button type="submit" primary ?disabled=${loading}>
             ${loading
               ? html`<uix-spinner size="sm"></uix-spinner>`
               : html`<uix-icon name=${isEdit ? "save" : "plus"} size="20"></uix-icon>`}
             ${isEdit ? "Save Changes" : "Create"}
-          </button>
+          </uix-button>
         </div>
       </form>
     `;

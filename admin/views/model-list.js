@@ -11,6 +11,7 @@ import {
 
 export default {
   tag: "admin-model-list",
+  style: true,
   dataQuery: true,
   properties: {
     rows: T.array(),
@@ -47,7 +48,6 @@ export default {
 
   getGroupableFields() {
     const schema = getModelSchema(this.model);
-    // Prioritize enum and relationship fields, then string fields
     const groupable = schema.filter((f) => {
       const type = f.type?.toLowerCase() || "";
       return (
@@ -58,7 +58,6 @@ export default {
         type === "boolean"
       );
     });
-    // Sort: enums first, then relationships, then others
     return groupable.sort((a, b) => {
       const aScore = a.enum ? 0 : a.type === "belongs" ? 1 : 2;
       const bScore = b.enum ? 0 : b.type === "belongs" ? 1 : 2;
@@ -91,7 +90,6 @@ export default {
         await $APP.Model[this.model].add(data);
       }
       this.closeModal();
-      // Trigger refresh by re-fetching
       this.dispatchEvent(new CustomEvent("refresh"));
     } catch (error) {
       console.error("Error saving:", error);
@@ -134,24 +132,6 @@ export default {
     );
   },
 
-  formatCellValue(value, type) {
-    if (value === null || value === undefined) return "-";
-    if (typeof value === "boolean") {
-      return value ? "Yes" : "No";
-    }
-    if (Array.isArray(value)) {
-      return `[${value.length} items]`;
-    }
-    if (typeof value === "object") {
-      return JSON.stringify(value).slice(0, 50) + "...";
-    }
-    if (type === "date" && value) {
-      return new Date(value).toLocaleDateString();
-    }
-    const str = String(value);
-    return str.length > 50 ? str.slice(0, 50) + "..." : str;
-  },
-
   render() {
     const { rows, model, selectedRow, modalOpen, confirmDelete } = this;
     const modelName = getSingularName(model);
@@ -160,112 +140,96 @@ export default {
     const filteredRows = this.filterRows(rows || []);
 
     return html`
-      <div class="p-8">
+      <div class="admin-model-list">
         <!-- Header -->
-        <div class="flex items-center justify-between mb-6">
+        <div class="admin-model-list-header">
           <div>
-            <h1 class="text-3xl font-black uppercase">${capitalize(model)}</h1>
-            <p class="text-gray-600">${filteredRows.length} records</p>
+            <h1 class="admin-model-list-title">${capitalize(model)}</h1>
+            <p class="admin-model-list-count">${filteredRows.length} records</p>
           </div>
 
-          <div class="flex items-center gap-4">
+          <div class="admin-model-list-actions">
             <!-- Column Selector -->
-            <div class="relative group">
-              <button
-                class="flex items-center gap-2 px-4 py-2 border-2 border-black rounded-lg
-                       hover:bg-gray-100 transition-colors"
-              >
+            <uix-dropdown>
+              <uix-button slot="trigger" ghost>
                 <uix-icon name="columns-3" size="18"></uix-icon>
                 Columns
-              </button>
-              <div
-                class="absolute right-0 mt-2 w-48 bg-white border-3 border-black rounded-xl
-                       shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-50 hidden group-hover:block"
-              >
-                <div class="p-2 max-h-64 overflow-y-auto">
-                  ${schema.map(
-                    (field) => html`
-                      <label
-                        class="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 rounded-lg cursor-pointer"
-                      >
-                        <input
-                          type="checkbox"
-                          ?checked=${this.selectedColumns?.includes(field.name)}
-                          ?disabled=${field.name === "id"}
-                          @change=${() => this.toggleColumn(field.name)}
-                          class="w-4 h-4"
-                        />
-                        <span class="text-sm">${field.label || field.name}</span>
-                      </label>
-                    `,
-                  )}
-                </div>
+              </uix-button>
+              <div class="admin-dropdown-content">
+                ${schema.map(
+                  (field) => html`
+                    <label class="admin-dropdown-item">
+                      <uix-checkbox
+                        ?checked=${this.selectedColumns?.includes(field.name)}
+                        ?disabled=${field.name === "id"}
+                        @change=${() => this.toggleColumn(field.name)}
+                      ></uix-checkbox>
+                      <span>${field.label || field.name}</span>
+                    </label>
+                  `,
+                )}
               </div>
-            </div>
+            </uix-dropdown>
 
             <!-- Group By Field Selector (Board Mode) -->
-            ${this.viewMode === "board"
-              ? html`
-                  <div class="relative group">
-                    <button
-                      class="flex items-center gap-2 px-4 py-2 border-2 border-black rounded-lg
-                             hover:bg-gray-100 transition-colors"
-                    >
+            ${
+              this.viewMode === "board"
+                ? html`
+                  <uix-dropdown>
+                    <uix-button slot="trigger" ghost>
                       <uix-icon name="layers" size="18"></uix-icon>
-                      ${this.groupByField
-                        ? capitalize(this.groupByField)
-                        : "No Grouping"}
-                    </button>
-                    <div
-                      class="absolute right-0 mt-2 w-48 bg-white border-3 border-black rounded-xl
-                             shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-50 hidden group-hover:block"
-                    >
-                      <div class="p-2 max-h-64 overflow-y-auto">
-                        <button
-                          @click=${() => (this.groupByField = "")}
-                          class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 rounded-lg text-left
-                                 ${!this.groupByField ? "bg-gray-100 font-bold" : ""}"
-                        >
-                          <uix-icon name="layout-grid" size="16"></uix-icon>
-                          No Grouping
-                        </button>
-                        ${this.getGroupableFields().map(
-                          (field) => html`
-                            <button
-                              @click=${() => (this.groupByField = field.name)}
-                              class="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 rounded-lg text-left
-                                     ${this.groupByField === field.name ? "bg-gray-100 font-bold" : ""}"
-                            >
-                              <uix-icon
-                                name=${field.enum ? "list-filter" : field.type === "belongs" ? "link" : "type"}
-                                size="16"
-                              ></uix-icon>
-                              ${field.label || capitalize(field.name)}
-                            </button>
-                          `,
-                        )}
-                      </div>
+                      ${
+                        this.groupByField
+                          ? capitalize(this.groupByField)
+                          : "No Grouping"
+                      }
+                    </uix-button>
+                    <div class="admin-dropdown-content">
+                      <button
+                        class="admin-dropdown-item ${!this.groupByField ? "active" : ""}"
+                        @click=${() => (this.groupByField = "")}
+                      >
+                        <uix-icon name="layout-grid" size="16"></uix-icon>
+                        No Grouping
+                      </button>
+                      ${this.getGroupableFields().map(
+                        (field) => html`
+                          <button
+                            class="admin-dropdown-item ${this.groupByField === field.name ? "active" : ""}"
+                            @click=${() => (this.groupByField = field.name)}
+                          >
+                            <uix-icon
+                              name=${field.enum ? "list-filter" : field.type === "belongs" ? "link" : "type"}
+                              size="16"
+                            ></uix-icon>
+                            ${field.label || capitalize(field.name)}
+                          </button>
+                        `,
+                      )}
                     </div>
-                  </div>
+                  </uix-dropdown>
                 `
-              : ""}
+                : ""
+            }
 
             <!-- View Mode Toggle -->
-            <div class="flex border-2 border-black rounded-lg overflow-hidden">
-              <button
+            <div class="admin-view-toggle">
+              <uix-button
+                ghost
+                size="sm"
+                ?primary=${this.viewMode === "list"}
                 @click=${() => (this.viewMode = "list")}
-                class="flex items-center gap-2 px-3 py-2 transition-colors
-                       ${this.viewMode === "list" ? "bg-black text-white" : "hover:bg-gray-100"}"
               >
                 <uix-icon name="list" size="18"></uix-icon>
-              </button>
-              <button
+              </uix-button>
+              <uix-button
+                ghost
+                size="sm"
+                ?primary=${this.viewMode === "board"}
                 @click=${() => (this.viewMode = "board")}
-                class="flex items-center gap-2 px-3 py-2 transition-colors
-                       ${this.viewMode === "board" ? "bg-black text-white" : "hover:bg-gray-100"}"
               >
                 <uix-icon name="kanban" size="18"></uix-icon>
-              </button>
+              </uix-button>
             </div>
 
             <!-- Import/Export -->
@@ -273,43 +237,28 @@ export default {
             <admin-export .model=${model} .rows=${rows}></admin-export>
 
             <!-- New Button -->
-            <button
-              @click=${this.openCreateForm}
-              class="flex items-center gap-2 px-6 py-3 bg-black text-white font-bold
-                     rounded-xl border-3 border-black
-                     shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]
-                     hover:translate-x-[2px] hover:translate-y-[2px]
-                     hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.3)]
-                     transition-all duration-150"
-            >
+            <uix-button primary @click=${this.openCreateForm}>
               <uix-icon name="plus" size="20"></uix-icon>
               New ${capitalize(modelName)}
-            </button>
+            </uix-button>
           </div>
         </div>
 
         <!-- Search -->
-        <div class="mb-6">
-          <div class="relative max-w-md">
-            <uix-icon
-              name="search"
-              size="20"
-              class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-            ></uix-icon>
-            <input
-              type="search"
-              placeholder="Search..."
-              .value=${this.searchQuery}
-              @input=${(e) => (this.searchQuery = e.target.value)}
-              class="w-full pl-12 pr-4 py-3 border-3 border-black rounded-xl
-                     focus:outline-none focus:ring-2 focus:ring-black"
-            />
-          </div>
+        <div class="admin-model-list-search">
+          <uix-input
+            type="search"
+            placeholder="Search..."
+            icon="search"
+            .value=${this.searchQuery}
+            @input=${(e) => (this.searchQuery = e.target.value)}
+          ></uix-input>
         </div>
 
         <!-- Content Area -->
-        ${this.viewMode === "board"
-          ? html`
+        ${
+          this.viewMode === "board"
+            ? html`
               <admin-board
                 .model=${model}
                 .rows=${filteredRows}
@@ -321,164 +270,63 @@ export default {
                 }}
               ></admin-board>
             `
-          : html`
-              <!-- Data Table -->
-              <div
-                class="bg-white border-3 border-black rounded-2xl overflow-hidden
-                       shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]"
-              >
-                ${filteredRows.length === 0
-                  ? html`
-                      <div class="p-12 text-center text-gray-500">
-                        <uix-icon name="inbox" size="48" class="mx-auto mb-4 opacity-50"></uix-icon>
-                        <p class="text-lg font-medium">No records found</p>
-                        <p class="text-sm">Create a new ${modelName} to get started</p>
-                      </div>
-                    `
-                  : html`
-                      <div class="overflow-x-auto">
-                        <table class="w-full">
-                          <thead class="bg-gray-100 border-b-3 border-black">
-                            <tr>
-                              ${columns.map(
-                                (col) => html`
-                                  <th
-                                    class="px-4 py-3 text-left text-sm font-black uppercase tracking-wide"
-                                  >
-                                    ${col.label}
-                                  </th>
-                                `,
-                              )}
-                              <th class="px-4 py-3 text-right text-sm font-black uppercase">
-                                Actions
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody class="divide-y divide-gray-200">
-                            ${filteredRows.map(
-                              (row) => html`
-                                <tr
-                                  class="hover:bg-gray-50 cursor-pointer transition-colors"
-                                  @click=${() => this.openEditForm(row)}
-                                >
-                                  ${columns.map(
-                                    (col) => html`
-                                      <td class="px-4 py-3 text-sm">
-                                        ${this.formatCellValue(row[col.name], col.type)}
-                                      </td>
-                                    `,
-                                  )}
-                                  <td class="px-4 py-3 text-right">
-                                    <button
-                                      @click=${(e) => {
-                                        e.stopPropagation();
-                                        this.openEditForm(row);
-                                      }}
-                                      class="p-2 hover:bg-gray-200 rounded-lg transition-colors"
-                                    >
-                                      <uix-icon name="pen" size="18"></uix-icon>
-                                    </button>
-                                  </td>
-                                </tr>
-                              `,
-                            )}
-                          </tbody>
-                        </table>
-                      </div>
-                    `}
-              </div>
-            `}
+            : html`
+                <uix-data-table
+                  .data-query=${{ model, key: "rows" }}
+                  .columns=${columns}
+                  .selectRow=${(row) => this.openEditForm(row)}
+                ></uix-data-table>
+            `
+        }
 
         <!-- Edit/Create Modal -->
-        ${
-          modalOpen
-            ? html`
-              <div
-                class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
-                @click=${(e) => {
-                  if (e.target === e.currentTarget) this.closeModal();
-                }}
-              >
-                <div
-                  class="bg-white border-3 border-black rounded-2xl w-full max-w-2xl max-h-[90vh]
-                         shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden flex flex-col"
-                >
-                  <!-- Modal Header -->
-                  <div
-                    class="flex items-center justify-between px-6 py-4 border-b-3 border-black bg-gray-50"
-                  >
-                    <h2 class="text-xl font-black uppercase">
-                      ${selectedRow?.id ? `Edit ${modelName}` : `New ${modelName}`}
-                    </h2>
-                    <button
-                      @click=${this.closeModal}
-                      class="p-2 hover:bg-gray-200 rounded-lg transition-colors"
-                    >
-                      <uix-icon name="x" size="24"></uix-icon>
-                    </button>
-                  </div>
+        <uix-modal
+          ?open=${modalOpen}
+          @close=${this.closeModal}
+          title=${selectedRow?.id ? `Edit ${modelName}` : `New ${modelName}`}
+        >
+          ${
+            modalOpen
+              ? keyed(
+                  selectedRow,
+                  html`
+                  <admin-model-form
+                    .model=${model}
+                    .row=${selectedRow}
+                    @submit=${this.handleFormSubmit}
+                    @delete=${() => (this.confirmDelete = true)}
+                  ></admin-model-form>
+                `,
+                )
+              : ""
+          }
+        </uix-modal>
 
-                  <!-- Modal Body -->
-                  <div class="flex-1 overflow-y-auto p-6">
-                    ${keyed(
-                      selectedRow,
-                      html`
-                        <admin-model-form
-                          .model=${model}
-                          .row=${selectedRow}
-                          @submit=${this.handleFormSubmit}
-                          @delete=${() => (this.confirmDelete = true)}
-                        ></admin-model-form>
-                      `,
-                    )}
-                  </div>
-                </div>
-              </div>
-            `
-            : ""
-        }
-
-        <!-- Delete Confirmation -->
-        ${
-          confirmDelete
-            ? html`
-              <div
-                class="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4"
-              >
-                <div
-                  class="bg-white border-3 border-black rounded-2xl p-6 max-w-md
-                         shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
-                >
-                  <div class="flex items-center gap-4 mb-4">
-                    <div class="p-3 bg-red-100 rounded-full">
-                      <uix-icon name="alert-triangle" size="24" class="text-red-600"></uix-icon>
-                    </div>
-                    <div>
-                      <h3 class="font-black text-lg">Delete ${modelName}?</h3>
-                      <p class="text-gray-600 text-sm">This action cannot be undone.</p>
-                    </div>
-                  </div>
-                  <div class="flex gap-4">
-                    <button
-                      @click=${() => (this.confirmDelete = false)}
-                      class="flex-1 px-4 py-3 border-3 border-black rounded-xl font-bold
-                             hover:bg-gray-100 transition-colors"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      @click=${this.handleDelete}
-                      class="flex-1 px-4 py-3 bg-red-500 text-white border-3 border-black
-                             rounded-xl font-bold hover:bg-red-600 transition-colors"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              </div>
-            `
-            : ""
-        }
+        <!-- Delete Confirmation Modal -->
+        <uix-modal
+          ?open=${confirmDelete}
+          @close=${() => (this.confirmDelete = false)}
+          title="Delete ${modelName}?"
+          size="sm"
+        >
+          <div class="admin-delete-confirm">
+            <div class="admin-delete-icon">
+              <uix-icon name="alert-triangle" size="24"></uix-icon>
+            </div>
+            <div>
+              <p class="admin-delete-title">Delete ${modelName}?</p>
+              <p class="admin-delete-text">This action cannot be undone.</p>
+            </div>
+          </div>
+          <div slot="footer" class="admin-modal-footer">
+            <uix-button ghost @click=${() => (this.confirmDelete = false)}>
+              Cancel
+            </uix-button>
+            <uix-button danger @click=${this.handleDelete}>
+              Delete
+            </uix-button>
+          </div>
+        </uix-modal>
       </div>
     `;
   },

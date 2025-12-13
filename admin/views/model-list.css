@@ -1,0 +1,190 @@
+/* Admin Model List */
+
+.admin-model-list {
+  padding: var(--admin-list-padding, 2rem);
+}
+
+/* Header */
+.admin-model-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--admin-list-header-margin, 1.5rem);
+}
+
+.admin-model-list-title {
+  font-size: var(--admin-list-title-size, 1.875rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.admin-model-list-count {
+  color: var(--admin-list-count-color, #6b7280);
+  margin: 0;
+}
+
+.admin-model-list-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--admin-list-actions-gap, 1rem);
+}
+
+/* View Toggle */
+.admin-view-toggle {
+  display: flex;
+  border: 2px solid var(--admin-toggle-border, #000);
+  border-radius: var(--admin-toggle-radius, 0.5rem);
+  overflow: hidden;
+}
+
+.admin-view-toggle uix-button {
+  border-radius: 0;
+}
+
+/* Dropdown Content */
+.admin-dropdown-content {
+  padding: var(--admin-dropdown-padding, 0.5rem);
+  max-height: var(--admin-dropdown-max-height, 16rem);
+  overflow-y: auto;
+}
+
+.admin-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: var(--admin-dropdown-item-padding, 0.5rem 0.75rem);
+  border: none;
+  background: none;
+  border-radius: var(--admin-dropdown-item-radius, 0.5rem);
+  cursor: pointer;
+  text-align: left;
+  font-size: 0.875rem;
+  transition: background-color 0.15s ease;
+}
+
+.admin-dropdown-item:hover {
+  background: var(--admin-dropdown-item-hover, #f3f4f6);
+}
+
+.admin-dropdown-item.active {
+  background: var(--admin-dropdown-item-active, #f3f4f6);
+  font-weight: 700;
+}
+
+/* Search */
+.admin-model-list-search {
+  margin-bottom: var(--admin-list-search-margin, 1.5rem);
+  max-width: var(--admin-list-search-width, 28rem);
+}
+
+/* Table Card */
+.admin-table-card {
+  overflow: hidden;
+}
+
+.admin-table-scroll {
+  overflow-x: auto;
+}
+
+/* Table */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table thead {
+  background: var(--admin-table-header-bg, #f3f4f6);
+  border-bottom: 3px solid var(--admin-table-border, #000);
+}
+
+.admin-table th {
+  padding: var(--admin-table-cell-padding, 0.75rem 1rem);
+  text-align: left;
+  font-size: 0.875rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.admin-table tbody tr {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  border-bottom: 1px solid var(--admin-table-row-border, #e5e7eb);
+}
+
+.admin-table tbody tr:hover {
+  background: var(--admin-table-row-hover, #f9fafb);
+}
+
+.admin-table td {
+  padding: var(--admin-table-cell-padding, 0.75rem 1rem);
+  font-size: 0.875rem;
+}
+
+.admin-table-actions-col {
+  text-align: right;
+  width: 1%;
+  white-space: nowrap;
+}
+
+/* Empty State */
+.admin-table-empty {
+  padding: var(--admin-table-empty-padding, 3rem);
+  text-align: center;
+  color: var(--admin-table-empty-color, #6b7280);
+}
+
+.admin-table-empty uix-icon {
+  margin: 0 auto 1rem;
+  opacity: 0.5;
+}
+
+.admin-table-empty-title {
+  font-size: 1.125rem;
+  font-weight: 500;
+  margin: 0 0 0.25rem;
+}
+
+.admin-table-empty-text {
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+/* Delete Confirmation */
+.admin-delete-confirm {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.admin-delete-icon {
+  padding: 0.75rem;
+  background: var(--admin-delete-icon-bg, #fee2e2);
+  border-radius: 9999px;
+  color: var(--admin-delete-icon-color, #dc2626);
+}
+
+.admin-delete-title {
+  font-weight: 900;
+  font-size: 1.125rem;
+  margin: 0;
+}
+
+.admin-delete-text {
+  color: var(--admin-delete-text-color, #6b7280);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+/* Modal Footer */
+.admin-modal-footer {
+  display: flex;
+  gap: 1rem;
+}
+
+.admin-modal-footer uix-button {
+  flex: 1;
+}

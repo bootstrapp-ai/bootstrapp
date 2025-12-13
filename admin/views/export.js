@@ -13,7 +13,6 @@ const convertToCSV = (data) => {
         if (value === null || value === undefined) return '""';
         if (typeof value === "object") return `"${JSON.stringify(value).replace(/"/g, '""')}"`;
         const str = String(value);
-        // Escape quotes and wrap in quotes if contains comma, newline, or quote
         if (str.includes(",") || str.includes("\n") || str.includes('"')) {
           return `"${str.replace(/"/g, '""')}"`;
         }
@@ -38,6 +37,7 @@ const downloadFile = (content, fileName, mimeType) => {
 
 export default {
   tag: "admin-export",
+  style: true,
   properties: {
     model: T.string(),
     rows: T.array(),
@@ -48,7 +48,6 @@ export default {
     this.exporting = true;
 
     try {
-      // Use provided rows or fetch all
       let data = this.rows;
       if (!data || data.length === 0) {
         data = await $APP.Model[this.model].getAll();
@@ -80,33 +79,24 @@ export default {
 
   render() {
     return html`
-      <div class="relative group">
-        <button
-          ?disabled=${this.exporting}
-          class="flex items-center gap-2 px-4 py-2 border-2 border-black rounded-lg
-                 hover:bg-gray-100 transition-colors
-                 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
+      <uix-dropdown>
+        <uix-button slot="trigger" ghost ?disabled=${this.exporting}>
           <uix-icon name="download" size="18"></uix-icon>
           ${this.exporting ? "Exporting..." : "Export"}
-        </button>
-        <div
-          class="absolute right-0 mt-2 w-32 bg-white border-3 border-black rounded-xl
-                 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-50 hidden group-hover:block"
-        >
+        </uix-button>
+        <div class="admin-export-options">
           ${["CSV", "JSON"].map(
             (format) => html`
               <button
+                class="admin-export-option"
                 @click=${() => this.exportData(format)}
-                class="block w-full px-4 py-2 text-left hover:bg-gray-100
-                       first:rounded-t-lg last:rounded-b-lg"
               >
                 ${format}
               </button>
             `,
           )}
         </div>
-      </div>
+      </uix-dropdown>
     `;
   },
 };
