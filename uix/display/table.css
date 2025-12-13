@@ -1,44 +1,53 @@
 :where(.uix-table, uix-table) {
-  --table-header-background-color: var(--colors-default-100);
-  --table-background-color: #fff;
-  --table-cell-hover-color: var(--colors-primary-200);
-  --table-border-color: var(--colors-default-500);
-  --table-cell-padding: 1rem;
-  width: var(--table-width, 100%);
-  display: table;
-  background-color: var(--table-background-color);
-  border-color: var(--table-border-color);
+  display: block;
+  width: 100%;
 
-  .uix-table__header-group {
-    display: table-header-group;
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: var(--table-border-width, 1px) solid var(--table-border-color, #e5e7eb);
+    border-radius: var(--table-border-radius, 0.5rem);
+    box-shadow: var(--table-shadow, none);
+    overflow: hidden;
   }
 
-  .uix-list {
-    display: table-row;
-
-    &[header] > * {
-      font-weight: var(--font-bold, 700);
-      text-transform: uppercase;
-    }
-
-    > * {
-      display: table-cell;
-      padding: var(--table-cell-padding);
-      text-align: var(--table-text-align, center);
-    }
-
-    &:not([header]):hover {
-      background-color: var(--table-cell-hover-color);
-    }
-
-    &[header] {
-      background-color: var(--table-header-background-color);
-      text-align: var(--table-row-text-align, center);
-    }
+  thead {
+    background-color: var(--table-header-background, #f9fafb);
   }
 
-  .uix-table__row-group {
-    background-color: var(--table-background-color, var(--color-surface));
-    display: table-row-group;
+  th {
+    padding: var(--table-cell-padding, 1rem);
+    text-align: left;
+    font-weight: var(--table-header-font-weight, 600);
+    font-size: var(--table-header-font-size, 0.75rem);
+    text-transform: var(--table-header-text-transform, uppercase);
+    color: var(--table-header-color, #374151);
+    letter-spacing: 0.05em;
+    border-bottom: var(--table-border-width, 1px) solid var(--table-border-color, #e5e7eb);
+  }
+
+  tbody tr {
+    background-color: var(--table-row-background, #ffffff);
+    transition: background-color 0.15s ease;
+  }
+
+  tbody tr:hover {
+    background-color: var(--table-row-hover-background, #f3f4f6);
+  }
+
+  tbody tr.clickable {
+    cursor: pointer;
+  }
+
+  td {
+    padding: var(--table-cell-padding, 1rem);
+    font-size: var(--table-cell-font-size, 0.875rem);
+    color: var(--table-cell-color, #4b5563);
+    border-bottom: 1px solid var(--table-border-color, #e5e7eb);
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
   }
 }

@@ -18,48 +18,39 @@ export default {
   },
   render() {
     return html`
-      <div class="uix-table__header-group" role="rowgroup">
-        <uix-list header>
-          ${this.columns.map(
-            (column) => html`
-              <span
-                transform="uppercase"
-                text="center"
-                weight="semibold"
-                size="sm"
-                word-break="keep-all"
+      <table>
+        <thead>
+          <tr>
+            ${this.columns.map(
+              (column) => html`
+                <th>${column.name || column.label || column}</th>
+              `,
+            )}
+          </tr>
+        </thead>
+        <tbody>
+          ${this.rows?.map(
+            (row) => html`
+              <tr
+                class=${this.selectRow ? "clickable" : ""}
+                @click=${this.selectRow ? (e) => this.selectRow(row, e) : null}
               >
-                ${column.name || column.label || column}
-              </span>
+                ${this.columns.map((column) => {
+                  const name = typeof column === "string" ? column : column.name;
+                  const columnType =
+                    typeof column === "string" ? "string" : column.type;
+                  return html`
+                    <td>
+                      ${TypesRenderers[columnType]?.call(null, row[name]) ??
+                      row[name]}
+                    </td>
+                  `;
+                })}
+              </tr>
             `,
           )}
-        </uix-list>
-      </div>
-      <div class="uix-table__row-group" role="rowgroup">
-        ${this.rows?.map(
-          (row) => html`
-            <uix-list
-              horizontal
-              class=${this.selectRow ? "cursor-pointer" : null}
-              @click=${this.selectRow ? (e) => this.selectRow(row, e) : null}
-            >
-              ${this.columns.map((column) => {
-                const name = typeof column === "string" ? column : column.name;
-                const columnType =
-                  typeof column === "string" ? "string" : column.type;
-                return html`
-                  <span text="center" size="sm">
-                    ${TypesRenderers[columnType] &&
-                    typeof TypesRenderers[columnType] === "function"
-                      ? TypesRenderers[columnType](row[name])
-                      : row[name]}
-                  </span>
-                `;
-              })}
-            </uix-list>
-          `,
-        )}
-      </div>
+        </tbody>
+      </table>
     `;
   },
 };
