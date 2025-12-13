@@ -8,6 +8,7 @@ import {
   getModelSchema,
   getSingularName,
 } from "../utils/model-utils.js";
+import { getModelActions, getPluginModals } from "../plugins.js";
 
 export default {
   tag: "admin-model-list",
@@ -23,6 +24,7 @@ export default {
     modalOpen: T.boolean({ defaultValue: false }),
     confirmDelete: T.boolean({ defaultValue: false }),
     searchQuery: T.string({ defaultValue: "" }),
+    pluginModal: T.string({ defaultValue: "" }),
   },
 
   connected() {
@@ -79,6 +81,24 @@ export default {
     this.modalOpen = false;
     this.selectedRow = null;
     this.confirmDelete = false;
+  },
+
+  openPluginModal(name) {
+    this.pluginModal = name;
+  },
+
+  closePluginModal() {
+    this.pluginModal = "";
+  },
+
+  handlePluginAction(action) {
+    const context = {
+      model: this.model,
+      rows: this.rows,
+      openModal: (name) => this.openPluginModal(name),
+      refresh: () => this.dispatchEvent(new CustomEvent("refresh")),
+    };
+    action.handler(context);
   },
 
   async handleFormSubmit(e) {
@@ -246,6 +266,16 @@ export default {
             <admin-import .model=${model}></admin-import>
             <admin-export .model=${model} .rows=${rows}></admin-export>
 
+            <!-- Plugin Actions -->
+            ${getModelActions(model).map(
+              (action) => html`
+                <uix-button ghost @click=${() => this.handlePluginAction(action)}>
+                  <uix-icon name=${action.icon || "plug"} size="18"></uix-icon>
+                  ${action.label}
+                </uix-button>
+              `,
+            )}
+
             <!-- New Button -->
             <uix-button primary @click=${this.openCreateForm}>
               <uix-icon name="plus" size="20"></uix-icon>
@@ -362,6 +392,25 @@ export default {
             </uix-button>
           </div>
         </uix-modal>
+
+        <!-- Plugin Modals -->
+        ${Object.entries(getPluginModals()).map(
+          ([name, config]) => html`
+            <uix-modal
+              ?open=${this.pluginModal === name}
+              @modal-close=${() => this.closePluginModal()}
+              @close-modal=${() => this.closePluginModal()}
+              @refresh=${() => {
+                this.closePluginModal();
+                this.dispatchEvent(new CustomEvent("refresh"));
+              }}
+              size="lg"
+            >
+              <div slot="header">${config.title || capitalize(name.replace(/-/g, " "))}</div>
+              ${this.pluginModal === name ? config.component({ model, context: this }) : ""}
+            </uix-modal>
+          `,
+        )}
       </div>
     `;
   },

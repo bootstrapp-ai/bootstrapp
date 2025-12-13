@@ -38,7 +38,6 @@
   box-shadow: var(--button-shadow, none);
   text-decoration: none;
   padding: var(--spacing-sm, 0.5rem) var(--spacing-md, 0.75rem);
-  color: var(--button-color, #fff);
   cursor: pointer;
   text-transform: var(--button-text-transform, none);
   transition: var(
@@ -52,6 +51,7 @@
   background: transparent;
   user-select: none;
   background-color: var(--button-background, #000);
+  color: var(--button-color, #fff);
 
   /* --- 2. Interactive States --- */
   &:focus-visible {
@@ -86,7 +86,13 @@
       )
       scale(0.97);
   }
-
+  &:not([variant], [primary]) {
+    --button-color: #fff;
+    --button-background: #000;
+    --button-border-color: #000;
+    --button-hover-background: #222;
+    --button-active-background: #222;
+  }
   &[primary],
   &[variant="primary"] {
     --button-background: var(--color-primary);

@@ -1,0 +1,40 @@
+{
+  "name": "@bootstrapp/maps",
+  "version": "0.1.0",
+  "description": "Provider-agnostic maps integration for searching and geocoding places",
+  "main": "./index.js",
+  "module": "./index.js",
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./app.js": "./app.js",
+    "./search.js": "./search.js",
+    "./search.css": "./search.css"
+  },
+  "keywords": [
+    "maps",
+    "geocoding",
+    "places",
+    "nominatim",
+    "openstreetmap",
+    "bootstrapp",
+    "web-components"
+  ],
+  "author": "Alan Leal",
+  "license": "AGPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bootstrapp-ai/bootstrapp.git",
+    "directory": "public/maps"
+  },
+  "homepage": "https://github.com/bootstrapp-ai/bootstrapp#readme",
+  "bugs": {
+    "url": "https://github.com/bootstrapp-ai/bootstrapp/issues"
+  },
+  "dependencies": {
+    "@bootstrapp/base": "^0.2.0",
+    "@bootstrapp/types": "^0.2.0",
+    "@bootstrapp/view": "^0.2.0",
+    "lit-html": "^3.0.0"
+  }
+}
