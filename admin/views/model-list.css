@@ -179,6 +179,13 @@
   margin: 0;
 }
 
+/* Modal Header */
+.admin-modal-id {
+  font-weight: 400;
+  color: var(--text-muted, #6b7280);
+  font-size: 0.875em;
+}
+
 /* Modal Footer */
 .admin-modal-footer {
   display: flex;

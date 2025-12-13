@@ -108,9 +108,11 @@ export function bindCustomSync({ instance, key, prop, syncObj, onAsyncLoad }) {
   Object.defineProperty(instance, key, {
     get: () => instance.state[key],
     set: (v) => {
-      if (instance.state[key] === v) return;
+      const oldValue = instance.state[key];
+      if (oldValue === v) return;
       instance.state[key] = v;
       if (!prop.query && v !== syncObj.get(key)) syncObj.set(key, v);
+      instance.requestUpdate(key, oldValue);
     },
   });
 
@@ -195,9 +197,11 @@ export function bindAdapterSync({
   Object.defineProperty(instance, key, {
     get: () => instance.state[key],
     set: (v) => {
-      if (instance.state[key] === v) return;
+      const oldValue = instance.state[key];
+      if (oldValue === v) return;
       instance.state[key] = v;
       if (v !== adapter.get(sKey)) adapter.set(sKey, v);
+      instance.requestUpdate(key, oldValue);
     },
   });
 

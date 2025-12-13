@@ -1,120 +1,182 @@
 /**
- * Textarea Component Styles
+ * UIX Textarea Styles
+ * Follows input.css pattern for consistency
  */
 
 :where(.uix-textarea, uix-textarea) {
+  /* --- 1. Layout & Core Props --- */
   display: inline-block;
-  width: 100%;
+  width: var(--textarea-width, 100%);
+  box-sizing: border-box;
 
-  & .textarea {
+  /* --- 2. Appearance --- */
+  background: var(--input-background, var(--input-bg, var(--color-surface-light, #ffffff)));
+  border: var(--input-border-width, 1px) solid var(--input-border-color, var(--color-surface, #e5e7eb));
+  border-radius: var(--input-border-radius, var(--radius-md, 0.375rem));
+  box-shadow: var(--input-shadow, none);
+
+  /* --- 3. Transitions --- */
+  transition: var(
+    --input-transition,
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.15s ease
+  );
+
+  /* --- 4. Native Textarea Element --- */
+  textarea {
     width: 100%;
-    font-family: inherit;
-    font-size: var(--textarea-font-size, var(--text-sm, 0.875rem));
-    line-height: var(--textarea-line-height, var(--leading-normal, 1.5));
+    min-height: var(--textarea-min-height, 6rem);
     padding: var(--input-padding-y, 0.5rem) var(--input-padding-x, 0.75rem);
-    background-color: var(--input-background-color, var(--color-surface));
-    color: var(--input-color, var(--color-primary));
-    border: 1px solid var(--input-border-color, var(--color-primary));
-    border-radius: var(--input-border-radius, var(--radius-md));
+    font-size: var(--input-font-size, var(--text-sm, 0.9rem));
+    font-weight: var(--input-font-weight, var(--font-normal, 400));
+    line-height: var(--textarea-line-height, var(--leading-normal, 1.5));
+    font-family: inherit;
+    color: var(--input-text, var(--input-color, var(--text-color, inherit)));
+    background: transparent;
+    border: none;
     outline: none;
-    transition:
-      border-color 0.2s ease,
-      box-shadow 0.2s ease;
+    box-sizing: border-box;
     resize: var(--textarea-resize, vertical);
-
-    &:focus {
-      border-color: var(--input-focus-border-color, var(--color-primary));
-      box-shadow: 0 0 0 3px
-        var(--input-focus-shadow-color, rgba(124, 111, 100, 0.1));
-    }
-
-    &:hover:not(:disabled):not(:focus) {
-      border-color: var(--input-hover-border-color, var(--color-hover));
-    }
-
-    &:disabled {
-      background-color: var(
-        --input-disabled-background-color,
-        var(--color-subtle)
-      );
-      color: var(--input-disabled-color, var(--color-muted));
-      cursor: not-allowed;
-      opacity: 0.6;
-    }
-
-    &[readonly] {
-      background-color: var(
-        --input-readonly-background-color,
-        var(--color-subtle)
-      );
-      cursor: default;
-    }
+    transition: var(--input-transition, background-color 0.2s ease);
 
     &::placeholder {
-      color: var(--input-placeholder-color, var(--color-muted));
+      color: var(--input-placeholder, var(--input-placeholder-color, var(--text-muted, #9ca3af)));
+      opacity: 1;
     }
   }
 
-  /* Size variants */
-  &[size="xs"] .textarea {
-    --textarea-font-size: var(--text-xs, 0.75rem);
+  /* --- 5. Interactive States --- */
+  &:hover:not(:focus-within):not(:has(textarea:disabled)) {
+    border-color: var(--input-hover-border-color, var(--input-border-focus, var(--color-primary-light)));
+  }
+
+  &:focus-within {
+    border-color: var(--input-focus-border-color, var(--input-border-focus, var(--color-primary)));
+    background: var(--input-focus-background, var(--input-bg-focus, var(--input-background)));
+    box-shadow: var(--input-focus-shadow, 0 0 0 3px rgba(250, 189, 47, 0.1));
+  }
+
+  &:has(textarea:disabled) {
+    opacity: var(--input-disabled-opacity, 0.6);
+    cursor: not-allowed;
+
+    textarea {
+      background: var(--input-disabled-background, var(--input-bg-disabled, var(--color-surface-dark)));
+      color: var(--input-disabled-color, var(--text-muted));
+      cursor: not-allowed;
+    }
+  }
+
+  &:has(textarea:read-only) textarea {
+    background: var(--input-readonly-background, var(--color-surface-dark));
+    cursor: default;
+  }
+
+  /* --- 6. Size Variants --- */
+  &[size="xs"] {
     --input-padding-y: 0.25rem;
     --input-padding-x: 0.5rem;
+    --input-font-size: var(--text-xs, 0.75rem);
+    --textarea-min-height: 3rem;
   }
 
-  &[size="sm"] .textarea {
-    --textarea-font-size: var(--text-sm, 0.8125rem);
+  &[size="sm"] {
     --input-padding-y: 0.375rem;
     --input-padding-x: 0.625rem;
+    --input-font-size: var(--text-sm, 0.875rem);
+    --textarea-min-height: 4.5rem;
   }
 
-  &[size="md"] .textarea {
-    --textarea-font-size: var(--text-sm, 0.875rem);
+  &[size="md"] {
     --input-padding-y: 0.5rem;
     --input-padding-x: 0.75rem;
+    --input-font-size: var(--text-base, 1rem);
+    --textarea-min-height: 6rem;
   }
 
-  &[size="lg"] .textarea {
-    --textarea-font-size: var(--text-base, 1rem);
+  &[size="lg"] {
     --input-padding-y: 0.625rem;
     --input-padding-x: 1rem;
+    --input-font-size: var(--text-lg, 1.125rem);
+    --textarea-min-height: 7.5rem;
   }
 
-  &[size="xl"] .textarea {
-    --textarea-font-size: var(--text-lg, 1.125rem);
+  &[size="xl"] {
     --input-padding-y: 0.75rem;
     --input-padding-x: 1.25rem;
+    --input-font-size: var(--text-xl, 1.25rem);
+    --textarea-min-height: 9rem;
   }
 
-  /* Resize options */
-  &[resize="none"] .textarea {
+  /* --- 7. Resize Options --- */
+  &[resize="none"] textarea {
     resize: none;
   }
 
-  &[resize="both"] .textarea {
+  &[resize="both"] textarea {
     resize: both;
   }
 
-  &[resize="horizontal"] .textarea {
+  &[resize="horizontal"] textarea {
     resize: horizontal;
   }
 
-  &[resize="vertical"] .textarea {
+  &[resize="vertical"] textarea {
     resize: vertical;
   }
 
-  /* Error state */
-  &[error] .textarea {
-    border-color: var(--color-danger);
+  /* --- 8. Required Indicator --- */
+  &[required] {
+    border-left: 3px solid var(--input-required-color, var(--color-warning));
   }
 
-  &[error] .textarea:focus {
-    border-color: var(--color-danger);
-    box-shadow: 0 0 0 3px rgba(251, 73, 52, 0.1);
+  /* --- 9. Error State --- */
+  &[error] {
+    --input-border-color: var(--color-danger);
+    --input-focus-border-color: var(--color-danger);
+    --input-focus-shadow: 0 0 0 3px rgba(251, 73, 52, 0.1);
   }
 
-  /* Full width */
-  &[w-full] {
+  /* --- 10. Success State --- */
+  &[success] {
+    --input-border-color: var(--color-success);
+    --input-focus-border-color: var(--color-success);
+    --input-focus-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+  }
+
+  /* --- 11. Variant Colors --- */
+  &[variant="primary"] {
+    --input-border-color: var(--color-primary);
+    --input-focus-border-color: var(--color-primary);
+  }
+
+  &[variant="secondary"] {
+    --input-border-color: var(--color-secondary);
+    --input-focus-border-color: var(--color-secondary);
+  }
+
+  &[variant="success"] {
+    --input-border-color: var(--color-success);
+    --input-focus-border-color: var(--color-success);
+    --input-focus-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+  }
+
+  &[variant="warning"] {
+    --input-border-color: var(--color-warning);
+    --input-focus-border-color: var(--color-warning);
+    --input-focus-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+  }
+
+  &[variant="error"] {
+    --input-border-color: var(--color-danger);
+    --input-focus-border-color: var(--color-danger);
+    --input-focus-shadow: 0 0 0 3px rgba(251, 73, 52, 0.1);
+  }
+
+  /* --- 12. Full Width --- */
+  &[w-full],
+  &[wfull] {
     width: 100%;
     display: block;
   }

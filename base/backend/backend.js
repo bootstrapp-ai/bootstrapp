@@ -357,7 +357,8 @@ if ($APP.settings.runtime === "worker") {
         $APP.Database = Database;
         await Database.init();
         if ($APP.data && !app.migrationTimestamp) {
-          await manager.migrateData($APP.data, Database);
+          console.error({ app });
+          await manager.migrateData($APP.data, app);
           app = await manager.getApp();
         }
 

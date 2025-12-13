@@ -215,7 +215,6 @@ function createReactiveArrayPrototype(proxifyRow, $APP) {
      * @private
      */
     destroy() {
-      // Unsubscribe from query-level subscription
       if (
         this.queryUnsubscribe &&
         typeof this.queryUnsubscribe === "function"
@@ -223,15 +222,10 @@ function createReactiveArrayPrototype(proxifyRow, $APP) {
         this.queryUnsubscribe();
         this.queryUnsubscribe = null;
       }
-
-      // Clear all subscribers
       this.subscriptions.clear();
     },
   };
-
-  // Make our prototype inherit from Array.prototype
   Object.setPrototypeOf(reactiveArrayPrototype, Array.prototype);
-  console.error({ reactiveArrayPrototype });
   return reactiveArrayPrototype;
 }
 
@@ -244,14 +238,11 @@ function createReactiveArrayPrototype(proxifyRow, $APP) {
 function createInstanceProxyHandler(Model, $APP) {
   return {
     get(target, prop, receiver) {
-      // Instance method: remove row from database
-      if (prop === "remove") {
+      if (prop === "remove")
         return () =>
           Model.request("REMOVE", target._modelName, { id: target.id });
-      }
 
-      // Instance method: update row in database
-      if (prop === "update") {
+      if (prop === "update")
         return () => {
           const cleanRow = { ...target };
           delete cleanRow._modelName;
@@ -259,9 +250,7 @@ function createInstanceProxyHandler(Model, $APP) {
             row: cleanRow,
           });
         };
-      }
 
-      // Instance method: load relationships
       if (prop === "include") {
         return async (include) => {
           if (!target.id || !target._modelName) {
@@ -553,7 +542,6 @@ export function createModel($APP) {
       return result;
     }
     if (action.includes("MANY")) {
-      console.error({ result });
       if (payload.opts.object) return result;
       const opts = payload.opts || {};
       if (result?.items) {
@@ -564,7 +552,6 @@ export function createModel($APP) {
           offset: result.offset,
           count: result.count,
         };
-        console.error({ paginationInfo });
         // Proxify items with pagination metadata attached to the array
         const reactiveItems = proxifyMultipleRows(
           result.items,

@@ -23,6 +23,11 @@ export default {
     }),
     error: T.boolean(false),
     fullWidth: T.boolean(false),
+    variant: T.string({
+      defaultValue: "default",
+      enum: ["default", "primary", "secondary", "success", "warning", "error"],
+    }),
+    name: T.string(),
   },
   style: true,
   shadow: false,
@@ -55,6 +60,7 @@ export default {
     return html`
       <textarea
         class="textarea"
+        name=${this.name}
         .value=${this.value}
         placeholder=${this.placeholder}
         rows=${this.rows}

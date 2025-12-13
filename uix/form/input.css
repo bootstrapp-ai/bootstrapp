@@ -137,14 +137,43 @@
     --input-focus-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
   }
 
-  /* --- 10. Full Width --- */
+  /* --- 10. Variant Colors --- */
+  &[variant="primary"] {
+    --input-border-color: var(--color-primary);
+    --input-focus-border-color: var(--color-primary);
+  }
+
+  &[variant="secondary"] {
+    --input-border-color: var(--color-secondary);
+    --input-focus-border-color: var(--color-secondary);
+  }
+
+  &[variant="success"] {
+    --input-border-color: var(--color-success);
+    --input-focus-border-color: var(--color-success);
+    --input-focus-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+  }
+
+  &[variant="warning"] {
+    --input-border-color: var(--color-warning);
+    --input-focus-border-color: var(--color-warning);
+    --input-focus-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+  }
+
+  &[variant="error"] {
+    --input-border-color: var(--color-danger);
+    --input-focus-border-color: var(--color-danger);
+    --input-focus-shadow: 0 0 0 3px rgba(251, 73, 52, 0.1);
+  }
+
+  /* --- 11. Full Width --- */
   &[w-full],
   &[wfull] {
     width: 100%;
     display: block;
   }
 
-  /* --- 11. Icon Support --- */
+  /* --- 12. Icon Support --- */
   &:has(.uix-icon) {
     position: relative;
 

@@ -79,11 +79,11 @@ export default {
 
   render() {
     return html`
-      <uix-dropdown>
-        <uix-button slot="trigger" ghost ?disabled=${this.exporting}>
-          <uix-icon name="download" size="18"></uix-icon>
-          ${this.exporting ? "Exporting..." : "Export"}
-        </uix-button>
+      <uix-button popovertarget="export-${this.model}" ghost ?disabled=${this.exporting}>
+        <uix-icon name="download" size="18"></uix-icon>
+        ${this.exporting ? "Exporting..." : "Export"}
+      </uix-button>
+      <uix-dropdown id="export-${this.model}">
         <div class="admin-export-options">
           ${["CSV", "JSON"].map(
             (format) => html`

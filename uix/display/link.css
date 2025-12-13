@@ -28,14 +28,15 @@
   &::part(anchor) {
     display: inline-flex;
     align-items: center;
-    justify-content: var(--link-justify-content, center);
+    justify-content: var(--link-justify-content, left);
     width: 100%;
     height: 100%;
     gap: var(--link-gap, var(--spacing-xs, 0.25rem));
     flex-direction: var(--link-direction, row);
 
     /* Spacing */
-    padding: var(--link-padding-y, var(--spacing-sm, 0.5rem)) var(--link-padding-x, var(--spacing-md, 0.75rem));
+    padding: var(--link-padding-y, var(--spacing-sm, 0.5rem))
+      var(--link-padding-x, var(--spacing-md, 0.75rem));
 
     /* Typography */
     font-family: inherit;
@@ -59,7 +60,10 @@
     /* --- Interactive States --- */
     &:hover {
       color: var(--link-hover-color, var(--link-color));
-      text-decoration: var(--link-hover-text-decoration, var(--link-text-decoration, none));
+      text-decoration: var(
+        --link-hover-text-decoration,
+        var(--link-text-decoration, none)
+      );
       opacity: var(--link-hover-opacity, 0.9);
     }
 

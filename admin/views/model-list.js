@@ -83,12 +83,22 @@ export default {
 
   async handleFormSubmit(e) {
     const data = e.detail;
+
     try {
+      let error, result;
       if (data.id) {
-        await $APP.Model[this.model].edit(data);
+        [error, result] = await $APP.Model[this.model].edit(data);
       } else {
-        await $APP.Model[this.model].add(data);
+        [error, result] = await $APP.Model[this.model].add(data);
       }
+
+      if (error) {
+        // Pass errors to form for display
+        const form = this.querySelector("admin-model-form uix-form");
+        form?.setErrors(error);
+        return;
+      }
+
       this.closeModal();
       this.dispatchEvent(new CustomEvent("refresh"));
     } catch (error) {
@@ -247,6 +257,7 @@ export default {
         <!-- Search -->
         <div class="admin-model-list-search">
           <uix-input
+            w-full
             type="search"
             placeholder="Search..."
             icon="search"
@@ -278,13 +289,19 @@ export default {
                 ></uix-data-table>
             `
         }
-
+ 
         <!-- Edit/Create Modal -->
         <uix-modal
           ?open=${modalOpen}
-          @close=${this.closeModal}
-          title=${selectedRow?.id ? `Edit ${modelName}` : `New ${modelName}`}
+          @modal-close=${this.closeModal}
         >
+          <div slot="header">
+            ${
+              selectedRow?.id
+                ? html`Edit ${capitalize(modelName)} <span class="admin-modal-id">#${selectedRow.id}</span>`
+                : html`New ${capitalize(modelName)}`
+            }
+          </div>
           ${
             modalOpen
               ? keyed(
@@ -293,36 +310,54 @@ export default {
                   <admin-model-form
                     .model=${model}
                     .row=${selectedRow}
-                    @submit=${this.handleFormSubmit}
-                    @delete=${() => (this.confirmDelete = true)}
+                    @form-submit=${this.handleFormSubmit}
                   ></admin-model-form>
                 `,
                 )
               : ""
           }
+          <div slot="footer">
+            <uix-button ghost @click=${this.closeModal}>
+              Cancel
+            </uix-button>
+            ${
+              selectedRow?.id
+                ? html`
+                <uix-button danger ghost @click=${() => (this.confirmDelete = true)}>
+                  <uix-icon name="trash" size="18"></uix-icon>
+                  Delete
+                </uix-button>
+              `
+                : ""
+            }
+            <uix-button primary @click=${() => this.querySelector("admin-model-form")?.submit()}>
+              <uix-icon name=${selectedRow?.id ? "save" : "plus"} size="18"></uix-icon>
+              ${selectedRow?.id ? "Save" : "Create"}
+            </uix-button>
+          </div>
         </uix-modal>
 
         <!-- Delete Confirmation Modal -->
         <uix-modal
           ?open=${confirmDelete}
-          @close=${() => (this.confirmDelete = false)}
-          title="Delete ${modelName}?"
+          @modal-close=${() => (this.confirmDelete = false)}
           size="sm"
         >
+          <div slot="header">Delete ${capitalize(modelName)}?</div>
           <div class="admin-delete-confirm">
             <div class="admin-delete-icon">
               <uix-icon name="alert-triangle" size="24"></uix-icon>
             </div>
             <div>
-              <p class="admin-delete-title">Delete ${modelName}?</p>
               <p class="admin-delete-text">This action cannot be undone.</p>
             </div>
           </div>
-          <div slot="footer" class="admin-modal-footer">
+          <div slot="footer">
             <uix-button ghost @click=${() => (this.confirmDelete = false)}>
               Cancel
             </uix-button>
             <uix-button danger @click=${this.handleDelete}>
+              <uix-icon name="trash" size="18"></uix-icon>
               Delete
             </uix-button>
           </div>

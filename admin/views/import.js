@@ -162,11 +162,11 @@ export default {
 
     return html`
       <!-- Import Dropdown -->
-      <uix-dropdown>
-        <uix-button slot="trigger" ghost>
-          <uix-icon name="upload" size="18"></uix-icon>
-          Import
-        </uix-button>
+      <uix-button popovertarget="import-${this.model}" ghost>
+        <uix-icon name="upload" size="18"></uix-icon>
+        Import
+      </uix-button>
+      <uix-dropdown id="import-${this.model}">
         <div class="admin-import-options">
           ${["CSV", "JSON"].map(
             (type) => html`
@@ -207,21 +207,14 @@ export default {
                                   <span class="admin-import-arrow">→</span>
                                   <uix-select
                                     .value=${this.fieldMapping[field.name] || ""}
+                                    placeholder="-- Skip --"
+                                    .options=${this.csvFields.map((csvField) => ({
+                                      value: csvField,
+                                      label: csvField,
+                                    }))}
                                     @change=${(e) =>
                                       this.updateMapping(field.name, e.target.value)}
-                                  >
-                                    <option value="">-- Skip --</option>
-                                    ${this.csvFields.map(
-                                      (csvField) => html`
-                                        <option
-                                          value=${csvField}
-                                          ?selected=${this.fieldMapping[field.name] === csvField}
-                                        >
-                                          ${csvField}
-                                        </option>
-                                      `,
-                                    )}
-                                  </uix-select>
+                                  ></uix-select>
                                 </div>
                               `,
                             )}

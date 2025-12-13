@@ -59,11 +59,11 @@ export class SystemModelManager {
    * @returns {Promise<Object|null>}
    */
   async getApp() {
-    const results = await this.db.getAll(this.MODELS.APP, {
+    const { items } = await this.db.getAll(this.MODELS.APP, {
       where: { active: true },
       limit: 1,
     });
-    return results.length > 0 ? results[0] : null;
+    return items.length > 0 ? items[0] : null;
   }
 
   /**
@@ -229,8 +229,7 @@ export class SystemModelManager {
    * @param {Object} opts - Migration options
    * @param {boolean} opts.skipDynamicCheck - Skip dynamic model check
    */
-  async migrateData(data) {
-    const app = await this.getApp();
+  async migrateData(data, app) {
     const appsData = Object.entries(data || {});
     if (appsData.length) {
       const dump = {};

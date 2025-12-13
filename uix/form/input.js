@@ -20,6 +20,10 @@ export default {
     required: T.boolean(false),
     error: T.boolean(false),
     fullWidth: T.boolean(false),
+    variant: T.string({
+      defaultValue: "default",
+      enum: ["default", "primary", "secondary", "success", "warning", "error"],
+    }),
   },
   style: true,
   shadow: false,

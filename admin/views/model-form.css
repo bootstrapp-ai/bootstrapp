@@ -1,9 +1,20 @@
 /* Admin Model Form */
 
 .admin-form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--admin-form-gap, 1.5rem);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--admin-form-gap, 1.25rem);
+}
+
+@media (min-width: 640px) {
+  .admin-form {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Full width for textarea fields */
+  .admin-form-field:has(uix-textarea) {
+    grid-column: 1 / -1;
+  }
 }
 
 .admin-form-field {

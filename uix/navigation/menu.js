@@ -9,7 +9,7 @@ export default {
     }),
     variant: T.string({
       defaultValue: "default",
-      enum: ["default", "bordered", "compact", "flush"],
+      enum: ["default", "bordered", "compact", "flush", "sidebar"],
     }),
     rounded: T.boolean(true),
     bordered: T.boolean(true),

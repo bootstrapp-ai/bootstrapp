@@ -13,6 +13,10 @@ export default {
     name: T.string(),
     label: T.string(),
     options: T.array({ defaultValue: [] }),
+    variant: T.string({
+      defaultValue: "default",
+      enum: ["default", "primary", "secondary", "success", "warning", "error"],
+    }),
   },
   formResetCallback() {
     const $select = this.querySelector("select");

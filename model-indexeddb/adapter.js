@@ -580,14 +580,11 @@ export class IndexedDBAdapter extends DatabaseAdapterBase {
    * @returns {Promise<void>}
    */
   async importData(dump, options = {}) {
-    console.error({ dump });
     for (const [modelName, entries] of Object.entries(dump)) {
-      if (this.models[modelName]) {
-        console.error({ modelName });
+      if (this.models[modelName])
         await this.addMany(modelName, entries, {
           keepIndex: options.keepIndex,
         });
-      }
     }
   }
 

@@ -46,9 +46,7 @@ const initBackend = async () => {
     appWorker.postMessage({ type: "APP:BACKEND:START" }, [wwChannel.port2]);
     //await navigator.storage.persist();
     $APP.events.on("APP:BACKEND:READY", async () => {
-      !console.error("APP:READY");
       await $APP.events.emit("APP:READY");
-      console.error("After APP:READY");
     });
   } catch (error) {
     console.error("Failed to initialize backend:", error);
@@ -99,22 +97,16 @@ const fetchDataQuery = async (instance) => {
 
   const isMany = query.many ?? (!id && !single);
   const opts = { limit: single ? 1 : limit, offset, includes, order, where };
-
-  // Unsubscribe from previous subscription if exists
   if (instance._dataQuerySub && instance._dataQuerySubHandler) {
     instance._dataQuerySub.unsubscribe(instance._dataQuerySubHandler);
     instance._dataQuerySub = null;
   }
 
-  // Store pagination info for dataLoaded events
   instance._paginationInfo = null;
-
-  // Define the handler that will be called on subscription updates
   instance._dataQuerySubHandler = (data) => {
     const oldValue = instance.state[key];
     instance.state[key] = data;
     instance.requestUpdate(key, oldValue);
-    console.error(instance._paginationInfo);
     instance.emit("dataLoaded", {
       instance,
       rows: isMany ? data : undefined,
@@ -126,12 +118,9 @@ const fetchDataQuery = async (instance) => {
 
   try {
     if (isMany) {
-      // getAll now returns reactive array directly (with pagination props attached)
       const result = await $APP.Model[model].getAll(opts);
       const oldValue = instance.state[key];
-      console.error(result, result.total, result);
       instance.state[key] = result;
-      // Read pagination info from reactive array (set by proxifyMultipleRows)
       instance._paginationInfo =
         result.limit !== undefined
           ? {
@@ -145,9 +134,8 @@ const fetchDataQuery = async (instance) => {
       result.subscribe?.(instance._dataQuerySubHandler);
       instance._dataQuerySub = result;
     } else if (single && where) {
-      // Single record via where clause (e.g., { slug: "my-slug" })
       const result = await $APP.Model[model].getAll(opts);
-      console.error(result);
+
       const oldValue = instance.state[key];
       instance.state[key] = result[0] || null;
       instance.requestUpdate(key, oldValue);
@@ -206,7 +194,7 @@ View.plugins.push({
         offset: T.number(),
         count: T.number(),
         key: T.string(),
-        single: T.boolean(), // Fetch single record using where clause
+        single: T.boolean(),
       },
     });
   },
@@ -227,8 +215,6 @@ View.plugins.push({
         instance._dataQuerySub.unsubscribe(instance._dataQuerySubHandler);
       instance._dataQuerySub = null;
       instance._dataQuerySubHandler = null;
-
-      // Clean up change listener
       if (instance._dataQueryChangeHandler) {
         instance.off("data-queryChanged", instance._dataQueryChangeHandler);
         instance._dataQueryChangeHandler = null;
@@ -241,15 +227,11 @@ const backend = (type, payload = {}, connection = null, timeout = 10000) => {
   if (!type) {
     return Promise.reject(new Error("backend: type parameter is required"));
   }
-
   const eventId =
     Date.now().toString() + Math.random().toString(36).substr(2, 9);
   const params = { type, payload, eventId };
-
   return new Promise((resolve, reject) => {
     if (connection) params.connection = connection;
-
-    // Set up timeout
     const timeoutId = setTimeout(() => {
       if (pendingRequests[eventId]) {
         delete pendingRequests[eventId];

@@ -1,0 +1,48 @@
+/* uix-form */
+
+uix-form form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--form-gap, 1.25rem);
+}
+
+@media (min-width: 640px) {
+  uix-form form {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Full width for textarea fields */
+  uix-form .form-field:has(uix-textarea) {
+    grid-column: 1 / -1;
+  }
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--form-field-gap, 0.5rem);
+}
+
+.form-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+.form-required {
+  color: var(--form-required-color, #ef4444);
+}
+
+.form-error {
+  color: var(--form-error-color, #ef4444);
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.form-field.has-error uix-input,
+.form-field.has-error uix-select,
+.form-field.has-error uix-textarea {
+  --input-border-color: var(--form-error-color, #ef4444);
+}

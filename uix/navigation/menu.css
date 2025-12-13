@@ -87,4 +87,142 @@
   &:not([bordered])::part(container) {
     border: none;
   }
+
+  /* =============================================
+     VARIANT: Sidebar
+     Full-width nav items, no shadow, accordion support
+     ============================================= */
+  &[variant="sidebar"] {
+    box-shadow: none;
+    background: transparent;
+    padding: var(--sidebar-nav-padding, 0);
+    gap: var(--sidebar-nav-gap, 0.25rem);
+
+    /* Menu items */
+    > li {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+
+      /* Links (anchor, uix-link, button) */
+      > a,
+      > uix-link,
+      > button {
+        display: flex;
+        align-items: center;
+        gap: var(--sidebar-item-gap, 0.75rem);
+        width: 100%;
+        padding: var(--sidebar-item-padding, 0.75rem 1rem);
+        border-radius: var(--sidebar-item-border-radius, 0.5rem);
+        color: var(--sidebar-item-color, var(--text-muted, #6b7280));
+        font-weight: var(--sidebar-item-font-weight, 500);
+        font-size: var(--menu-item-font-size, inherit);
+        text-decoration: none;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        text-align: left;
+        transition:
+          background-color 0.2s ease,
+          color 0.2s ease;
+
+        &:hover {
+          background-color: var(--sidebar-item-hover-background, #f5f5f5);
+          color: var(--sidebar-item-hover-color, var(--text-color, #1a1a1a));
+        }
+
+        &.active,
+        &[aria-current="page"] {
+          background-color: var(--sidebar-item-active-background, #000000);
+          color: var(--sidebar-item-active-color, #ffffff);
+          font-weight: var(--sidebar-item-active-font-weight, 600);
+        }
+      }
+    }
+
+    /* Divider */
+    > li.divider,
+    > li[role="separator"] {
+      height: 0;
+      padding-top: var(--sidebar-section-padding, 1rem);
+      margin-top: var(--sidebar-section-margin, 0.5rem);
+      border-top: 1px solid
+        var(--sidebar-border-color, var(--color-border, #e5e7eb));
+      background: none;
+    }
+
+    /* Accordion via <details> */
+    details {
+      summary {
+        display: flex;
+        align-items: center;
+        gap: var(--sidebar-item-gap, 0.75rem);
+        padding: var(--sidebar-item-padding, 0.75rem 1rem);
+        border-radius: var(--sidebar-item-border-radius, 0.5rem);
+        color: var(--sidebar-item-color, var(--text-muted, #6b7280));
+        font-weight: var(--sidebar-item-font-weight, 500);
+        cursor: pointer;
+        list-style: none;
+        transition:
+          background-color 0.2s ease,
+          color 0.2s ease;
+
+        &::-webkit-details-marker {
+          display: none;
+        }
+
+        &:hover {
+          background-color: var(--sidebar-item-hover-background, #f5f5f5);
+          color: var(--sidebar-item-hover-color, var(--text-color, #1a1a1a));
+        }
+
+        /* Chevron icon */
+        uix-icon:last-child {
+          margin-left: auto;
+          transition: transform 0.2s ease;
+        }
+      }
+
+      &[open] summary uix-icon:last-child {
+        transform: rotate(90deg);
+      }
+
+      /* Nested list */
+      > ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        padding-left: var(--sidebar-nested-indent, 1rem);
+
+        > li {
+          > a,
+          > uix-link {
+            display: flex;
+            align-items: center;
+            gap: var(--sidebar-item-gap, 0.75rem);
+            padding: var(--sidebar-nested-item-padding, 0.5rem 1rem);
+            border-radius: var(--sidebar-item-border-radius, 0.5rem);
+            color: var(--sidebar-item-color, var(--text-muted, #6b7280));
+            font-size: var(--sidebar-nested-item-font-size, 0.875rem);
+            text-decoration: none;
+            transition:
+              background-color 0.2s ease,
+              color 0.2s ease;
+
+            &:hover {
+              background-color: var(--sidebar-item-hover-background, #f5f5f5);
+              color: var(--sidebar-item-hover-color, var(--text-color, #1a1a1a));
+            }
+
+            &.active,
+            &[aria-current="page"] {
+              background-color: var(--sidebar-item-hover-background, #e5e5e5);
+              color: var(--sidebar-item-hover-color, #000000);
+              font-weight: 600;
+            }
+          }
+        }
+      }
+    }
+  }
 }

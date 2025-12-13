@@ -101,7 +101,6 @@ export function createModelEventHandlers($APP) {
     },
     GET_MANY: async ({ payload: { model, opts = {} }, respond } = {}) => {
       const response = await $APP.Database.getAll(model, opts);
-      console.error({ response });
       respond(response);
     },
   };

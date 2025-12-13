@@ -1,9 +1,0 @@
-/**
- * Form Control Component Styles
- */
-
-:where(.uix-form-input, uix-form-input) {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
