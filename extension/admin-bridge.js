@@ -9,6 +9,7 @@ const MSG = {
   PONG: "ext:pong",
   GET_TABS: "ext:getTabs",
   SCRAPE: "ext:scrape",
+  SCRAPE_INSTAGRAM: "ext:scrapeInstagram",
   INJECT: "ext:inject",
   EXECUTE: "ext:execute",
   OBSERVE: "ext:observe",
@@ -190,6 +191,17 @@ export const createExtensionBridge = (extensionId) => {
      */
     scrape: async (tabId, selector, options = {}) => {
       const response = await sendRequest(MSG.SCRAPE, { tabId, selector, options });
+      return response.data;
+    },
+
+    /**
+     * Scrape Instagram profile data from a tab
+     * Uses a dedicated scraper that doesn't require eval (CSP-safe)
+     * @param {number} tabId - Tab ID with Instagram profile page
+     * @returns {Promise<Object>} Instagram profile data
+     */
+    scrapeInstagram: async (tabId) => {
+      const response = await sendRequest(MSG.SCRAPE_INSTAGRAM, { tabId });
       return response.data;
     },
 

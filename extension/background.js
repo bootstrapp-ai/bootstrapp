@@ -9,6 +9,7 @@ const MSG = {
   PING: "ext:ping",
   GET_TABS: "ext:getTabs",
   SCRAPE: "ext:scrape",
+  SCRAPE_INSTAGRAM: "ext:scrapeInstagram",
   INJECT: "ext:inject",
   OBSERVE: "ext:observe",
   EXECUTE: "ext:execute",
@@ -98,6 +99,13 @@ async function handleMessage(message, sender, sendResponse) {
           ...payload,
         });
         sendResponse({ ...scrapeResult, requestId });
+        break;
+
+      case MSG.SCRAPE_INSTAGRAM:
+        const igResult = await sendToContentScript(tabId, {
+          type: MSG.SCRAPE_INSTAGRAM,
+        });
+        sendResponse({ ...igResult, requestId });
         break;
 
       case MSG.INJECT:

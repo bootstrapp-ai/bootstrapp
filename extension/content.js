@@ -9,6 +9,7 @@
   // Message types
   const MSG = {
     SCRAPE: "ext:scrape",
+    SCRAPE_INSTAGRAM: "ext:scrapeInstagram",
     INJECT: "ext:inject",
     EXECUTE: "ext:execute",
     OBSERVE: "ext:observe",
@@ -39,6 +40,9 @@
     switch (type) {
       case MSG.SCRAPE:
         return scrape(payload);
+
+      case MSG.SCRAPE_INSTAGRAM:
+        return scrapeInstagramProfile();
 
       case MSG.INJECT:
         return inject(payload);
@@ -122,6 +126,97 @@
     }));
 
     return multiple ? results : results[0];
+  }
+
+  // ============================================
+  // INSTAGRAM PROFILE SCRAPER
+  // ============================================
+
+  function scrapeInstagramProfile() {
+    try {
+      const data = {
+        username: null,
+        fullName: null,
+        bio: null,
+        avatar: null,
+        followers: null,
+        following: null,
+        posts: null,
+        isVerified: false,
+        externalLink: null,
+        profileUrl: window.location.href,
+      };
+
+      // Get username from URL (most reliable)
+      const urlMatch = window.location.pathname.match(/^\/([^\/]+)\/?/);
+      data.username = urlMatch ? urlMatch[1] : null;
+
+      // Get from meta tags (very reliable)
+      const metaTitle = document.querySelector('meta[property="og:title"]');
+      if (metaTitle) {
+        const titleContent = metaTitle.content;
+        // Format: "Full Name (@username) • Instagram photos and videos"
+        const nameMatch = titleContent.match(/^([^(]+)\s*\(@/);
+        if (nameMatch) {
+          data.fullName = nameMatch[1].trim();
+        }
+      }
+
+      const metaDesc = document.querySelector('meta[property="og:description"]');
+      if (metaDesc) {
+        // Format: "123 Followers, 45 Following, 67 Posts - See Instagram photos..."
+        const descContent = metaDesc.content;
+        const followersMatch = descContent.match(/([\d,.]+[KMB]?)\s*Followers/i);
+        const followingMatch = descContent.match(/([\d,.]+[KMB]?)\s*Following/i);
+        const postsMatch = descContent.match(/([\d,.]+[KMB]?)\s*Posts/i);
+
+        if (followersMatch) data.followers = followersMatch[1];
+        if (followingMatch) data.following = followingMatch[1];
+        if (postsMatch) data.posts = postsMatch[1];
+      }
+
+      // Get avatar (profile picture)
+      const avatarImg =
+        document.querySelector('header img[alt*="profile picture"]') ||
+        document.querySelector("img[alt*=\"'s profile picture\"]") ||
+        document.querySelector('header img[data-testid="user-avatar"]');
+      if (avatarImg) {
+        data.avatar = avatarImg.src;
+      }
+
+      // Check for verification badge
+      data.isVerified = !!document.querySelector('svg[aria-label="Verified"]');
+
+      // Get bio text - look for spans with text in header section
+      const headerSection = document.querySelector("header section");
+      if (headerSection) {
+        // Try different approaches for bio
+        const bioSpan = headerSection.querySelector('span[dir="auto"]');
+        if (bioSpan && bioSpan.textContent && !bioSpan.textContent.includes("Followers")) {
+          data.bio = bioSpan.textContent.trim();
+        }
+
+        // Alternative: look for h1 (sometimes contains name)
+        if (!data.fullName) {
+          const h1 = headerSection.querySelector("h1");
+          if (h1) {
+            data.fullName = h1.textContent.trim();
+          }
+        }
+      }
+
+      // Get external link
+      const extLink = document.querySelector('header a[href*="l.instagram.com"]');
+      if (extLink) {
+        data.externalLink = extLink.href;
+      }
+
+      console.log("[CS] Instagram profile data:", data);
+      return { type: MSG.DATA, data };
+    } catch (error) {
+      console.error("[CS] Instagram scrape error:", error);
+      return { type: MSG.ERROR, error: error.message };
+    }
   }
 
   // ============================================
