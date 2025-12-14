@@ -15,6 +15,7 @@ import T from "/$app/types/index.js";
 import { html, nothing } from "/npm/lit-html";
 
 export default {
+  tag: "admin-extension-manager",
   style: true,
   properties: {
     extensionId: T.string({ defaultValue: "" }),
@@ -29,6 +30,7 @@ export default {
   },
 
   _unsubscribe: null,
+  _refreshing: false,
 
   connected() {
     // Load saved extension ID and connection state
@@ -37,14 +39,23 @@ export default {
 
     // Subscribe to connection changes
     this._unsubscribe = onConnectionChange((event) => {
+      const wasConnected = this.connected;
       this.connected = event.type === "connected";
-      if (this.connected) {
-        this.refreshTabs();
+
+      // Reset refreshing flag on disconnect
+      if (event.type === "disconnected") {
+        this._refreshing = false;
+        this.tabs = [];
+      }
+
+      // Fetch tabs on new connection (with small delay to ensure connection is ready)
+      if (this.connected && !wasConnected) {
+        setTimeout(() => this.refreshTabs(), 100);
       }
     });
 
-    // If already connected, refresh tabs
-    if (this.connected) {
+    // If already connected, refresh tabs once
+    if (this.connected && this.tabs.length === 0) {
       this.refreshTabs();
     }
   },
@@ -86,12 +97,29 @@ export default {
 
   async refreshTabs() {
     const bridge = getExtensionBridge();
-    if (!bridge) return;
+    if (!bridge) {
+      console.log("[ExtManager] Cannot refresh - no bridge");
+      return;
+    }
+    if (this._refreshing) {
+      console.log("[ExtManager] Already refreshing, skipping");
+      return;
+    }
+
+    this._refreshing = true;
+    this.error = "";
 
     try {
-      this.tabs = await bridge.getTabs();
+      const tabs = await bridge.getTabs();
+      console.log("[ExtManager] Got tabs:", tabs?.length);
+      // Force reactivity by creating new array
+      this.tabs = [...(tabs || [])];
     } catch (err) {
-      console.error("Failed to refresh tabs:", err);
+      console.error("[ExtManager] Failed to refresh tabs:", err);
+      this.error = `Failed to get tabs: ${err.message}`;
+    } finally {
+      // Always reset refreshing flag
+      this._refreshing = false;
     }
   },
 

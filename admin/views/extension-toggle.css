@@ -1,0 +1,79 @@
+/* Extension Toggle Styles */
+
+.ext-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  user-select: none;
+}
+
+.ext-toggle-setup {
+  color: var(--color-text-muted, #6b7280);
+}
+
+.ext-toggle-setup:hover {
+  color: var(--color-text, #111);
+}
+
+.ext-toggle-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ext-toggle-off {
+  color: var(--color-text-muted, #6b7280);
+}
+
+.ext-toggle-off:hover {
+  background: var(--color-background, #f3f4f6);
+}
+
+.ext-toggle-on {
+  color: var(--color-success, #10b981);
+}
+
+.ext-toggle-on:hover {
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.ext-toggle-label {
+  flex: 1;
+}
+
+.ext-toggle-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+.ext-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.ext-toggle-off .ext-dot {
+  background: var(--color-border, #d1d5db);
+}
+
+.ext-toggle-on .ext-dot {
+  background: var(--color-success, #10b981);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+}
+
+.ext-toggle-indicator.connecting .spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

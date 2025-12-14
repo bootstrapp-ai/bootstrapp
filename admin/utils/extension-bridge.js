@@ -10,19 +10,27 @@ const STORAGE_KEY = "bootstrapp-extension-id";
 // Singleton state
 let bridge = null;
 let connectionPromise = null;
+let disconnectHandler = null;
 const listeners = new Set();
 
 /**
- * Get or create the shared bridge instance
+ * Get or create the shared bridge instance (only if connected)
  */
 export const getExtensionBridge = () => {
-  const extensionId = localStorage.getItem(STORAGE_KEY);
-  if (!extensionId) return null;
-
-  if (!bridge) {
-    bridge = createExtensionBridge(extensionId);
+  if (bridge?.isConnected()) {
+    return bridge;
   }
-  return bridge;
+  return null;
+};
+
+/**
+ * Handle disconnect event from bridge
+ */
+const handleDisconnect = () => {
+  console.log("[ExtBridge] Connection lost");
+  bridge = null;
+  connectionPromise = null;
+  notifyListeners({ type: "disconnected" });
 };
 
 /**
@@ -52,15 +60,22 @@ export const connectExtension = async (extensionId) => {
   // Create new bridge and connect
   bridge = createExtensionBridge(id);
 
+  // Set up disconnect handler
+  if (bridge.onDisconnect) {
+    bridge.onDisconnect(handleDisconnect);
+  }
+
   connectionPromise = bridge.connect()
     .then(() => {
       connectionPromise = null;
+      console.log("[ExtBridge] Connected successfully");
       notifyListeners({ type: "connected" });
       return bridge;
     })
     .catch((err) => {
       connectionPromise = null;
       bridge = null;
+      console.error("[ExtBridge] Connection failed:", err);
       throw err;
     });
 

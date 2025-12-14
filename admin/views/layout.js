@@ -114,6 +114,7 @@ export default {
         </uix-menu>
 
         <div slot="footer" class="sidebar-footer-content">
+          <admin-extension-toggle></admin-extension-toggle>
           <uix-darkmode></uix-darkmode>
         </div>
       </uix-sidebar>

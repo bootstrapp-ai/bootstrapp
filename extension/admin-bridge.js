@@ -28,6 +28,7 @@ export const createExtensionBridge = (extensionId) => {
   let connected = false;
   const eventListeners = new Map();
   const pendingRequests = new Map();
+  const disconnectCallbacks = new Set();
   let requestId = 0;
 
   // Check if chrome.runtime is available
@@ -47,7 +48,10 @@ export const createExtensionBridge = (extensionId) => {
       }
 
       const reqId = nextRequestId();
+      console.log(`[Bridge] Sending request: ${type} (${reqId})`);
+
       const timeout = setTimeout(() => {
+        console.log(`[Bridge] TIMEOUT for ${reqId} - pending requests:`, [...pendingRequests.keys()]);
         pendingRequests.delete(reqId);
         reject(new Error("Request timeout"));
       }, 30000);
@@ -65,9 +69,11 @@ export const createExtensionBridge = (extensionId) => {
   // Handle incoming messages
   const handleMessage = (message) => {
     console.log("[Bridge] Received:", message);
+    console.log("[Bridge] Message requestId:", message.requestId, "| Pending:", [...pendingRequests.keys()]);
 
     // Handle response to pending request
     if (message.requestId && pendingRequests.has(message.requestId)) {
+      console.log(`[Bridge] MATCHED request ${message.requestId}`);
       const { resolve, reject, timeout } = pendingRequests.get(message.requestId);
       clearTimeout(timeout);
       pendingRequests.delete(message.requestId);
@@ -78,6 +84,13 @@ export const createExtensionBridge = (extensionId) => {
         resolve(message);
       }
       return;
+    }
+
+    // No match - log why
+    if (message.requestId) {
+      console.log(`[Bridge] NO MATCH - requestId ${message.requestId} not in pending requests`);
+    } else {
+      console.log("[Bridge] NO MATCH - message has no requestId");
     }
 
     // Handle events
@@ -123,6 +136,8 @@ export const createExtensionBridge = (extensionId) => {
             console.log("[Bridge] Disconnected from extension");
             connected = false;
             port = null;
+            // Notify disconnect callbacks
+            disconnectCallbacks.forEach((cb) => cb());
           });
 
           // Wait for initial pong
@@ -240,6 +255,16 @@ export const createExtensionBridge = (extensionId) => {
     ping: async () => {
       const response = await sendRequest(MSG.PING);
       return response.type === MSG.PONG;
+    },
+
+    /**
+     * Register a disconnect callback
+     * @param {Function} callback - Called when connection is lost
+     * @returns {Function} Unsubscribe function
+     */
+    onDisconnect: (callback) => {
+      disconnectCallbacks.add(callback);
+      return () => disconnectCallbacks.delete(callback);
     },
   };
 };

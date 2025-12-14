@@ -68,18 +68,19 @@ chrome.runtime.onConnectExternal.addListener((port) => {
 
 // Main message handler
 async function handleMessage(message, sender, sendResponse) {
-  const { type, tabId, ...payload } = message;
+  const { type, requestId, tabId, ...payload } = message;
 
   try {
     switch (type) {
       case MSG.PING:
-        sendResponse({ type: MSG.PONG, timestamp: Date.now() });
+        sendResponse({ type: MSG.PONG, requestId, timestamp: Date.now() });
         break;
 
       case MSG.GET_TABS:
         const tabs = await chrome.tabs.query({});
         sendResponse({
           type: MSG.DATA,
+          requestId,
           data: tabs.map((t) => ({
             id: t.id,
             url: t.url,
@@ -96,7 +97,7 @@ async function handleMessage(message, sender, sendResponse) {
           type: MSG.SCRAPE,
           ...payload,
         });
-        sendResponse(scrapeResult);
+        sendResponse({ ...scrapeResult, requestId });
         break;
 
       case MSG.INJECT:
@@ -104,7 +105,7 @@ async function handleMessage(message, sender, sendResponse) {
           type: MSG.INJECT,
           ...payload,
         });
-        sendResponse(injectResult);
+        sendResponse({ ...injectResult, requestId });
         break;
 
       case MSG.EXECUTE:
@@ -112,7 +113,7 @@ async function handleMessage(message, sender, sendResponse) {
           type: MSG.EXECUTE,
           ...payload,
         });
-        sendResponse(execResult);
+        sendResponse({ ...execResult, requestId });
         break;
 
       case MSG.OBSERVE:
@@ -121,21 +122,21 @@ async function handleMessage(message, sender, sendResponse) {
           type: MSG.OBSERVE,
           ...payload,
         });
-        sendResponse(observeResult);
+        sendResponse({ ...observeResult, requestId });
         break;
 
       // Forward events from content script to admin
       case MSG.EVENT:
         broadcastToAdmin({ type: MSG.EVENT, tabId: sender.tab?.id, ...payload });
-        sendResponse({ type: MSG.DATA, success: true });
+        sendResponse({ type: MSG.DATA, requestId, success: true });
         break;
 
       default:
-        sendResponse({ type: MSG.ERROR, error: `Unknown message type: ${type}` });
+        sendResponse({ type: MSG.ERROR, requestId, error: `Unknown message type: ${type}` });
     }
   } catch (error) {
     console.error("[BG] Error handling message:", error);
-    sendResponse({ type: MSG.ERROR, error: error.message });
+    sendResponse({ type: MSG.ERROR, requestId, error: error.message });
   }
 }
 
