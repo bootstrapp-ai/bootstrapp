@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bootstrapp Admin Bridge</title>
+  <link rel="stylesheet" href="panel.css">
+</head>
+<body>
+  <div id="app">
+    <header class="header">
+      <h1 class="header-title">
+        <span class="logo">B</span>
+        Bootstrapp
+      </h1>
+      <button id="refresh-btn" class="icon-btn" title="Refresh tabs">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"/>
+        </svg>
+      </button>
+    </header>
+
+    <nav class="tabs-nav">
+      <button class="tab-btn active" data-tab="tabs">Tabs</button>
+      <button class="tab-btn" data-tab="scrape">Scrape</button>
+      <button class="tab-btn" data-tab="inject">Inject</button>
+    </nav>
+
+    <main class="content">
+      <!-- Tabs List -->
+      <section id="tabs-section" class="section active">
+        <div id="tabs-list" class="tabs-list">
+          <div class="loading">Loading tabs...</div>
+        </div>
+      </section>
+
+      <!-- Scrape Section -->
+      <section id="scrape-section" class="section">
+        <div class="form-group">
+          <label for="scrape-selector">CSS Selector</label>
+          <input type="text" id="scrape-selector" placeholder="e.g., h1, .price, #title">
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="scrape-multiple"> Select all matches
+          </label>
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="scrape-html"> Get HTML instead of text
+          </label>
+        </div>
+        <button id="scrape-btn" class="btn primary">Scrape Active Tab</button>
+        <div id="scrape-result" class="result-box"></div>
+      </section>
+
+      <!-- Inject Section -->
+      <section id="inject-section" class="section">
+        <div class="form-group">
+          <label for="inject-target">Target Selector</label>
+          <input type="text" id="inject-target" placeholder="e.g., body, #container" value="body">
+        </div>
+        <div class="form-group">
+          <label for="inject-html">HTML to Inject</label>
+          <textarea id="inject-html" rows="5" placeholder="<div>Your HTML here</div>"></textarea>
+        </div>
+        <button id="inject-btn" class="btn primary">Inject into Active Tab</button>
+        <div id="inject-result" class="result-box"></div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span class="status" id="status">Ready</span>
+    </footer>
+  </div>
+
+  <script src="panel.js" type="module"></script>
+</body>
+</html>

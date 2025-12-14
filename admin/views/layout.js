@@ -102,6 +102,15 @@ export default {
               Theme
             </uix-link>
           </li>
+          <li>
+            <uix-link
+              href="/admin/extension"
+              icon="puzzle"
+              class=${this.isActive("/admin/extension") ? "active" : ""}
+            >
+              Extension
+            </uix-link>
+          </li>
         </uix-menu>
 
         <div slot="footer" class="sidebar-footer-content">

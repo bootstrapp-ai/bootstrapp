@@ -1,0 +1,110 @@
+/**
+ * Shared Extension Bridge Singleton
+ * Single connection instance shared across all admin components
+ */
+
+import { createExtensionBridge } from "/$app/extension/admin-bridge.js";
+
+const STORAGE_KEY = "bootstrapp-extension-id";
+
+// Singleton state
+let bridge = null;
+let connectionPromise = null;
+const listeners = new Set();
+
+/**
+ * Get or create the shared bridge instance
+ */
+export const getExtensionBridge = () => {
+  const extensionId = localStorage.getItem(STORAGE_KEY);
+  if (!extensionId) return null;
+
+  if (!bridge) {
+    bridge = createExtensionBridge(extensionId);
+  }
+  return bridge;
+};
+
+/**
+ * Connect to the extension (or return existing connection)
+ */
+export const connectExtension = async (extensionId) => {
+  // Save extension ID
+  if (extensionId) {
+    localStorage.setItem(STORAGE_KEY, extensionId);
+  }
+
+  const id = extensionId || localStorage.getItem(STORAGE_KEY);
+  if (!id) {
+    throw new Error("Extension ID required");
+  }
+
+  // If already connecting, wait for that
+  if (connectionPromise) {
+    return connectionPromise;
+  }
+
+  // If already connected, return
+  if (bridge?.isConnected()) {
+    return bridge;
+  }
+
+  // Create new bridge and connect
+  bridge = createExtensionBridge(id);
+
+  connectionPromise = bridge.connect()
+    .then(() => {
+      connectionPromise = null;
+      notifyListeners({ type: "connected" });
+      return bridge;
+    })
+    .catch((err) => {
+      connectionPromise = null;
+      bridge = null;
+      throw err;
+    });
+
+  return connectionPromise;
+};
+
+/**
+ * Disconnect from extension
+ */
+export const disconnectExtension = () => {
+  if (bridge) {
+    bridge.disconnect();
+    bridge = null;
+    notifyListeners({ type: "disconnected" });
+  }
+};
+
+/**
+ * Check if connected
+ */
+export const isConnected = () => bridge?.isConnected() ?? false;
+
+/**
+ * Get saved extension ID
+ */
+export const getExtensionId = () => localStorage.getItem(STORAGE_KEY) || "";
+
+/**
+ * Subscribe to connection changes
+ */
+export const onConnectionChange = (callback) => {
+  listeners.add(callback);
+  return () => listeners.delete(callback);
+};
+
+const notifyListeners = (event) => {
+  listeners.forEach((cb) => cb(event));
+};
+
+export default {
+  getExtensionBridge,
+  connectExtension,
+  disconnectExtension,
+  isConnected,
+  getExtensionId,
+  onConnectionChange,
+};

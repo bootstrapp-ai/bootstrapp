@@ -86,13 +86,15 @@
       )
       scale(0.97);
   }
-  &:not([variant], [primary]) {
+
+  &:not([variant], [primary], [secondary], [danger], [success], [warning]) {
     --button-color: #fff;
     --button-background: #000;
     --button-border-color: #000;
     --button-hover-background: #222;
     --button-active-background: #222;
   }
+
   &[primary],
   &[variant="primary"] {
     --button-background: var(--color-primary);

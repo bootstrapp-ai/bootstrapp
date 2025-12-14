@@ -65,6 +65,14 @@ const routes = {
     template: "admin-layout",
   },
 
+  // Browser Extension
+  "/admin/extension": {
+    name: "admin-extension",
+    component: () => html`<admin-extension-manager></admin-extension-manager>`,
+    title: "Admin - Browser Extension",
+    template: "admin-layout",
+  },
+
   // Legacy CMS routes (for backward compatibility)
   "/admin/cms": {
     component: () => html`<admin-dashboard></admin-dashboard>`,

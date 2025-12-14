@@ -1,0 +1,24 @@
+{
+  "name": "@bootstrapp/extension",
+  "version": "0.1.0",
+  "description": "Chrome extension for bidirectional communication between admin panel and browser tabs",
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./admin-bridge.js": "./admin-bridge.js"
+  },
+  "keywords": [
+    "chrome-extension",
+    "browser-extension",
+    "scraping",
+    "dom-manipulation",
+    "bootstrapp"
+  ],
+  "author": "Alan Leal",
+  "license": "AGPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bootstrapp-ai/bootstrapp.git",
+    "directory": "public/extension"
+  }
+}

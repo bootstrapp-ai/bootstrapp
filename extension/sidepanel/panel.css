@@ -1,0 +1,319 @@
+/**
+ * Bootstrapp Extension - Side Panel Styles
+ */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  background: #f5f5f5;
+  color: #333;
+  min-width: 300px;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #1a1a1a;
+  color: white;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: #fbbf24;
+  color: #1a1a1a;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: #888;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+/* Tab Navigation */
+.tabs-nav {
+  display: flex;
+  background: white;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 12px;
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.tab-btn:hover {
+  background: #f5f5f5;
+  color: #333;
+}
+
+.tab-btn.active {
+  color: #1a1a1a;
+  border-bottom-color: #fbbf24;
+}
+
+/* Content */
+.content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.section {
+  display: none;
+  padding: 16px;
+}
+
+.section.active {
+  display: block;
+}
+
+/* Tabs List */
+.tabs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tab-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: white;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.tab-item:hover {
+  border-color: #ccc;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.tab-item.active {
+  border-color: #fbbf24;
+  background: #fffbeb;
+}
+
+.tab-favicon {
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.tab-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.tab-title {
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tab-url {
+  font-size: 11px;
+  color: #888;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.select-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: #888;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.15s;
+}
+
+.tab-item:hover .select-btn {
+  opacity: 1;
+}
+
+.select-btn:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+/* Forms */
+.form-group {
+  margin-bottom: 12px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 500;
+  font-size: 12px;
+  color: #555;
+}
+
+.form-group input[type="text"],
+.form-group textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+
+.form-group input[type="text"]:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #fbbf24;
+}
+
+.form-group input[type="checkbox"] {
+  margin-right: 6px;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn.primary {
+  background: #1a1a1a;
+  color: white;
+}
+
+.btn.primary:hover {
+  background: #333;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Result Box */
+.result-box {
+  margin-top: 12px;
+  padding: 12px;
+  background: #1a1a1a;
+  border-radius: 6px;
+  min-height: 60px;
+}
+
+.result-box pre {
+  font-family: "SF Mono", Monaco, Consolas, monospace;
+  font-size: 11px;
+  color: #a0f0a0;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.result-box .error {
+  color: #f87171;
+}
+
+.result-box .loading {
+  color: #888;
+}
+
+/* Status Messages */
+.loading,
+.empty,
+.error {
+  padding: 20px;
+  text-align: center;
+  color: #888;
+}
+
+.error {
+  color: #ef4444;
+}
+
+/* Footer */
+.footer {
+  padding: 10px 16px;
+  background: white;
+  border-top: 1px solid #e5e5e5;
+}
+
+.status {
+  font-size: 11px;
+  color: #888;
+}
+
+.status.success {
+  color: #22c55e;
+}
+
+.status.error {
+  color: #ef4444;
+}
