@@ -1,8 +1,14 @@
 import $APP from "/$app.js";
 import { html } from "/npm/lit-html";
+import { getPluginRoutes } from "./plugins.js";
 
 // Import bundler module (registers bundler-ui component)
 import "/$app/bundler/index.js";
+
+// Import admin plugins (they self-register via registerPlugin)
+import "/$app/bundler/plugin.js";
+import "/$app/theme/plugin.js";
+import "/$app/extension/admin/plugin.js";
 
 // Register admin module
 $APP.addModule({
@@ -10,8 +16,8 @@ $APP.addModule({
   path: "/$app/admin/views",
 });
 
-// Admin routes
-const routes = {
+// Core admin routes (dashboard, models, legacy)
+const coreRoutes = {
   // Dashboard
   "/admin": {
     name: "admin-dashboard",
@@ -46,38 +52,6 @@ const routes = {
     template: "admin-layout",
   },
 
-  // Deploy
-  "/admin/deploy": {
-    name: "admin-deploy",
-    component: () => html`<admin-deploy></admin-deploy>`,
-    title: "Admin - Deploy",
-    template: "admin-layout",
-  },
-
-  // Theme
-  "/admin/theme": {
-    name: "admin-theme",
-    component: () => html`<admin-theme></admin-theme>`,
-    title: "Admin - Theme",
-    template: "admin-layout",
-  },
-
-  // Browser Extension
-  "/admin/extension": {
-    name: "admin-extension",
-    component: () => html`<admin-extension-manager></admin-extension-manager>`,
-    title: "Admin - Browser Extension",
-    template: "admin-layout",
-  },
-
-  // Bundler
-  "/admin/bundler": {
-    name: "admin-bundler",
-    component: () => html`<bundler-ui></bundler-ui>`,
-    title: "Admin - Bundler",
-    template: "admin-layout",
-  },
-
   // Legacy CMS routes (for backward compatibility)
   "/admin/cms": {
     component: () => html`<admin-dashboard></admin-dashboard>`,
@@ -109,6 +83,9 @@ const routes = {
     template: "admin-layout",
   },
 };
+
+// Merge core routes with plugin routes
+const routes = { ...coreRoutes, ...getPluginRoutes() };
 
 // Register routes
 $APP.routes.set(routes);

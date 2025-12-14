@@ -1,8 +1,14 @@
 import { exec } from "node:child_process"; // <-- IMPORT 'exec'
 import { randomUUID } from "node:crypto"; // <-- NEW IMPORT
+import fs from "node:fs/promises";
+import http from "node:http";
+import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import mime from "mime";
 import WebSocket, { WebSocketServer } from "ws";
+
+// Track deployed server instance
+let deployedServer = null;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = new URL(".", import.meta.url).pathname;
@@ -45,6 +51,72 @@ const fromFetchResponse = async (response, res) => {
   );
   const bodyBuffer = Buffer.from(await response.arrayBuffer());
   res.end(bodyBuffer);
+};
+
+// --- Deployed Files Serving ---
+
+const serveDeployedFile = async (deployedDir, filePath, res) => {
+  let fullPath = path.join(deployedDir, filePath);
+
+  try {
+    // Handle directory -> index.html
+    const stat = await fs.stat(fullPath);
+    if (stat.isDirectory()) {
+      fullPath = path.join(fullPath, "index.html");
+    }
+  } catch {
+    // File doesn't exist, will handle below
+  }
+
+  // Try to serve file
+  try {
+    const content = await fs.readFile(fullPath);
+    const mimeType = mime.getType(fullPath) || "application/octet-stream";
+    res.writeHead(200, { "Content-Type": mimeType });
+    res.end(content);
+    return;
+  } catch {
+    // File not found, try SPA fallback
+  }
+
+  // SPA fallback
+  const indexPath = path.join(deployedDir, "index.html");
+  try {
+    const content = await fs.readFile(indexPath);
+    res.writeHead(200, { "Content-Type": "text/html" });
+    res.end(content);
+  } catch {
+    res.writeHead(404);
+    res.end("Not found");
+  }
+};
+
+const startDeployedServer = (projectDir, port) => {
+  const deployedDir = path.join(projectDir, ".deployed");
+
+  const server = http.createServer(async (req, res) => {
+    const { pathname } = new URL(req.url, `http://localhost:${port}`);
+    await serveDeployedFile(deployedDir, pathname, res);
+  });
+
+  server.listen(port, () => {
+    console.log(`📦 Deployed build available at http://localhost:${port}/`);
+  });
+
+  return server;
+};
+
+const clearDirectory = async (dirPath) => {
+  try {
+    await fs.rm(dirPath, { recursive: true, force: true });
+  } catch {
+    // Directory might not exist
+  }
+  await fs.mkdir(dirPath, { recursive: true });
+};
+
+const ensureDir = async (dirPath) => {
+  await fs.mkdir(dirPath, { recursive: true });
 };
 
 // --- Plugin Loader ---
@@ -166,6 +238,9 @@ const createRequestHandler = (
   };
 
   return async (req, res) => {
+    const urlObj = new URL(req.url, `http://${req.headers.host}`);
+    const pathname = urlObj.pathname;
+
     if (req.url === "/.well-known/appspecific/com.chrome.devtools.json") {
       adapter.log(
         "Serving DevTools workspace config file (workspace format)...",
@@ -184,6 +259,68 @@ const createRequestHandler = (
       res.end(JSON.stringify(jsonResponse));
       return;
     }
+
+    // POST /deploy - receive and store files
+    if (req.method === "POST" && pathname === "/deploy") {
+      try {
+        // Parse body
+        const chunks = [];
+        for await (const chunk of req) {
+          chunks.push(chunk);
+        }
+        const body = JSON.parse(Buffer.concat(chunks).toString());
+        const { files } = body;
+
+        // Clear and recreate .deployed/
+        const deployedDir = adapter.join(projectDir, ".deployed");
+        await clearDirectory(deployedDir);
+
+        // Write files
+        for (const file of files) {
+          const filePath = adapter.join(deployedDir, file.path);
+          await ensureDir(adapter.dirname(filePath));
+
+          const content =
+            file.encoding === "base64"
+              ? Buffer.from(file.content, "base64")
+              : file.content;
+          await fs.writeFile(filePath, content);
+        }
+
+        adapter.log(`📦 Deployed ${files.length} files to .deployed/`);
+
+        // Start separate port server if not running
+        if (!deployedServer) {
+          deployedServer = startDeployedServer(projectDir, port + 2);
+        }
+
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify({
+            success: true,
+            urls: {
+              prefixed: `http://${host}:${port}/_deployed/`,
+              standalone: `http://${host}:${port + 2}/`,
+            },
+          }),
+        );
+        return;
+      } catch (err) {
+        adapter.error("Deploy error:", err);
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+        return;
+      }
+    }
+
+    // GET /_deployed/* - serve from .deployed/
+    if (pathname.startsWith("/_deployed")) {
+      const deployedDir = adapter.join(projectDir, ".deployed");
+      const deployedPath = pathname.replace("/_deployed", "") || "/index.html";
+      await serveDeployedFile(deployedDir, deployedPath, res);
+      return;
+    }
+
     const serverModules = getServerModules();
 
     if (serverModules.length > 0) {

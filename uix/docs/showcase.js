@@ -5,10 +5,10 @@
 
 import Theme from "/$app/theme/index.js";
 import T from "/$app/types/index.js";
+import View from "/$app/view/index.js";
 import { html, nothing } from "/npm/lit-html";
 import { unsafeHTML } from "/npm/lit-html/directives/unsafe-html.js";
 import { html as staticHTML, unsafeStatic } from "/npm/lit-html/static.js";
-import View from "/$app/view/index.js";
 import {
   getComponentList,
   getDefaultValues,

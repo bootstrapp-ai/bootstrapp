@@ -16,7 +16,16 @@ export default {
       enum: ["pending", "success", "failed"],
       defaultValue: "pending",
     }),
+    deployType: T.string({
+      enum: ["spa", "ssg", "hybrid", "worker"],
+      defaultValue: "hybrid",
+    }),
+    deployTarget: T.string({
+      enum: ["github", "cloudflare", "zip", "targz", "localhost"],
+      defaultValue: "github",
+    }),
     deployedAt: T.string(),
     files: T.array(),
+    result: T.object(),
   },
 };

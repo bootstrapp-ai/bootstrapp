@@ -1,5 +1,13 @@
 import Github from "/$app/github/index.js";
 import $APP from "/$app.js";
+import { deployToTarget, getTarget, getTargets } from "./targets/index.js";
+
+// Import targets (they self-register)
+import "./targets/github.js";
+import "./targets/cloudflare.js";
+import "./targets/zip.js";
+import "./targets/targz.js";
+import "./targets/localhost.js";
 
 const { Router } = $APP;
 
@@ -495,7 +503,6 @@ const bundler = {
       Object.entries(filesForSW).map(async ([path, file]) => {
         const minifiedContent = await minify(file.content, file.mimeType);
         let finalContent = minifiedContent;
-        console.log($APP.settings.obfuscate, file.mimeType);
         if (
           file.mimeType === "application/javascript" &&
           $APP.settings.obfuscate
@@ -513,32 +520,60 @@ const bundler = {
       serviceWorker = await obfuscate(serviceWorker);
     }
     filesForDeployment.push({ path: "sw.js", content: serviceWorker });
-    await Github.deploy({
-      ...credentials,
-      files: filesForDeployment,
-    });
-    console.log(`✅ ${mode.toUpperCase()} bundle deployed successfully!`);
+    console.log(
+      `✅ ${mode.toUpperCase()} bundle created with ${filesForDeployment.length} files`,
+    );
     return filesForDeployment;
   },
-  async deploy({ mode, ...credentials }) {
+  /**
+   * Get all available deployment targets
+   */
+  getTargets,
+
+  /**
+   * Build files for deployment
+   * @param {string} mode - Build mode: spa, ssg, hybrid
+   * @returns {Array} Files ready for deployment [{path, content}]
+   */
+  async build(mode) {
     switch (mode) {
       case "spa":
-        return this.bundleSPA(credentials);
+        return this._bundleSPACore({}, { mode: "spa" });
       case "ssg":
-        return this.bundleSSG(credentials);
+        return this.bundleSSG();
       case "hybrid":
-        return this.bundleHybrid(credentials);
-      case "worker":
-        return this.deployWorker(credentials);
+        return this._bundleSPACore({}, { mode: "hybrid" });
       default:
-        console.error(`Unknown deployment mode: ${mode}`);
-        throw new Error(`Unknown deployment mode: ${mode}`);
+        throw new Error(`Unknown build mode: ${mode}`);
     }
+  },
+
+  /**
+   * Deploy to a target
+   * @param {Object} options - Deployment options
+   * @param {string} options.mode - Build mode: spa, ssg, hybrid, worker
+   * @param {string} options.target - Deploy target: github, cloudflare, zip, targz
+   * @param {Object} options.credentials - Target-specific credentials
+   */
+  async deploy({ mode, target = "github", ...credentials }) {
+    console.log(`🚀 Deploying: mode=${mode}, target=${target}`);
+    if (target === "cloudflare" || mode === "worker")
+      return this.deployWorker({ cloudflare: credentials });
+
+    const files = await this.build(mode);
+    const result = await deployToTarget(target, files, {
+      ...credentials,
+      name: $APP.settings.name,
+      version: credentials.version || Date.now(),
+    });
+    console.log({ result });
+    console.log(`✅ Deployment to ${target} completed!`, result);
+    return result;
   },
   async bundleSPA(credentials) {
     return this._bundleSPACore(credentials, { mode: "spa" });
   },
-  async bundleSSG(credentials) {
+  async bundleSSG() {
     console.log("🚀 Starting SSG bundle process...");
     const files = [];
     const staticFiles = await getStaticHTML({ ssgOnly: true });
@@ -556,24 +591,7 @@ const bundler = {
     files.push({ path: "sitemap.xml", content: sitemapXML });
     const robotsTXT = this._createRobotsTXT($APP.settings);
     files.push({ path: "robots.txt", content: robotsTXT });
-    staticFiles.map(async (file) => {
-      try {
-        const title = `${file.title} - ${file.path}`;
-        const body = `${file.title} - ${file.path}`;
-        await Github.ensureDiscussionExists({
-          ...credentials,
-          categoryName: "Announcements",
-          title,
-          body,
-        });
-      } catch (error) {
-        console.error(
-          "Failed to create GitHub discussion announcement:",
-          error,
-        );
-      }
-    });
-    await Github.deploy({ ...credentials, files });
+    console.log(`✅ SSG bundle created with ${files.length} files`);
     return files;
   },
   async bundleHybrid(credentials) {

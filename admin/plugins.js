@@ -16,6 +16,7 @@ const plugins = new Map();
  */
 export const registerPlugin = (name, config) => {
   plugins.set(name, { name, ...config });
+  console.log({ plugins });
 };
 
 /**

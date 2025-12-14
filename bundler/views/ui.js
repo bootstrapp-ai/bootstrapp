@@ -99,73 +99,119 @@ $APP.define("release-creator", {
     version: T.string(`v${new Date().toISOString().slice(0, 10)}`),
     notes: T.string(""),
     deployMode: T.string("hybrid"),
+    deployTarget: T.string("github"),
     isDeploying: T.boolean(false),
   },
+
+  getTargetOptions() {
+    const targets = Bundler.getTargets();
+    return targets.map((t) => ({
+      value: t.name,
+      label: t.label,
+    }));
+  },
+
+  getModeOptions() {
+    // When cloudflare target is selected, only worker mode makes sense
+    if (this.deployTarget === "cloudflare") {
+      return [{ value: "worker", label: "Cloudflare Workers" }];
+    }
+    return [
+      { value: "spa", label: "SPA" },
+      { value: "ssg", label: "SSG" },
+      { value: "hybrid", label: "Hybrid" },
+    ];
+  },
+
+  needsCredentials() {
+    // ZIP, TAR.GZ, and localhost don't need credentials
+    return !["zip", "targz", "localhost"].includes(this.deployTarget);
+  },
+
   async handleDeploy() {
     if (this.isDeploying) return;
 
     this.isDeploying = true;
     const credentials = await $APP.Model.bundler_credentials.get("singleton");
 
-    if (this.deployMode === "worker") {
-      if (
-        !credentials?.cloudflare?.apiToken ||
-        !credentials?.cloudflare?.accountId ||
-        !credentials?.cloudflare?.projectName
-      ) {
-        alert(
-          "Please provide your Cloudflare Account ID, API Token, and a Project Name before deploying.",
-        );
-        this.isDeploying = false;
-        return;
-      }
-    } else {
-      if (!credentials || !credentials.token) {
-        alert("Please provide a GitHub token before deploying.");
-        this.isDeploying = false;
-        return;
+    // Validate credentials for targets that need them
+    if (this.needsCredentials()) {
+      if (this.deployTarget === "cloudflare") {
+        if (
+          !credentials?.cloudflare?.apiToken ||
+          !credentials?.cloudflare?.accountId ||
+          !credentials?.cloudflare?.projectName
+        ) {
+          alert(
+            "Please provide your Cloudflare Account ID, API Token, and a Project Name before deploying.",
+          );
+          this.isDeploying = false;
+          return;
+        }
+      } else if (this.deployTarget === "github") {
+        if (!credentials || !credentials.token) {
+          alert("Please provide a GitHub token before deploying.");
+          this.isDeploying = false;
+          return;
+        }
       }
     }
-
-    let newRelease;
+    const release = {
+      version: this.version,
+      notes: this.notes,
+      status: "pending",
+      deployedAt: Date.now(),
+      deployType: this.deployMode,
+      deployTarget: this.deployTarget,
+    };
     try {
-      newRelease = await $APP.Model.bundler_releases.add({
-        version: this.version,
-        notes: this.notes,
-        status: "pending",
-        deployedAt: new Date(),
-        deployType: this.deployMode,
-      });
-
-      const files = await Bundler.deploy({
+      const [error, newRelease] =
+        await $APP.Model.bundler_releases.add(release);
+      const result = await Bundler.deploy({
         ...credentials,
         mode: this.deployMode,
+        target: this.deployTarget,
+        version: this.version,
       });
-
       await $APP.Model.bundler_releases.edit({
         ...newRelease,
         status: "success",
-        files,
+        result,
       });
 
-      alert(`Deployment (${this.deployMode.toUpperCase()}) successful!`);
+      const targetLabel =
+        Bundler.getTargets().find((t) => t.name === this.deployTarget)?.label ||
+        this.deployTarget;
+      alert(`Deployment to ${targetLabel} successful!`);
     } catch (error) {
-      console.error(
-        `Deployment failed for ${this.deployMode.toUpperCase()}:`,
-        error,
-      );
+      console.error(`Deployment failed:`, { error });
+      console.trace();
       alert(`Deployment failed: ${error.message}`);
-      if (newRelease?._id) {
-        await $APP.Model.bundler_releases.edit({
-          ...newRelease,
+      if (release?._id) {
+        await $APP.Model.bundler_releases.add({
+          ...release,
           status: "failed",
+          error: error.message,
         });
       }
     } finally {
       this.isDeploying = false;
     }
   },
+
   render() {
+    const targetOptions = this.getTargetOptions();
+    const modeOptions = this.getModeOptions();
+
+    // Auto-switch to worker mode when cloudflare is selected
+    if (this.deployTarget === "cloudflare" && this.deployMode !== "worker") {
+      this.deployMode = "worker";
+    }
+    // Switch away from worker mode when not cloudflare
+    if (this.deployTarget !== "cloudflare" && this.deployMode === "worker") {
+      this.deployMode = "hybrid";
+    }
+
     return html`
       <uix-card shadow="none" borderWidth="0">
         <h2 slot="header">New Release</h2>
@@ -188,18 +234,30 @@ $APP.define("release-creator", {
         </div>
         <div class="bundler-deploy-row">
           <uix-select
-            label="Deployment Mode"
+            label="Build Mode"
             value=${this.deployMode}
-            .options=${[{ value: "spa", label: "SPA" }, { value: "ssg", label: "SSG" }, { value: "hybrid", label: "Hybrid" }, { value: "worker", label: "Cloudflare Workers" }]}
+            .options=${modeOptions}
             @change=${(e) => (this.deployMode = e.target.value)}
+          >
+          </uix-select>
+          <uix-select
+            label="Deploy Target"
+            value=${this.deployTarget}
+            .options=${targetOptions}
+            @change=${(e) => (this.deployTarget = e.target.value)}
           >
           </uix-select>
           <uix-button
             @click=${() => this.handleDeploy()}
-            label=${this.isDeploying ? `Deploying ${this.deployMode.toUpperCase()}...` : "Deploy"}
+            label=${this.isDeploying ? `Deploying...` : "Deploy"}
             ?disabled=${this.isDeploying}
           ></uix-button>
         </div>
+        ${
+          !this.needsCredentials()
+            ? html`<p class="bundler-help-text">This target downloads directly to your browser - no credentials needed.</p>`
+            : ""
+        }
       </uix-card>
     `;
   },
@@ -236,6 +294,11 @@ $APP.define("release-history", {
                       ${
                         release.deployType
                           ? html`<span class="bundler-release-type">${release.deployType.toUpperCase()}</span>`
+                          : ""
+                      }
+                      ${
+                        release.deployTarget
+                          ? html`<span class="bundler-release-target">${release.deployTarget}</span>`
                           : ""
                       }
                       <span class="bundler-release-date">${new Date(release.deployedAt).toLocaleString()}</span>
@@ -412,12 +475,12 @@ export default {
           </uix-card>
           <uix-card shadow="none" borderWidth="0">
             <uix-stat title="Successful" value=${this.releaseStats.success} variant="success" centered>
-              <uix-icon slot="figure" name="check-circle" size="xl"></uix-icon>
+              <uix-icon slot="figure" name="circle-check" size="xl"></uix-icon>
             </uix-stat>
           </uix-card>
           <uix-card shadow="none" borderWidth="0">
             <uix-stat title="Failed" value=${this.releaseStats.failed} variant="danger" centered>
-              <uix-icon slot="figure" name="x-circle" size="xl"></uix-icon>
+              <uix-icon slot="figure" name="circle-x" size="xl"></uix-icon>
             </uix-stat>
           </uix-card>
           <uix-card shadow="none" borderWidth="0">

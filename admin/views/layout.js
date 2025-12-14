@@ -1,6 +1,7 @@
 import Router from "/$app/router/index.js";
 import T from "/$app/types/index.js";
 import { html } from "/npm/lit-html";
+import { getSidebarItems } from "../plugins.js";
 import { capitalize, getModelNames } from "../utils/model-utils.js";
 
 export default {
@@ -20,7 +21,7 @@ export default {
     if (path === "/admin") {
       return currentPath === "/admin";
     }
-    return currentPath === path || currentPath.startsWith(path + "/");
+    return currentPath === path || currentPath.startsWith(`${path}/`);
   },
 
   isModelActive(modelName) {
@@ -30,7 +31,8 @@ export default {
 
   render() {
     const models = getModelNames();
-
+    const sidebarItems = getSidebarItems();
+    console.error({ sidebarItems });
     return html`
       <uix-sidebar
         position="left"
@@ -84,46 +86,22 @@ export default {
 
           <li class="divider"></li>
 
-          <li>
-            <uix-link
-              href="/admin/deploy"
-              icon="rocket"
-              class=${this.isActive("/admin/deploy") ? "active" : ""}
-            >
-              Deploy
-            </uix-link>
-          </li>
-          <li>
-            <uix-link
-              href="/admin/theme"
-              icon="palette"
-              class=${this.isActive("/admin/theme") ? "active" : ""}
-            >
-              Theme
-            </uix-link>
-          </li>
-          <li>
-            <uix-link
-              href="/admin/extension"
-              icon="puzzle"
-              class=${this.isActive("/admin/extension") ? "active" : ""}
-            >
-              Extension
-            </uix-link>
-          </li>
-          <li>
-            <uix-link
-              href="/admin/bundler"
-              icon="package"
-              class=${this.isActive("/admin/bundler") ? "active" : ""}
-            >
-              Bundler
-            </uix-link>
-          </li>
+          ${sidebarItems.map(
+            (item) => html`
+              <li>
+                <uix-link
+                  href=${item.href}
+                  icon=${item.icon}
+                  class=${this.isActive(item.href) ? "active" : ""}
+                >
+                  ${item.label}
+                </uix-link>
+              </li>
+            `,
+          )}
         </uix-menu>
 
         <div slot="footer" class="sidebar-footer-content">
-          <admin-extension-toggle></admin-extension-toggle>
           <uix-darkmode></uix-darkmode>
         </div>
       </uix-sidebar>

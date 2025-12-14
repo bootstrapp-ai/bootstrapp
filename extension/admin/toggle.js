@@ -3,18 +3,18 @@
  * Persistent toggle for extension connection (like dark mode toggle)
  */
 
+import T from "/$app/types/index.js";
+import { html } from "/npm/lit-html";
 import {
   connectExtension,
   disconnectExtension,
   getExtensionId,
   isConnected,
   onConnectionChange,
-} from "../utils/extension-bridge.js";
-import T from "/$app/types/index.js";
-import { html } from "/npm/lit-html";
+} from "../extension-bridge.js";
 
 export default {
-  tag: "admin-extension-toggle",
+  tag: "extension-toggle",
   style: true,
   properties: {
     connected: T.boolean({ defaultValue: false }),
@@ -87,9 +87,11 @@ export default {
         <uix-icon name="puzzle" size="18"></uix-icon>
         <span class="ext-toggle-label">Extension</span>
         <div class="ext-toggle-indicator ${this.connecting ? "connecting" : ""}">
-          ${this.connecting
-            ? html`<uix-icon name="loader" size="14" class="spinning"></uix-icon>`
-            : html`<span class="ext-dot"></span>`}
+          ${
+            this.connecting
+              ? html`<uix-icon name="loader" size="14" class="spinning"></uix-icon>`
+              : html`<span class="ext-dot"></span>`
+          }
         </div>
       </div>
     `;

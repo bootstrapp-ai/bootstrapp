@@ -3,19 +3,19 @@
  * Manage browser extension connection, browse tabs, and scrape content
  */
 
+import T from "/$app/types/index.js";
+import { html, nothing } from "/npm/lit-html";
 import {
-  connectExtension as sharedConnect,
-  disconnectExtension as sharedDisconnect,
   getExtensionBridge,
   getExtensionId,
   isConnected,
   onConnectionChange,
-} from "../utils/extension-bridge.js";
-import T from "/$app/types/index.js";
-import { html, nothing } from "/npm/lit-html";
+  connectExtension as sharedConnect,
+  disconnectExtension as sharedDisconnect,
+} from "../extension-bridge.js";
 
 export default {
-  tag: "admin-extension-manager",
+  tag: "extension-manager",
   style: true,
   properties: {
     extensionId: T.string({ defaultValue: "" }),
@@ -157,7 +157,7 @@ export default {
           this.connected
             ? html`
               <div class="ext-status ext-status-connected">
-                <uix-icon name="check-circle" size="18"></uix-icon>
+                <uix-icon name="circle-check" size="18"></uix-icon>
                 Connected
               </div>
               <p class="ext-id-display">ID: ${this.extensionId}</p>
@@ -316,7 +316,7 @@ export default {
 
   render() {
     return html`
-      <div class="admin-extension-manager">
+      <div class="extension-manager">
         <header class="ext-header">
           <h1 class="ext-page-title">
             <uix-icon name="puzzle" size="28"></uix-icon>

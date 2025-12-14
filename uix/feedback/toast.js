@@ -76,7 +76,7 @@ export default {
   _getIcon(variant) {
     const icons = {
       success: "circle-check",
-      error: "x-circle",
+      error: "circle-x",
       warning: "alert-triangle",
       info: "info",
       default: "bell",
