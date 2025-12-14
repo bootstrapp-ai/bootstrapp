@@ -10,9 +10,14 @@
   const MSG = {
     SCRAPE: "ext:scrape",
     SCRAPE_INSTAGRAM: "ext:scrapeInstagram",
+    FETCH_INSTAGRAM_PROFILE: "ext:fetchInstagramProfile",
     INJECT: "ext:inject",
     EXECUTE: "ext:execute",
     OBSERVE: "ext:observe",
+    START_INTERCEPT: "ext:startIntercept",
+    STOP_INTERCEPT: "ext:stopIntercept",
+    INTERCEPTED_DATA: "ext:interceptedData",
+    UPDATE_DOC_ID: "ext:updateDocId",
     DATA: "ext:data",
     ERROR: "ext:error",
     EVENT: "ext:event",
@@ -44,6 +49,12 @@
       case MSG.SCRAPE_INSTAGRAM:
         return scrapeInstagramProfile();
 
+      case MSG.FETCH_INSTAGRAM_PROFILE:
+        return fetchInstagramProfileAPI(payload);
+
+      case MSG.UPDATE_DOC_ID:
+        return updateInstagramDocId(payload);
+
       case MSG.INJECT:
         return inject(payload);
 
@@ -52,6 +63,12 @@
 
       case MSG.OBSERVE:
         return observe(payload);
+
+      case MSG.START_INTERCEPT:
+        return startInterception(payload);
+
+      case MSG.STOP_INTERCEPT:
+        return stopInterception();
 
       default:
         return { type: MSG.ERROR, error: `Unknown message type: ${type}` };
@@ -220,6 +237,196 @@
   }
 
   // ============================================
+  // INSTAGRAM DIRECT API
+  // ============================================
+
+  // Default doc_id registry - these may change over time
+  const DEFAULT_DOC_IDS = {
+    profile: null, // Discover via interception
+    post: "10015901848474",
+    reel: "25981206651899035",
+    comments: "8845758582119845",
+    timeline: "9310670392322965",
+  };
+
+  // Instagram Web App ID (stable)
+  const IG_APP_ID = "936619743392459";
+
+  /**
+   * Get doc_ids from storage, merged with defaults
+   */
+  async function getDocIds() {
+    try {
+      const result = await chrome.storage.local.get("instagramDocIds");
+      return { ...DEFAULT_DOC_IDS, ...(result.instagramDocIds || {}) };
+    } catch {
+      return DEFAULT_DOC_IDS;
+    }
+  }
+
+  /**
+   * Update a specific doc_id in storage
+   */
+  async function updateInstagramDocId({ type, docId }) {
+    try {
+      const current = await getDocIds();
+      current[type] = docId;
+      await chrome.storage.local.set({ instagramDocIds: current });
+      console.log(`[CS] Updated doc_id for ${type}: ${docId}`);
+      return { type: MSG.DATA, data: { success: true, type, docId } };
+    } catch (error) {
+      return { type: MSG.ERROR, error: error.message };
+    }
+  }
+
+  /**
+   * Extract LSD token from page (CSRF token)
+   */
+  function getLsdToken() {
+    // Try hidden input first (most reliable)
+    const input = document.querySelector('input[name="lsd"]');
+    if (input?.value) {
+      return input.value;
+    }
+
+    // Try to find in script tags
+    const scripts = document.querySelectorAll("script");
+    for (const script of scripts) {
+      const text = script.textContent || "";
+      // Pattern: "LSD",[],{"token":"..."}
+      const match = text.match(/"LSD"\s*,\s*\[\]\s*,\s*\{\s*"token"\s*:\s*"([^"]+)"/);
+      if (match) {
+        return match[1];
+      }
+      // Alternative pattern
+      const altMatch = text.match(/\\"LSD\\"[^}]*\\"token\\":\\"([^"\\]+)\\"/);
+      if (altMatch) {
+        return altMatch[1];
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Fetch profile via REST API (more stable, doesn't need doc_id)
+   */
+  async function fetchProfileViaRest(username) {
+    try {
+      const response = await fetch(
+        `https://i.instagram.com/api/v1/users/web_profile_info/?username=${encodeURIComponent(username)}`,
+        {
+          headers: {
+            "X-IG-App-ID": IG_APP_ID,
+            "X-Requested-With": "XMLHttpRequest",
+          },
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok) {
+        console.log(`[CS] REST API returned ${response.status}`);
+        return null;
+      }
+
+      const data = await response.json();
+      return data?.data?.user || null;
+    } catch (error) {
+      console.error("[CS] REST API error:", error);
+      return null;
+    }
+  }
+
+  /**
+   * Fetch profile via GraphQL (needs doc_id)
+   */
+  async function fetchProfileViaGraphQL(username, docId) {
+    const lsd = getLsdToken();
+    if (!lsd) {
+      console.log("[CS] No LSD token found");
+      return null;
+    }
+
+    if (!docId) {
+      console.log("[CS] No doc_id for profile");
+      return null;
+    }
+
+    try {
+      const response = await fetch("https://www.instagram.com/api/graphql", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "X-IG-App-ID": IG_APP_ID,
+          "X-FB-LSD": lsd,
+          "X-ASBD-ID": "129477",
+          "X-Requested-With": "XMLHttpRequest",
+        },
+        body: new URLSearchParams({
+          variables: JSON.stringify({ username }),
+          doc_id: docId,
+          lsd: lsd,
+        }),
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        console.log(`[CS] GraphQL returned ${response.status}`);
+        return null;
+      }
+
+      const data = await response.json();
+      // Handle different response formats
+      return (
+        data?.data?.user ||
+        data?.data?.xdt_api__v1__users__web_profile_info?.user ||
+        null
+      );
+    } catch (error) {
+      console.error("[CS] GraphQL error:", error);
+      return null;
+    }
+  }
+
+  /**
+   * Main function to fetch Instagram profile via API
+   * Tries REST API first, falls back to GraphQL
+   */
+  async function fetchInstagramProfileAPI({ username }) {
+    console.log(`[CS] Fetching Instagram profile: ${username}`);
+
+    try {
+      // Try REST API first (more stable)
+      let user = await fetchProfileViaRest(username);
+      if (user) {
+        console.log("[CS] Got profile via REST API");
+        return { type: MSG.DATA, data: { success: true, user, source: "rest" } };
+      }
+
+      // Fallback to GraphQL if we have a doc_id
+      const docIds = await getDocIds();
+      if (docIds.profile) {
+        user = await fetchProfileViaGraphQL(username, docIds.profile);
+        if (user) {
+          console.log("[CS] Got profile via GraphQL");
+          return { type: MSG.DATA, data: { success: true, user, source: "graphql" } };
+        }
+      }
+
+      return {
+        type: MSG.DATA,
+        data: {
+          success: false,
+          error: "Could not fetch profile. Make sure you're logged into Instagram.",
+        },
+      };
+    } catch (error) {
+      console.error("[CS] Fetch profile error:", error);
+      return { type: MSG.ERROR, error: error.message };
+    }
+  }
+
+  // ============================================
   // INJECTION
   // ============================================
 
@@ -382,6 +589,58 @@
     }
 
     observers.delete(id);
+  }
+
+  // ============================================
+  // REQUEST INTERCEPTION
+  // ============================================
+
+  let interceptorActive = false;
+  const INTERCEPT_EVENT = "__bootstrapp_intercepted";
+
+  function startInterception(options = {}) {
+    try {
+      if (interceptorActive) {
+        return { type: MSG.DATA, data: { status: "already_active" } };
+      }
+
+      // Inject the interceptor script into page context
+      const script = document.createElement("script");
+      script.src = chrome.runtime.getURL("interceptor.js");
+      script.onload = () => script.remove();
+      (document.head || document.documentElement).appendChild(script);
+
+      // Listen for intercepted data from page context
+      window.addEventListener(INTERCEPT_EVENT, handleInterceptedData);
+      interceptorActive = true;
+
+      console.log("[CS] Request interception started");
+      return { type: MSG.DATA, data: { status: "started" } };
+    } catch (error) {
+      return { type: MSG.ERROR, error: error.message };
+    }
+  }
+
+  function stopInterception() {
+    try {
+      window.removeEventListener(INTERCEPT_EVENT, handleInterceptedData);
+      interceptorActive = false;
+      console.log("[CS] Request interception stopped");
+      return { type: MSG.DATA, data: { status: "stopped" } };
+    } catch (error) {
+      return { type: MSG.ERROR, error: error.message };
+    }
+  }
+
+  function handleInterceptedData(event) {
+    const { detail } = event;
+    console.log("[CS] Intercepted data:", detail);
+
+    // Send to background script
+    chrome.runtime.sendMessage({
+      type: MSG.INTERCEPTED_DATA,
+      ...detail,
+    });
   }
 
   // ============================================

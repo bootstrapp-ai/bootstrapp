@@ -1,38 +1,25 @@
+/**
+ * UIX Tabs Styles
+ * Tabs component that consumes theme variables
+ */
+
 :where(.uix-tabs, uix-tabs) {
   display: flex;
   flex-direction: column;
   width: 100%;
 
-  /* Container styling */
-  --tabs-border-width: 0;
-  --tabs-border-color: transparent;
-  --tabs-border-radius: 0;
-  --tabs-shadow: none;
-
-  /* Tab list styling */
-  --tabs-list-background: transparent;
-  --tabs-list-border-color: var(--color-surface-dark);
-  --tab-hover-color: var(--color-primary-light);
-  --tab-hover-background: var(--color-surface-dark);
-  --tab-active-color: var(--color-primary);
-  --tab-active-background: transparent;
-  --tab-indicator-color: var(--color-primary-dark);
-  --tab-gap: var(--spacing-xs, 0.25rem);
-  --tab-padding: var(--spacing-md, 0.75rem) var(--spacing-lg, 1rem);
-  --tab-font-size: var(--text-sm, 0.875rem);
-  --tab-font-weight: var(--font-medium, 500);
-  --tab-border-width: 2px;
-
-  /* Apply container styling */
-  border: var(--tabs-border-width) solid var(--tabs-border-color);
-  border-radius: var(--tabs-border-radius);
-  box-shadow: var(--tabs-shadow);
+  /* Container styling - uses theme variables with fallbacks */
+  border: var(--tabs-border-width, 0) solid var(--tabs-border-color, transparent);
+  border-radius: var(--tabs-border-radius, 0);
+  box-shadow: var(--tabs-shadow, none);
+  background: var(--tabs-background, transparent);
+  overflow: hidden;
 
   &::part(tab-list) {
     display: flex;
     flex-direction: row;
-    background: var(--tabs-list-background);
-    border-bottom: 1px solid var(--tabs-list-border-color);
+    background: var(--tabs-list-background, transparent);
+    border-bottom: 1px solid var(--tabs-list-border-color, var(--color-surface-dark));
     overflow-x: auto;
     scrollbar-width: none;
     flex-shrink: 0;
@@ -46,15 +33,17 @@
     white-space: nowrap;
     cursor: pointer;
     position: relative;
-    gap: var(--tab-gap);
-    padding: var(--tab-padding);
+    gap: var(--tabs-tab-gap, var(--spacing-xs, 0.25rem));
+    padding: var(--tabs-tab-padding, var(--spacing-md, 0.75rem) var(--spacing-lg, 1rem));
     font-family: inherit;
-    font-size: var(--tab-font-size);
-    font-weight: var(--tab-font-weight);
-    color: var(--tab-color);
-    background: transparent;
+    font-size: var(--tabs-tab-font-size, var(--text-sm, 0.875rem));
+    font-weight: var(--tabs-tab-font-weight, var(--font-medium, 500));
+    text-transform: var(--tabs-tab-text-transform, none);
+    letter-spacing: var(--tabs-tab-letter-spacing, normal);
+    color: var(--tabs-tab-color, var(--text-muted));
+    background: var(--tabs-tab-background, transparent);
     border: none;
-    border-bottom: var(--tab-border-width) solid transparent;
+    border-bottom: var(--tabs-tab-border-width, 2px) solid transparent;
     outline: none;
     transition:
       color 0.2s ease,
@@ -62,18 +51,18 @@
       border-color 0.2s ease;
 
     &:hover {
-      color: var(--tab-hover-color);
-      background: var(--tab-hover-background);
+      color: var(--tabs-tab-color-hover, var(--color-primary-light));
+      background: var(--tabs-tab-background-hover, var(--color-surface-dark));
     }
 
     &:focus-visible {
-      background: var(--tab-hover-background);
+      background: var(--tabs-tab-background-hover, var(--color-surface-dark));
     }
 
     &[active] {
-      color: var(--tab-active-color);
-      background: var(--tab-active-background);
-      border-bottom-color: var(--tab-indicator-color);
+      color: var(--tabs-tab-color-active, var(--text-color));
+      background: var(--tabs-tab-background-active, transparent);
+      border-bottom-color: var(--tabs-tab-border-active, var(--color-primary));
     }
 
     &[disabled] {
@@ -88,12 +77,13 @@
     width: 100%;
     min-height: 0;
     overflow-y: auto;
+    background: var(--tabs-panel-background, transparent);
   }
 
   [slot="panel"] {
     min-height: 0;
     overflow-y: auto;
-    padding: var(--spacing-lg, 1rem);
+    padding: var(--tabs-panel-padding, var(--spacing-lg, 1rem));
     flex-grow: 1;
     animation: fadeIn 0.2s ease-in-out;
 
@@ -110,18 +100,18 @@
     &::part(tab-list) {
       flex-direction: column;
       border-bottom: none;
-      border-right: 1px solid var(--tabs-list-border-color);
+      border-right: 1px solid var(--tabs-list-border-color, var(--color-surface-dark));
       min-width: 150px;
     }
 
     [slot="tab"] {
       justify-content: flex-start;
       border-bottom: none;
-      border-right: var(--tab-border-width) solid transparent;
+      border-right: var(--tabs-tab-border-width, 2px) solid transparent;
 
       &[active] {
         border-color: transparent;
-        border-right-color: var(--tab-indicator-color);
+        border-right-color: var(--tabs-tab-border-active, var(--color-primary));
       }
     }
   }

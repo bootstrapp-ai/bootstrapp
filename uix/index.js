@@ -104,6 +104,7 @@ export default {
       "code",
       "file-upload",
       "form",
+      "label",
       "input",
       "form-input",
       "join",

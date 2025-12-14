@@ -7,6 +7,10 @@
   "exports": {
     ".": "./index.js"
   },
+  "bootstrapp": {
+    "schema": true,
+    "namespace": true
+  },
   "dependencies": {
     "@bootstrapp/base": "^0.2.0",
     "@bootstrapp/github": "^0.1.0"

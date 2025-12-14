@@ -1,0 +1,55 @@
+/**
+ * UIX Label Styles
+ */
+
+:where(.uix-label, uix-label) {
+  display: block;
+
+  .label {
+    display: block;
+    font-size: var(--label-font-size, var(--text-sm, 0.875rem));
+    font-weight: var(--label-font-weight, var(--font-semibold, 600));
+    margin-bottom: var(--label-margin, 0.5rem);
+    color: var(--label-color, var(--text-color, #1a1a1a));
+    letter-spacing: var(--label-letter-spacing, 0);
+    text-transform: var(--label-text-transform, none);
+    line-height: var(--label-line-height, 1.4);
+    cursor: pointer;
+  }
+
+  .label-required {
+    color: var(--color-danger, #ef4444);
+    margin-left: 0.25rem;
+  }
+
+  /* Inline variant (for checkbox labels) */
+  &[inline] {
+    display: inline;
+
+    .label {
+      display: inline;
+      margin-bottom: 0;
+    }
+  }
+
+  /* Size variants */
+  &[size="xs"] {
+    --label-font-size: var(--text-xs, 0.75rem);
+  }
+
+  &[size="sm"] {
+    --label-font-size: var(--text-sm, 0.875rem);
+  }
+
+  &[size="md"] {
+    --label-font-size: var(--text-base, 1rem);
+  }
+
+  &[size="lg"] {
+    --label-font-size: var(--text-lg, 1.125rem);
+  }
+
+  &[size="xl"] {
+    --label-font-size: var(--text-xl, 1.25rem);
+  }
+}

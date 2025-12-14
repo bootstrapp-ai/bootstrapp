@@ -127,9 +127,10 @@ dialog::backdrop {
 
 *:not(:defined) {
   display: block;
-  height: 100vh;
+  height: 100%;
   opacity: 0;
   transition: opacity 0.5s ease-in-out;
+  border: 1px solid red;
 }
 
 .dark {

@@ -34,7 +34,7 @@ export default {
           height: var(--device-height);
           transform: scale(var(--device-scale));
           transform-origin: top center;
-          background: var(--device-bg, #000);
+          background: var(--device-background, #000);
           border-radius: var(--device-radius, 36px);
           padding: var(--device-padding, 12px);
           box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3),
@@ -72,7 +72,7 @@ export default {
           transform: translateX(-50%);
           width: 150px;
           height: 24px;
-          background: var(--device-bg, #000);
+          background: var(--device-background, #000);
           border-radius: 0 0 16px 16px;
           z-index: 10;
         }

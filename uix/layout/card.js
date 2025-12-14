@@ -17,7 +17,7 @@ export default {
     }),
     shadow: T.string({
       defaultValue: "none",
-      enum: ["none", "sm", "md", "lg", "brutalist"],
+      enum: ["none", "sm", "md", "lg"],
     }),
     hover: T.boolean({
       defaultValue: false,

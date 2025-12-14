@@ -47,3 +47,19 @@ export const getPluginModals = () =>
  */
 export const getFieldTypes = () =>
   getPlugins().reduce((acc, p) => ({ ...acc, ...p.fieldTypes }), {});
+
+/**
+ * Get all sidebar items from plugins
+ * @returns {Array} Array of sidebar item configs
+ */
+export const getSidebarItems = () =>
+  getPlugins()
+    .filter((p) => p.sidebar)
+    .flatMap((p) => p.sidebar);
+
+/**
+ * Get all routes from plugins
+ * @returns {Object} Merged routes object
+ */
+export const getPluginRoutes = () =>
+  getPlugins().reduce((acc, p) => ({ ...acc, ...p.routes }), {});

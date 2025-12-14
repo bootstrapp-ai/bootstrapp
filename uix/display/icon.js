@@ -11,7 +11,7 @@ export default {
     name: T.string(),
     svg: T.string(),
     solid: T.boolean(),
-    size: T.string("xs"),
+    size: T.string(),
     color: T.string({
       enum: [
         "primary",

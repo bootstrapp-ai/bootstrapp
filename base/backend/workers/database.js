@@ -3,9 +3,7 @@ import $APP from "/$app.js";
 if ($APP.settings.runtime === "worker") {
   const bootstrap = async () => {
     console.log("bootstrap() called");
-    const APP = await $APP.bootstrap({
-      backend: true,
-    });
+    const APP = await $APP.load(!$APP.settings.dev, true);
     return APP;
   };
 

@@ -1,10 +1,14 @@
 import T from "/$app/types/index.js";
 import { html } from "/npm/lit-html";
 
+const generateId = () => `uix-input-${Math.random().toString(36).slice(2, 9)}`;
+
 export default {
   tag: "uix-input",
   properties: {
+    label: T.string(),
     name: T.string(),
+    id: T.string(),
     value: T.string(""),
     placeholder: T.string(""),
     type: T.string({
@@ -12,7 +16,6 @@ export default {
       enum: ["text", "email", "tel", "url", "search", "password"],
     }),
     size: T.string({
-      defaultValue: "md",
       enum: ["xs", "sm", "md", "lg", "xl"],
     }),
     disabled: T.boolean(false),
@@ -28,6 +31,16 @@ export default {
   style: true,
   shadow: false,
 
+  connected() {
+    if (!this.id && !this._inputId) {
+      this._inputId = generateId();
+    }
+  },
+
+  getInputId() {
+    return this.id || this._inputId || (this._inputId = generateId());
+  },
+
   handleInput(e) {
     this.value = e.target.value;
     this.emit("input", { value: this.value });
@@ -39,12 +52,15 @@ export default {
   },
 
   render() {
+    const id = this.getInputId();
     return html`
+      ${this.label ? html`<uix-label for=${id} text=${this.label} ?required=${this.required}></uix-label>` : ""}
       <input
-        name=${this.name}
+        id=${id}
+        name=${this.name ?? id}
         class="input"
         type=${this.type}
-        .value=${this.value}
+        value=${this.value}
         placeholder=${this.placeholder}
         ?disabled=${this.disabled}
         ?readonly=${this.readonly}

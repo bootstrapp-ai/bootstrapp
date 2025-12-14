@@ -1,0 +1,201 @@
+/* Bundler UI Styles */
+
+.bundler-ui {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  min-height: 100%;
+}
+
+.bundler-page-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-color, #111);
+  margin: 0;
+}
+
+/* Tab Content */
+.bundler-tab-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.bundler-deploy-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+  .bundler-deploy-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+.bundler-credentials-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+  .bundler-credentials-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Dashboard */
+.bundler-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.bundler-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 1024px) {
+  .bundler-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .bundler-stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.bundler-quick-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Forms */
+.bundler-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.bundler-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 640px) {
+  .bundler-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.bundler-full-width {
+  grid-column: span 2;
+}
+
+@media (max-width: 640px) {
+  .bundler-full-width {
+    grid-column: span 1;
+  }
+}
+
+.bundler-deploy-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.bundler-deploy-row uix-select {
+  flex: 1;
+}
+
+/* Help text */
+.bundler-help-text {
+  font-size: 0.875rem;
+  color: var(--text-muted, #6b7280);
+  margin: 0.5rem 0 0 0;
+}
+
+/* Loading */
+.bundler-loading {
+  text-align: center;
+  padding: 1rem;
+  color: var(--text-muted, #6b7280);
+}
+
+/* Empty state */
+.bundler-empty {
+  text-align: center;
+  padding: 1rem;
+  color: var(--text-muted, #6b7280);
+  margin: 0;
+}
+
+/* Releases */
+.bundler-releases {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.bundler-release {
+  padding: 0.75rem;
+  border-radius: var(--radius-md, 0.375rem);
+}
+
+.bundler-release-success {
+  background: var(--color-success-lighter, #d1fae5);
+}
+
+.bundler-release-failed {
+  background: var(--color-danger-lighter, #fee2e2);
+}
+
+.bundler-release-pending {
+  background: var(--color-warning-lighter, #fef3c7);
+}
+
+.bundler-release-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.bundler-release-version {
+  font-weight: 600;
+  color: var(--text-color, #111);
+}
+
+.bundler-release-status {
+  font-size: 0.875rem;
+}
+
+.bundler-release-type {
+  font-size: 0.75rem;
+  font-family: monospace;
+  padding: 0.125rem 0.5rem;
+  background: var(--color-surface, #fff);
+  border-radius: var(--radius-sm, 0.25rem);
+  color: var(--text-muted, #6b7280);
+}
+
+.bundler-release-date {
+  font-size: 0.875rem;
+  color: var(--text-muted, #6b7280);
+  margin-left: auto;
+}
+
+.bundler-release-notes {
+  font-size: 0.875rem;
+  color: var(--text-color, #374151);
+  margin: 0.5rem 0 0 0;
+}

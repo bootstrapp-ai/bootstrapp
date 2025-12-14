@@ -155,10 +155,6 @@
     );
   }
 
-  &[shadow="brutalist"] {
-    box-shadow: var(--card-shadow-brutalist, 4px 4px 0px #1d2021);
-  }
-
   /* Hover Effects */
   &[hover] {
     transition: all 200ms ease;
@@ -166,10 +162,6 @@
 
     &:hover {
       border-color: var(--card-border-hover, #83a598);
-    }
-
-    &[shadow="brutalist"]:hover {
-      box-shadow: var(--card-shadow-brutalistHover, 6px 6px 0px #83a598);
     }
 
     &[shadow="sm"]:hover {

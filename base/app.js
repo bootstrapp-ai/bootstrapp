@@ -136,13 +136,14 @@ if (runtime === "frontend") {
 }
 
 const prototypeAPP = {
-  async load(production) {
+  async load(production, backend = false) {
     try {
       const response = await fetch("/package.json");
       if (!response.ok)
         throw new Error(`HTTP error! status: ${response.status}`);
       const appConfig = await response.json();
-      await this.bootstrap({ ...appConfig, production });
+      this._packageJson = appConfig;
+      await this.bootstrap({ ...appConfig, production, backend });
     } catch (error) {
       console.error("Could not load 'package.json'. Bootstrap failed.", {
         error,
@@ -158,6 +159,7 @@ const prototypeAPP = {
     for (const [key, value] of Object.entries({
       ...settings,
       backend,
+      runtime,
       frontend: !backend,
       production,
       dev: !production,
@@ -166,6 +168,10 @@ const prototypeAPP = {
     if (!backend && theme) this.theme.set(theme);
     try {
       await import("/index.js");
+      if (this.settings.dev) {
+        await this.loadModuleSchemas();
+        await this.loadModuleData();
+      }
       await import(
         backend ? "/$app/base/backend/backend.js" : "/$app/base/frontend.js"
       );
@@ -174,6 +180,67 @@ const prototypeAPP = {
       console.warn(error);
     }
     return this;
+  },
+  async loadModuleSchemas() {
+    console.log(this.settings.dev, { runtime });
+    if (!this.settings.dev || !this._packageJson) return;
+
+    console.log(this.settings.dev, { runtime });
+    const { discoverSchemaModules, namespaceModels } = await import(
+      "/$app/model/schema-loader.js"
+    );
+    const modules = await discoverSchemaModules(this._packageJson);
+    console.log({ modules });
+    for (const mod of modules) {
+      try {
+        const schemaPath = `/node_modules/${mod.packageName}/models/schema.js`;
+        const schemaModule = await import(schemaPath);
+        const models = schemaModule.default;
+
+        if (models) {
+          const namespace = mod.namespace ? mod.name : null;
+          const namespacedModels = namespaceModels(models, namespace);
+          this.models.set(namespacedModels);
+          this.log?.(
+            `Loaded schema from ${mod.packageName}` +
+              (namespace ? ` (namespace: ${namespace}_*)` : ""),
+          );
+        }
+      } catch (e) {
+        console.warn(`Failed to load schema from ${mod.packageName}:`, e);
+      }
+    }
+  },
+  async loadModuleData() {
+    if (!this.settings.dev || !this._packageJson) return;
+
+    const { discoverSchemaModules, namespaceData } = await import(
+      "/$app/model/schema-loader.js"
+    );
+    const modules = await discoverSchemaModules(this._packageJson);
+
+    for (const mod of modules) {
+      try {
+        const seedPath = `/node_modules/${mod.packageName}/models/seed.js`;
+        const seedModule = await import(seedPath);
+        const data = seedModule.default;
+
+        if (data) {
+          const namespace = mod.namespace ? mod.name : null;
+          const namespacedData = namespaceData(data, namespace);
+          this.data.set(namespacedData);
+          this.log?.(
+            `Loaded seed data from ${mod.packageName}` +
+              (namespace ? ` (namespace: ${namespace}_*)` : ""),
+          );
+        }
+      } catch (e) {
+        // seed.js is optional, don't warn if not found
+        if (!e.message?.includes("Failed to fetch")) {
+          console.warn(`Failed to load seed from ${mod.packageName}:`, e);
+        }
+      }
+    }
   },
   addModule(module) {
     if (

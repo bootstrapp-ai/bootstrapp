@@ -66,11 +66,6 @@ const postMessageToPort = (port, params, retryFn) => {
 
 const postMessageToWW = (params) =>
   postMessageToPort(wwPort, params, postMessageToWW);
-// --- REFACTORED ---
-// The requestDataSync function is no longer needed and has been removed.
-// The View plugin 'connected' event now handles all data fetching and subscription.
-
-// Extracted fetch logic for dataQuery plugin
 const fetchDataQuery = async (instance) => {
   const query = instance["data-query"];
   if (!query) return;
@@ -97,11 +92,11 @@ const fetchDataQuery = async (instance) => {
 
   const isMany = query.many ?? (!id && !single);
   const opts = { limit: single ? 1 : limit, offset, includes, order, where };
+  console.error({ isMany, opts });
   if (instance._dataQuerySub && instance._dataQuerySubHandler) {
     instance._dataQuerySub.unsubscribe(instance._dataQuerySubHandler);
     instance._dataQuerySub = null;
   }
-
   instance._paginationInfo = null;
   instance._dataQuerySubHandler = (data) => {
     const oldValue = instance.state[key];
@@ -147,17 +142,15 @@ const fetchDataQuery = async (instance) => {
       instance._dataQuerySub = result;
     } else {
       // Single record via id
-      const reactiveRow = await $APP.Model[model].get({
-        ...opts,
-        where: { id },
-      });
+      const reactiveRow = await $APP.Model[model].get(id);
       const oldValue = instance.state[key];
       instance.state[key] = reactiveRow;
       instance.requestUpdate(key, oldValue);
 
-      // Subscribe to the array, handler extracts single item
+      // Subscribe to updates - handle both array and single row formats
       reactiveRow.subscribe?.((data) => {
-        instance._dataQuerySubHandler(data[0]);
+        const row = Array.isArray(data) ? data[0] : data;
+        instance._dataQuerySubHandler(row);
       });
       instance._dataQuerySub = reactiveRow;
     }

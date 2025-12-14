@@ -496,13 +496,13 @@ render() {
       :host([size="xl"]) { --avatar-size: 5rem; }
 
       :host([variant="primary"]) {
-        --avatar-bg: var(--color-primary);
+        --avatar-background: var(--color-primary);
       }
 
       .avatar-container {
         width: var(--avatar-size);
         height: var(--avatar-size);
-        background: var(--avatar-bg);
+        background: var(--avatar-background);
       }
     </style>
     <div part="container" class="avatar-container">

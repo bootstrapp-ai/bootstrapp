@@ -111,6 +111,15 @@ export default {
               Extension
             </uix-link>
           </li>
+          <li>
+            <uix-link
+              href="/admin/bundler"
+              icon="package"
+              class=${this.isActive("/admin/bundler") ? "active" : ""}
+            >
+              Bundler
+            </uix-link>
+          </li>
         </uix-menu>
 
         <div slot="footer" class="sidebar-footer-content">

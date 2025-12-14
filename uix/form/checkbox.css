@@ -3,30 +3,25 @@
  */
 
 :where(.uix-checkbox, uix-checkbox) {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--checkbox-gap, 0.5rem);
 
-  .checkbox-wrapper {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--checkbox-gap, 0.5rem);
-    cursor: pointer;
-    user-select: none;
-
-    &:has(.checkbox:disabled) {
-      cursor: not-allowed;
-      opacity: 0.6;
-    }
+  &:has(.checkbox:disabled) {
+    cursor: not-allowed;
+    opacity: 0.6;
   }
 
   .checkbox {
     appearance: none;
-    width: var(--checkbox-size, 1.125rem);
-    height: var(--checkbox-size, 1.125rem);
-    border: 2px solid var(--checkbox-border-color, var(--color-primary));
-    border-radius: var(--checkbox-border-radius, var(--radius-sm));
+    width: var(--checkbox-size, 1.5rem);
+    height: var(--checkbox-size, 1.5rem);
+    border: var(--checkbox-border-width, 2px) solid var(--checkbox-border-color, var(--color-primary));
+    border-radius: var(--checkbox-border-radius, var(--radius-md, 0.375rem));
     background-color: var(--checkbox-background-color, var(--color-surface));
+    box-shadow: var(--checkbox-shadow, none);
     cursor: pointer;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
     position: relative;
     flex-shrink: 0;
 
@@ -79,38 +74,46 @@
 
   .checkbox-label {
     color: var(--checkbox-label-color, var(--text-color));
-    font-size: var(--checkbox-label-font-size, var(--text-sm, 0.875rem));
+    font-size: var(--checkbox-label-font-size, var(--text-base, 1rem));
+    font-weight: var(--checkbox-label-font-weight, var(--font-medium, 500));
     line-height: var(--leading-normal, 1.5);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .checkbox-required {
+    color: var(--color-danger, #ef4444);
+    margin-left: 0.25rem;
   }
 
   /* Size variants */
   &[size="xs"] {
-    --checkbox-size: 0.875rem;
+    --checkbox-size: 1rem;
     --checkbox-label-font-size: var(--text-xs, 0.75rem);
     --checkbox-gap: 0.375rem;
   }
 
   &[size="sm"] {
-    --checkbox-size: 1rem;
-    --checkbox-label-font-size: var(--text-sm, 0.8125rem);
-    --checkbox-gap: 0.4375rem;
-  }
-
-  &[size="md"] {
-    --checkbox-size: 1.125rem;
+    --checkbox-size: 1.25rem;
     --checkbox-label-font-size: var(--text-sm, 0.875rem);
     --checkbox-gap: 0.5rem;
   }
 
-  &[size="lg"] {
-    --checkbox-size: 1.25rem;
+  &[size="md"] {
+    --checkbox-size: 1.5rem;
     --checkbox-label-font-size: var(--text-base, 1rem);
+    --checkbox-gap: 0.5rem;
+  }
+
+  &[size="lg"] {
+    --checkbox-size: 1.75rem;
+    --checkbox-label-font-size: var(--text-lg, 1.125rem);
     --checkbox-gap: 0.625rem;
   }
 
   &[size="xl"] {
-    --checkbox-size: 1.5rem;
-    --checkbox-label-font-size: var(--text-lg, 1.125rem);
+    --checkbox-size: 2rem;
+    --checkbox-label-font-size: var(--text-xl, 1.25rem);
     --checkbox-gap: 0.75rem;
   }
 

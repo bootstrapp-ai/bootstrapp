@@ -25,6 +25,12 @@
   cursor: pointer;
 
   /* --- 4. Anchor Part --- */
+
+  &[vertical]::part(anchor) {
+    display: flex;
+    flex-direction: column;
+  }
+
   &::part(anchor) {
     display: inline-flex;
     align-items: center;

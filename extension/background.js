@@ -10,15 +10,20 @@ const MSG = {
   GET_TABS: "ext:getTabs",
   SCRAPE: "ext:scrape",
   SCRAPE_INSTAGRAM: "ext:scrapeInstagram",
+  FETCH_INSTAGRAM_PROFILE: "ext:fetchInstagramProfile",
+  UPDATE_DOC_ID: "ext:updateDocId",
   INJECT: "ext:inject",
   OBSERVE: "ext:observe",
   EXECUTE: "ext:execute",
+  START_INTERCEPT: "ext:startIntercept",
+  STOP_INTERCEPT: "ext:stopIntercept",
 
   // Responses
   PONG: "ext:pong",
   DATA: "ext:data",
   ERROR: "ext:error",
   EVENT: "ext:event",
+  INTERCEPTED_DATA: "ext:interceptedData",
 };
 
 // Track connected admin panels
@@ -108,6 +113,22 @@ async function handleMessage(message, sender, sendResponse) {
         sendResponse({ ...igResult, requestId });
         break;
 
+      case MSG.FETCH_INSTAGRAM_PROFILE:
+        const profileResult = await sendToContentScript(tabId, {
+          type: MSG.FETCH_INSTAGRAM_PROFILE,
+          ...payload,
+        });
+        sendResponse({ ...profileResult, requestId });
+        break;
+
+      case MSG.UPDATE_DOC_ID:
+        const docIdResult = await sendToContentScript(tabId, {
+          type: MSG.UPDATE_DOC_ID,
+          ...payload,
+        });
+        sendResponse({ ...docIdResult, requestId });
+        break;
+
       case MSG.INJECT:
         const injectResult = await sendToContentScript(tabId, {
           type: MSG.INJECT,
@@ -136,6 +157,31 @@ async function handleMessage(message, sender, sendResponse) {
       // Forward events from content script to admin
       case MSG.EVENT:
         broadcastToAdmin({ type: MSG.EVENT, tabId: sender.tab?.id, ...payload });
+        sendResponse({ type: MSG.DATA, requestId, success: true });
+        break;
+
+      case MSG.START_INTERCEPT:
+        const startResult = await sendToContentScript(tabId, {
+          type: MSG.START_INTERCEPT,
+          ...payload,
+        });
+        sendResponse({ ...startResult, requestId });
+        break;
+
+      case MSG.STOP_INTERCEPT:
+        const stopResult = await sendToContentScript(tabId, {
+          type: MSG.STOP_INTERCEPT,
+        });
+        sendResponse({ ...stopResult, requestId });
+        break;
+
+      case MSG.INTERCEPTED_DATA:
+        // Forward intercepted API data to admin panels
+        broadcastToAdmin({
+          type: MSG.INTERCEPTED_DATA,
+          tabId: sender.tab?.id,
+          ...payload,
+        });
         sendResponse({ type: MSG.DATA, requestId, success: true });
         break;
 

@@ -1,19 +1,6 @@
-import $APP from "/$app.js";
 import T from "/$app/types/index.js";
 
-$APP.data.set({
-  credentials: [
-    {
-      id: "singleton",
-      owner: "meiraleal",
-      branch: "main",
-      repo: "brazuka.dev",
-      token: "",
-    },
-  ],
-});
-
-$APP.models.set({
+export default {
   credentials: {
     owner: T.string(),
     repo: T.string(),
@@ -32,4 +19,4 @@ $APP.models.set({
     deployedAt: T.string(),
     files: T.array(),
   },
-});
+};

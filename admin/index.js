@@ -1,16 +1,13 @@
 import $APP from "/$app.js";
 import { html } from "/npm/lit-html";
 
+// Import bundler module (registers bundler-ui component)
+import "/$app/bundler/index.js";
+
 // Register admin module
 $APP.addModule({
   name: "admin",
   path: "/$app/admin/views",
-  settings: {
-    appbar: {
-      label: "Admin",
-      icon: "shield",
-    },
-  },
 });
 
 // Admin routes
@@ -70,6 +67,14 @@ const routes = {
     name: "admin-extension",
     component: () => html`<admin-extension-manager></admin-extension-manager>`,
     title: "Admin - Browser Extension",
+    template: "admin-layout",
+  },
+
+  // Bundler
+  "/admin/bundler": {
+    name: "admin-bundler",
+    component: () => html`<bundler-ui></bundler-ui>`,
+    title: "Admin - Bundler",
     template: "admin-layout",
   },
 

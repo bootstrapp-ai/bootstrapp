@@ -7,31 +7,60 @@
   /* --- 1. Layout & Core Props --- */
   display: inline-block;
   width: var(--select-width, auto);
-  position: relative;
   box-sizing: border-box;
 
-  /* --- 2. Appearance (inherits from input theme variables) --- */
-  background: var(--select-background, var(--input-background, var(--input-bg, var(--color-surface-light, #ffffff))));
-  border: var(--select-border-width, var(--input-border-width, 1px)) solid var(--select-border-color, var(--input-border-color, var(--color-surface, #e5e7eb)));
-  border-radius: var(--select-border-radius, var(--input-border-radius, var(--radius-md, 0.375rem)));
-  box-shadow: var(--select-shadow, var(--input-shadow, none));
+  /* --- Label --- */
+  .select-label {
+    display: block;
+    font-size: var(--input-label-font-size, var(--text-sm, 0.875rem));
+    font-weight: var(--input-label-font-weight, var(--font-semibold, 600));
+    margin-bottom: var(--input-label-margin, 0.5rem);
+    color: var(--input-label-color, var(--text-color, #1a1a1a));
+    letter-spacing: var(--input-label-letter-spacing, 0);
+    text-transform: var(--input-label-text-transform, none);
+  }
 
-  /* --- 3. Transitions --- */
-  transition: var(
-    --select-transition,
-    border-color 0.2s ease,
-    background-color 0.2s ease,
-    box-shadow 0.15s ease,
-    transform 0.15s ease
-  );
+  .select-required {
+    color: var(--color-danger, #ef4444);
+    margin-left: 0.25rem;
+  }
 
-  /* --- 4. Native Select Element --- */
+  /* --- 2. Select Wrapper (contains select + arrow icon) --- */
+  .select-wrapper {
+    position: relative;
+    background: var(--select-background, var(--input-background, var(--color-surface-light, #ffffff)));
+    border: var(--select-border-width, var(--input-border-width, 1px)) solid var(--select-border-color, var(--input-border-color, var(--color-surface, #e5e7eb)));
+    border-radius: var(--select-border-radius, var(--input-border-radius, var(--radius-md, 0.375rem)));
+    box-shadow: var(--select-shadow, var(--input-shadow, none));
+
+    /* Transitions */
+    transition: var(
+      --select-transition,
+      border-color 0.2s ease,
+      background-color 0.2s ease,
+      box-shadow 0.15s ease,
+      transform 0.15s ease
+    );
+
+    &:hover:not(:focus-within) {
+      border-color: var(--select-hover-border-color, var(--input-hover-border-color, var(--color-primary-light)));
+    }
+
+    &:focus-within {
+      border-color: var(--select-focus-border-color, var(--input-focus-border-color, var(--color-primary)));
+      box-shadow: var(--select-focus-shadow, var(--input-focus-shadow, 0 0 0 3px rgba(250, 189, 47, 0.1)));
+    }
+  }
+
+  /* --- 3. Native Select Element --- */
   select {
     appearance: none;
+    background: transparent;
+    border: none;
     -webkit-appearance: none;
     -moz-appearance: none;
     width: 100%;
-    height: var(--select-height, var(--input-height, 2.5rem));
+    height: var(--select-height, var(--input-height, 3rem));
     padding: var(--select-padding-y, var(--input-padding-y, 0.5rem)) var(--select-padding-x, var(--input-padding-x, 0.75rem));
     padding-right: calc(var(--select-padding-x, var(--input-padding-x, 0.75rem)) + var(--select-arrow-size, 1rem) + 0.5rem);
     font-size: var(--select-font-size, var(--input-font-size, var(--text-sm, 0.875rem)));
@@ -67,9 +96,8 @@
     }
   }
 
-  /* --- 5. Arrow Indicator --- */
-  .select-arrow,
-  &::part(arrow) {
+  /* --- 5. Arrow Indicator (inside .select-wrapper) --- */
+  .select-wrapper .select-arrow {
     position: absolute;
     right: var(--select-padding-x, var(--input-padding-x, 0.75rem));
     top: 50%;
@@ -82,34 +110,24 @@
     transition: opacity 0.2s ease, transform 0.2s ease;
   }
 
-  /* --- 6. Interactive States --- */
-  &:hover:not(:focus-within):not(:has(select:disabled)) {
-    border-color: var(--select-hover-border-color, var(--input-border-focus, var(--color-primary-light)));
-  }
-
-  &:focus-within {
-    border-color: var(--select-focus-border-color, var(--input-border-focus, var(--color-primary)));
-    background: var(--select-focus-background, var(--input-focus-background, var(--input-bg-focus, var(--select-background))));
-    box-shadow: var(--select-focus-shadow, var(--input-focus-shadow, 0 0 0 3px rgba(250, 189, 47, 0.1)));
-
-    .select-arrow,
-    &::part(arrow) {
-      opacity: 1;
-    }
+  /* --- 6. Interactive States (on .select-wrapper) --- */
+  .select-wrapper:focus-within .select-arrow {
+    opacity: 1;
   }
 
   &:has(select:disabled) {
-    opacity: var(--select-disabled-opacity, 0.6);
-    cursor: not-allowed;
+    .select-wrapper {
+      opacity: var(--select-disabled-opacity, 0.6);
+      cursor: not-allowed;
+    }
 
     select {
-      background: var(--select-disabled-background, var(--input-disabled-background, var(--input-bg-disabled, var(--color-surface-dark))));
+      background: var(--select-disabled-background, var(--input-disabled-background, var(--color-surface-dark)));
       color: var(--select-disabled-color, var(--text-muted));
       cursor: not-allowed;
     }
 
-    .select-arrow,
-    &::part(arrow) {
+    .select-wrapper .select-arrow {
       opacity: 0.4;
     }
   }
@@ -156,7 +174,7 @@
   }
 
   /* --- 8. Required Indicator --- */
-  &[required] {
+  &[required] .select-wrapper {
     border-left: 3px solid var(--select-required-color, var(--color-warning));
   }
 

@@ -70,14 +70,17 @@ export default {
       // Handle number inputs
       if (el.type === "number" || el.getAttribute("type") === "number") {
         const val = el.value;
-        data[name] = val !== "" && val !== null && val !== undefined
-          ? parseFloat(val)
-          : null;
+        data[name] =
+          val !== "" && val !== null && val !== undefined
+            ? parseFloat(val)
+            : null;
         return;
       }
 
       // Handle multi-select (by attribute or field config)
-      const isMultiple = el.multiple || el.hasAttribute("multiple") ||
+      const isMultiple =
+        el.multiple ||
+        el.hasAttribute("multiple") ||
         fieldConfig.type === "multi-select";
 
       if (isMultiple) {
@@ -95,7 +98,7 @@ export default {
 
       // Default: string values, convert empty string to null
       const value = el.value;
-      data[name] = (value === "" || value === undefined) ? null : value;
+      data[name] = value === "" || value === undefined ? null : value;
     });
 
     return data;
@@ -131,7 +134,7 @@ export default {
           break;
         case "number":
           if (typeof value === "string") {
-            result[field.name] = value === "" ? null : (parseFloat(value) || 0);
+            result[field.name] = value === "" ? null : parseFloat(value) || 0;
           }
           break;
         case "switch":
@@ -190,7 +193,7 @@ export default {
     e.preventDefault();
     e.stopPropagation();
 
-    this.errors = {};  // Clear previous errors
+    this.errors = {}; // Clear previous errors
 
     const rawData = this.collectFormData();
     const serialized = this.serialize(rawData);
@@ -202,7 +205,8 @@ export default {
       textarea: () => html`
         <uix-textarea
           name=${field.name}
-          .value=${value || ""}
+          label=${field.label}
+          value=${value || ""}
           ?required=${field.required}
           placeholder=${field.placeholder || ""}
           rows=${field.rows || 3}
@@ -220,8 +224,9 @@ export default {
         return html`
           <uix-select
             name=${field.name}
+            label=${field.label}
             ?required=${field.required}
-            .value=${value || ""}
+            value=${value || ""}
             placeholder="Select..."
             .options=${normalizedOptions}
           ></uix-select>
@@ -239,9 +244,10 @@ export default {
         return html`
           <uix-select
             name=${field.name}
+            label=${field.label}
             multiple
             ?required=${field.required}
-            .value=${Array.isArray(value) ? value : []}
+            value=${Array.isArray(value) ? value : []}
             .options=${normalizedOptions}
           ></uix-select>
         `;
@@ -267,7 +273,8 @@ export default {
         <uix-input
           type="number"
           name=${field.name}
-          .value=${value ?? ""}
+          label=${field.label}
+          value=${value ?? ""}
           ?required=${field.required}
           placeholder=${field.placeholder || ""}
           step="any"
@@ -278,7 +285,8 @@ export default {
         <uix-input
           type="date"
           name=${field.name}
-          .value=${value || ""}
+          label=${field.label}
+          value=${value || ""}
           ?required=${field.required}
         ></uix-input>
       `,
@@ -287,7 +295,8 @@ export default {
         <uix-input
           type="datetime-local"
           name=${field.name}
-          .value=${value || ""}
+          label=${field.label}
+          value=${value || ""}
           ?required=${field.required}
         ></uix-input>
       `,
@@ -296,7 +305,8 @@ export default {
         <uix-input
           type="time"
           name=${field.name}
-          .value=${value || ""}
+          label=${field.label}
+          value=${value || ""}
           ?required=${field.required}
         ></uix-input>
       `,
@@ -305,7 +315,8 @@ export default {
         <uix-input
           type="email"
           name=${field.name}
-          .value=${value || ""}
+          label=${field.label}
+          value=${value || ""}
           ?required=${field.required}
           placeholder=${field.placeholder || "email@example.com"}
         ></uix-input>
@@ -315,7 +326,8 @@ export default {
         <uix-input
           type="url"
           name=${field.name}
-          .value=${value || ""}
+          label=${field.label}
+          value=${value || ""}
           ?required=${field.required}
           placeholder=${field.placeholder || "https://"}
         ></uix-input>
@@ -325,7 +337,8 @@ export default {
         <uix-input
           type="password"
           name=${field.name}
-          .value=${value || ""}
+          label=${field.label}
+          value=${value || ""}
           ?required=${field.required}
           placeholder=${field.placeholder || ""}
         ></uix-input>
@@ -335,7 +348,8 @@ export default {
         <uix-input
           type="tel"
           name=${field.name}
-          .value=${value || ""}
+          label=${field.label}
+          value=${value || ""}
           ?required=${field.required}
           placeholder=${field.placeholder || ""}
         ></uix-input>
@@ -346,7 +360,8 @@ export default {
       <uix-input
         type="text"
         name=${field.name}
-        .value=${value || ""}
+        label=${field.label}
+        value=${value || ""}
         ?required=${field.required}
         placeholder=${field.placeholder || ""}
       ></uix-input>
@@ -364,12 +379,6 @@ export default {
           const error = this.errors?.[field.name];
           return html`
             <div class="form-field ${error ? "has-error" : ""}">
-              <label class="form-label">
-                ${field.label}
-                ${field.required
-                  ? html`<span class="form-required">*</span>`
-                  : ""}
-              </label>
               ${this.renderField(field, formData[field.name])}
               ${error ? html`<span class="form-error">${error}</span>` : ""}
             </div>

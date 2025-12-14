@@ -1,9 +1,13 @@
 import T from "/$app/types/index.js";
 import { html } from "/npm/lit-html";
 
+const generateId = () => `uix-checkbox-${Math.random().toString(36).slice(2, 9)}`;
+
 export default {
   tag: "uix-checkbox",
   properties: {
+    id: T.string(),
+    label: T.string(),
     checked: T.boolean(false),
     value: T.string(""),
     name: T.string(""),
@@ -28,6 +32,13 @@ export default {
       this._internals = this.attachInternals();
     }
     this._updateFormValue();
+    if (!this.id && !this._checkboxId) {
+      this._checkboxId = generateId();
+    }
+  },
+
+  get checkboxId() {
+    return this.id || this._checkboxId || (this._checkboxId = generateId());
   },
 
   updated({ changedProps }) {
@@ -58,23 +69,21 @@ export default {
   },
 
   render() {
+    const id = this.checkboxId;
     return html`
-      <label class="checkbox-wrapper">
-        <input
-          type="checkbox"
-          class="checkbox"
-          .checked=${this.checked}
-          .indeterminate=${this.indeterminate}
-          .value=${this.value}
-          name=${this.name}
-          ?disabled=${this.disabled}
-          ?required=${this.required}
-          @change=${this.handleChange.bind(this)}
-        />
-        <span class="checkbox-label">
-          <slot></slot>
-        </span>
-      </label>
+      <input
+        type="checkbox"
+        id=${id}
+        class="checkbox"
+        ?checked=${this.checked}
+        .indeterminate=${this.indeterminate}
+        value=${this.value}
+        name=${this.name}
+        ?disabled=${this.disabled}
+        ?required=${this.required}
+        @change=${this.handleChange.bind(this)}
+      />
+      ${this.label ? html`<uix-label inline for=${id} text=${this.label} ?required=${this.required}></uix-label>` : ""}
     `;
   },
 };
@@ -91,24 +100,24 @@ export default {
  * @example
  * // Basic checkbox
  * ```html
- * <uix-checkbox>Accept terms and conditions</uix-checkbox>
+ * <uix-checkbox label="Accept terms and conditions"></uix-checkbox>
  * ```
  *
  * @example
  * // Checked by default
  * ```html
- * <uix-checkbox checked>Subscribe to newsletter</uix-checkbox>
+ * <uix-checkbox checked label="Subscribe to newsletter"></uix-checkbox>
  * ```
  *
  * @example
  * // Size variants
  * ```html
  * <div style="display: flex; flex-direction: column; gap: 0.5rem;">
- *   <uix-checkbox size="xs">Extra small</uix-checkbox>
- *   <uix-checkbox size="sm">Small</uix-checkbox>
- *   <uix-checkbox size="md" checked>Medium</uix-checkbox>
- *   <uix-checkbox size="lg">Large</uix-checkbox>
- *   <uix-checkbox size="xl">Extra large</uix-checkbox>
+ *   <uix-checkbox size="xs" label="Extra small"></uix-checkbox>
+ *   <uix-checkbox size="sm" label="Small"></uix-checkbox>
+ *   <uix-checkbox size="md" checked label="Medium"></uix-checkbox>
+ *   <uix-checkbox size="lg" label="Large"></uix-checkbox>
+ *   <uix-checkbox size="xl" label="Extra large"></uix-checkbox>
  * </div>
  * ```
  *
@@ -116,26 +125,26 @@ export default {
  * // Color variants
  * ```html
  * <div style="display: flex; flex-direction: column; gap: 0.5rem;">
- *   <uix-checkbox variant="primary" checked>Primary</uix-checkbox>
- *   <uix-checkbox variant="secondary" checked>Secondary</uix-checkbox>
- *   <uix-checkbox variant="success" checked>Success</uix-checkbox>
- *   <uix-checkbox variant="warning" checked>Warning</uix-checkbox>
- *   <uix-checkbox variant="error" checked>Error</uix-checkbox>
+ *   <uix-checkbox variant="primary" checked label="Primary"></uix-checkbox>
+ *   <uix-checkbox variant="secondary" checked label="Secondary"></uix-checkbox>
+ *   <uix-checkbox variant="success" checked label="Success"></uix-checkbox>
+ *   <uix-checkbox variant="warning" checked label="Warning"></uix-checkbox>
+ *   <uix-checkbox variant="error" checked label="Error"></uix-checkbox>
  * </div>
  * ```
  *
  * @example
  * // Indeterminate state
  * ```html
- * <uix-checkbox indeterminate>Select all</uix-checkbox>
+ * <uix-checkbox indeterminate label="Select all"></uix-checkbox>
  * ```
  *
  * @example
  * // Disabled state
  * ```html
  * <div style="display: flex; flex-direction: column; gap: 0.5rem;">
- *   <uix-checkbox disabled>Disabled unchecked</uix-checkbox>
- *   <uix-checkbox checked disabled>Disabled checked</uix-checkbox>
+ *   <uix-checkbox disabled label="Disabled unchecked"></uix-checkbox>
+ *   <uix-checkbox checked disabled label="Disabled checked"></uix-checkbox>
  * </div>
  * ```
  *
@@ -145,15 +154,16 @@ export default {
  * html`<uix-checkbox
  *   .checked=${this.agreed}
  *   @change=${(e) => this.agreed = e.detail.checked}
- * >I agree to the terms</uix-checkbox>`
+ *   label="I agree to the terms"
+ * ></uix-checkbox>`
  * ```
  *
  * @example
  * // In a form
  * ```html
  * <form>
- *   <uix-checkbox name="newsletter" value="yes">Subscribe to newsletter</uix-checkbox>
- *   <uix-checkbox name="terms" value="accepted" required>Accept terms (required)</uix-checkbox>
+ *   <uix-checkbox name="newsletter" value="yes" label="Subscribe to newsletter"></uix-checkbox>
+ *   <uix-checkbox name="terms" value="accepted" required label="Accept terms"></uix-checkbox>
  *   <button type="submit">Submit</button>
  * </form>
  * ```

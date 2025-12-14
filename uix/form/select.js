@@ -1,11 +1,14 @@
 import T from "/$app/types/index.js";
 import { html } from "/npm/lit-html";
 
+const generateId = () => `uix-select-${Math.random().toString(36).slice(2, 9)}`;
+
 export default {
   tag: "uix-select",
   style: true,
   formAssociated: true,
   properties: {
+    id: T.string(),
     value: T.string(),
     disabled: T.boolean(),
     required: T.boolean(),
@@ -46,6 +49,13 @@ export default {
       this._internals = this.attachInternals();
     }
     this._defaultValue = this.value;
+    if (!this.id && !this._selectId) {
+      this._selectId = generateId();
+    }
+  },
+
+  get selectId() {
+    return this.id || this._selectId || (this._selectId = generateId());
   },
 
   _onInput(e) {
@@ -59,35 +69,40 @@ export default {
   },
 
   render() {
-    const { value, disabled, required, placeholder, name, options } = this;
+    const { value, disabled, required, placeholder, name, label, options } = this;
+    const id = this.selectId;
     return html`
-        <select
-          name=${name || ""}
-          value=${value || ""}
-          ?disabled=${disabled}
-          ?required=${required}
-          @input=${this._onInput.bind(this)}
-          @change=${this._onChange.bind(this)}
-        >
-          ${
-            placeholder && !value
-              ? html`<option value="" disabled selected hidden>
-                ${placeholder}
-              </option>`
-              : ""
-          }
-          ${options.map(
-            (option) => html`
-              <option
-                value=${option.value ?? option}
-                ?selected=${(option.value ?? option) === this.value}
-              >
-                ${option.label ?? option}
-              </option>
-            `,
-          )}
-        </select>
-        <uix-icon name="chevron-down" class="select-arrow"></uix-icon>
+        ${label ? html`<uix-label for=${id} text=${label} ?required=${required}></uix-label>` : ""}
+        <div class="select-wrapper">
+          <select
+            id=${id}
+            name=${name || ""}
+            value=${value || ""}
+            ?disabled=${disabled}
+            ?required=${required}
+            @input=${this._onInput.bind(this)}
+            @change=${this._onChange.bind(this)}
+          >
+            ${
+              placeholder && !value
+                ? html`<option value="" disabled selected hidden>
+                  ${placeholder}
+                </option>`
+                : ""
+            }
+            ${options.map(
+              (option) => html`
+                <option
+                  value=${option.value ?? option}
+                  ?selected=${(option.value ?? option) === this.value}
+                >
+                  ${option.label ?? option}
+                </option>
+              `,
+            )}
+          </select>
+          <uix-icon name="chevron-down" class="select-arrow"></uix-icon>
+        </div>
     `;
   },
 };

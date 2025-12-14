@@ -10,10 +10,15 @@ const MSG = {
   GET_TABS: "ext:getTabs",
   SCRAPE: "ext:scrape",
   SCRAPE_INSTAGRAM: "ext:scrapeInstagram",
+  FETCH_INSTAGRAM_PROFILE: "ext:fetchInstagramProfile",
+  UPDATE_DOC_ID: "ext:updateDocId",
   INJECT: "ext:inject",
   EXECUTE: "ext:execute",
   OBSERVE: "ext:observe",
   STOP_OBSERVE: "ext:stopObserve",
+  START_INTERCEPT: "ext:startIntercept",
+  STOP_INTERCEPT: "ext:stopIntercept",
+  INTERCEPTED_DATA: "ext:interceptedData",
   DATA: "ext:data",
   ERROR: "ext:error",
   EVENT: "ext:event",
@@ -30,6 +35,7 @@ export const createExtensionBridge = (extensionId) => {
   const eventListeners = new Map();
   const pendingRequests = new Map();
   const disconnectCallbacks = new Set();
+  const interceptDataCallbacks = new Set();
   let requestId = 0;
 
   // Check if chrome.runtime is available
@@ -202,6 +208,30 @@ export const createExtensionBridge = (extensionId) => {
      */
     scrapeInstagram: async (tabId) => {
       const response = await sendRequest(MSG.SCRAPE_INSTAGRAM, { tabId });
+      return response.data;
+    },
+
+    /**
+     * Fetch Instagram profile via direct API call
+     * Tries REST API first, falls back to GraphQL
+     * @param {number} tabId - Tab ID (must be on instagram.com for cookies)
+     * @param {string} username - Instagram username to fetch
+     * @returns {Promise<Object>} { success, user, source } or { success: false, error }
+     */
+    fetchInstagramProfile: async (tabId, username) => {
+      const response = await sendRequest(MSG.FETCH_INSTAGRAM_PROFILE, { tabId, username });
+      return response.data;
+    },
+
+    /**
+     * Update a doc_id in the registry
+     * @param {number} tabId - Tab ID
+     * @param {string} type - Type of doc_id (profile, post, reel, etc)
+     * @param {string} docId - The new doc_id value
+     * @returns {Promise<Object>} Result
+     */
+    updateDocId: async (tabId, type, docId) => {
+      const response = await sendRequest(MSG.UPDATE_DOC_ID, { tabId, type, docId });
       return response.data;
     },
 

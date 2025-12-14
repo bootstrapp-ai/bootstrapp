@@ -1,9 +1,13 @@
 import T from "/$app/types/index.js";
 import { html } from "/npm/lit-html";
 
+const generateId = () => `uix-textarea-${Math.random().toString(36).slice(2, 9)}`;
+
 export default {
   tag: "uix-textarea",
   properties: {
+    label: T.string(),
+    id: T.string(),
     value: T.string(""),
     placeholder: T.string(""),
     rows: T.number({ defaultValue: 4 }),
@@ -38,6 +42,13 @@ export default {
       this._internals = this.attachInternals();
     }
     this._internals.setFormValue(this.value);
+    if (!this.id && !this._textareaId) {
+      this._textareaId = generateId();
+    }
+  },
+
+  get textareaId() {
+    return this.id || this._textareaId || (this._textareaId = generateId());
   },
 
   handleInput(e) {
@@ -53,22 +64,24 @@ export default {
   },
 
   render() {
+    const id = this.textareaId;
     const attrs = {};
     if (this.maxlength !== null) attrs.maxlength = this.maxlength;
     if (this.minlength !== null) attrs.minlength = this.minlength;
 
     return html`
+      ${this.label ? html`<uix-label for=${id} text=${this.label} ?required=${this.required}></uix-label>` : ""}
       <textarea
+        id=${id}
         class="textarea"
         name=${this.name}
-        .value=${this.value}
+        value=${this.value}
         placeholder=${this.placeholder}
         rows=${this.rows}
         cols=${this.cols}
         ?disabled=${this.disabled}
         ?readonly=${this.readonly}
         ?required=${this.required}
-        ...${attrs}
         @input=${this.handleInput.bind(this)}
         @change=${this.handleChange.bind(this)}
       ></textarea>
