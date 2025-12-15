@@ -57,10 +57,12 @@ chrome.runtime.onConnectExternal.addListener((port) => {
 
   const connectionId = `${port.sender.tab?.id || "webapp"}-${Date.now()}`;
   adminConnections.set(connectionId, port);
+  console.log("[BG] Admin connections now:", adminConnections.size);
 
   port.postMessage({ type: MSG.PONG, connectionId });
 
   port.onMessage.addListener((message) => {
+    console.log("[BG] Port message from admin:", message.type);
     handleMessage(message, port.sender, (response) => {
       port.postMessage(response);
     });
@@ -68,7 +70,9 @@ chrome.runtime.onConnectExternal.addListener((port) => {
 
   port.onDisconnect.addListener(() => {
     console.log("[BG] Connection closed:", connectionId);
+    console.log("[BG] Disconnect error:", chrome.runtime.lastError?.message);
     adminConnections.delete(connectionId);
+    console.log("[BG] Admin connections now:", adminConnections.size);
   });
 });
 
@@ -177,6 +181,8 @@ async function handleMessage(message, sender, sendResponse) {
 
       case MSG.INTERCEPTED_DATA:
         // Forward intercepted API data to admin panels
+        console.log("[BG] Received INTERCEPTED_DATA, broadcasting to", adminConnections.size, "admin(s)");
+        console.log("[BG] Payload preview:", JSON.stringify(payload).substring(0, 200));
         broadcastToAdmin({
           type: MSG.INTERCEPTED_DATA,
           tabId: sender.tab?.id,

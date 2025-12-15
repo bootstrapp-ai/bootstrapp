@@ -5,13 +5,11 @@
 
 // Message types
 const MSG = {
+  // Core
   PING: "ext:ping",
   PONG: "ext:pong",
   GET_TABS: "ext:getTabs",
   SCRAPE: "ext:scrape",
-  SCRAPE_INSTAGRAM: "ext:scrapeInstagram",
-  FETCH_INSTAGRAM_PROFILE: "ext:fetchInstagramProfile",
-  UPDATE_DOC_ID: "ext:updateDocId",
   INJECT: "ext:inject",
   EXECUTE: "ext:execute",
   OBSERVE: "ext:observe",
@@ -22,6 +20,12 @@ const MSG = {
   DATA: "ext:data",
   ERROR: "ext:error",
   EVENT: "ext:event",
+
+  // Instagram Integration
+  SCRAPE_INSTAGRAM: "ext:scrapeInstagram",
+  FETCH_INSTAGRAM_PROFILE: "ext:fetchInstagramProfile",
+  UPDATE_DOC_ID: "ext:updateDocId",
+
 };
 
 /**
@@ -37,6 +41,7 @@ export const createExtensionBridge = (extensionId) => {
   const disconnectCallbacks = new Set();
   const interceptDataCallbacks = new Set();
   let requestId = 0;
+  let keepAliveInterval = null;
 
   // Check if chrome.runtime is available
   const isExtensionAvailable = () => {
@@ -105,6 +110,11 @@ export const createExtensionBridge = (extensionId) => {
       const listeners = eventListeners.get(message.observerId) || [];
       listeners.forEach((callback) => callback(message));
     }
+
+    // Handle intercepted data
+    if (message.type === MSG.INTERCEPTED_DATA) {
+      interceptDataCallbacks.forEach((callback) => callback(message));
+    }
   };
 
   return {
@@ -143,6 +153,11 @@ export const createExtensionBridge = (extensionId) => {
             console.log("[Bridge] Disconnected from extension");
             connected = false;
             port = null;
+            // Clear keep-alive
+            if (keepAliveInterval) {
+              clearInterval(keepAliveInterval);
+              keepAliveInterval = null;
+            }
             // Notify disconnect callbacks
             disconnectCallbacks.forEach((cb) => cb());
           });
@@ -157,6 +172,15 @@ export const createExtensionBridge = (extensionId) => {
               clearTimeout(timeout);
               connected = true;
               console.log("[Bridge] Connected to extension:", msg.connectionId);
+
+              // Start keep-alive ping every 20 seconds to prevent service worker from going idle
+              if (keepAliveInterval) clearInterval(keepAliveInterval);
+              keepAliveInterval = setInterval(() => {
+                if (connected && port) {
+                  port.postMessage({ type: MSG.PING, keepAlive: true });
+                }
+              }, 20000);
+
               resolve(true);
             }
           };
@@ -172,6 +196,10 @@ export const createExtensionBridge = (extensionId) => {
      * Disconnect from the extension
      */
     disconnect: () => {
+      if (keepAliveInterval) {
+        clearInterval(keepAliveInterval);
+        keepAliveInterval = null;
+      }
       if (port) {
         port.disconnect();
         port = null;
@@ -233,6 +261,40 @@ export const createExtensionBridge = (extensionId) => {
     updateDocId: async (tabId, type, docId) => {
       const response = await sendRequest(MSG.UPDATE_DOC_ID, { tabId, type, docId });
       return response.data;
+    },
+
+    // ========================================
+    // Google Maps Integration (API Interception)
+    // ========================================
+
+    /**
+     * Start interception on a tab
+     * @param {number} tabId - Tab ID to intercept requests on
+     * @returns {Promise<Object>} { status: 'started' | 'already_active' }
+     */
+    startIntercept: async (tabId) => {
+      const response = await sendRequest(MSG.START_INTERCEPT, { tabId });
+      return response.data;
+    },
+
+    /**
+     * Stop interception on a tab
+     * @param {number} tabId - Tab ID
+     * @returns {Promise<Object>} { status: 'stopped' }
+     */
+    stopIntercept: async (tabId) => {
+      const response = await sendRequest(MSG.STOP_INTERCEPT, { tabId });
+      return response.data;
+    },
+
+    /**
+     * Register a callback for intercepted data
+     * @param {Function} callback - Called when data is intercepted
+     * @returns {Function} Unsubscribe function
+     */
+    onInterceptedData: (callback) => {
+      interceptDataCallbacks.add(callback);
+      return () => interceptDataCallbacks.delete(callback);
     },
 
     /**

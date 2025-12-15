@@ -8,6 +8,24 @@ import T from "/$app/types/index.js";
 import { render } from "/npm/lit-html";
 
 const SANITIZE_KEYS = ["__proto__", "constructor", "prototype"];
+const KNOWN_DEFINITION_KEYS = new Set([
+  "properties",
+  "icons",
+  "static",
+  "formAssociated",
+  "dataQuery",
+  "style",
+  "css",
+  "connected",
+  "disconnected",
+  "shadow",
+  "willUpdate",
+  "firstUpdated",
+  "updated",
+  "class",
+  "role",
+  "tag",
+]);
 
 export const settings = {};
 /**
@@ -83,15 +101,15 @@ class View extends HTMLElement {
       updated,
       class: klass,
       role,
-      ...prototypeMethods // Catches all methods/properties not explicitly destructured
     } = definition;
 
-    // SECURITY FIX 1: Filter prototypeMethods to prevent pollution
-    for (const key of SANITIZE_KEYS) {
-      if (Object.hasOwn(prototypeMethods, key)) {
-        // In a real environment, you might log this attempt
-        delete prototypeMethods[key];
-      }
+    const prototypeMethods = {};
+    for (const key of Object.keys(definition)) {
+      if (KNOWN_DEFINITION_KEYS.has(key)) continue;
+      if (SANITIZE_KEYS.includes(key)) continue;
+
+      const descriptor = Object.getOwnPropertyDescriptor(definition, key);
+      Object.defineProperty(prototypeMethods, key, descriptor);
     }
 
     const methodKeysToBind = Object.keys(prototypeMethods);
@@ -206,15 +224,26 @@ class View extends HTMLElement {
             },
       });
     }
-    const filteredPrototypeMethods = Object.fromEntries(
-      Object.entries(prototypeMethods).filter(
-        // We already filtered dangerous keys from prototypeMethods above,
-        // but we retain the filter against properties key collision
-        ([key]) => !Object.hasOwn(component.properties, key),
-      ),
-    );
-    // This Object.assign is now safe because prototypeMethods was sanitized (Fix 1)
-    Object.assign(component.prototype, filteredPrototypeMethods);
+    // Copy prototype methods to component, preserving getters/setters
+    for (const key of Object.keys(prototypeMethods)) {
+      // Skip if it collides with a reactive property
+      if (Object.hasOwn(component.properties, key)) continue;
+
+      const descriptor = Object.getOwnPropertyDescriptor(prototypeMethods, key);
+
+      // If it's a getter/setter, define it properly
+      if (descriptor.get || descriptor.set) {
+        Object.defineProperty(component.prototype, key, {
+          configurable: true,
+          enumerable: true,
+          get: descriptor.get,
+          set: descriptor.set,
+        });
+      } else {
+        // Regular method/property - just assign
+        component.prototype[key] = descriptor.value;
+      }
+    }
 
     component.tag = tag;
     component._attrs = Object.fromEntries(

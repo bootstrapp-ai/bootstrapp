@@ -5,7 +5,7 @@
 
 // Message types
 export const MSG = {
-  // Commands (Admin/Panel -> Extension)
+  // Core Commands (Admin/Panel -> Extension)
   PING: "ext:ping",
   GET_TABS: "ext:getTabs",
   SCRAPE: "ext:scrape",
@@ -13,12 +13,24 @@ export const MSG = {
   EXECUTE: "ext:execute",
   OBSERVE: "ext:observe",
   STOP_OBSERVE: "ext:stopObserve",
+  START_INTERCEPT: "ext:startIntercept",
+  STOP_INTERCEPT: "ext:stopIntercept",
 
-  // Responses (Extension -> Admin/Panel)
+  // Core Responses (Extension -> Admin/Panel)
   PONG: "ext:pong",
   DATA: "ext:data",
   ERROR: "ext:error",
   EVENT: "ext:event",
+  INTERCEPTED_DATA: "ext:interceptedData",
+
+  // Instagram Integration
+  SCRAPE_INSTAGRAM: "ext:scrapeInstagram",
+  FETCH_INSTAGRAM_PROFILE: "ext:fetchInstagramProfile",
+  UPDATE_DOC_ID: "ext:updateDocId",
+
+  // Google Maps Integration
+  SCRAPE_GMAPS_SEARCH: "ext:scrapeGmapsSearch",
+  SCRAPE_GMAPS_DETAILS: "ext:scrapeGmapsDetails",
 };
 
 /**

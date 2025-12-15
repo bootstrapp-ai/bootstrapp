@@ -38,9 +38,7 @@ export default {
   },
 
   render() {
-    return html`
-      <div class="maps-search">
-        <div class="maps-search-input">
+    return html`<div class="maps-search-input">
           <uix-input
             .value=${this.query}
             @input=${(e) => (this.query = e.target.value)}
@@ -54,8 +52,9 @@ export default {
           </uix-button>
         </div>
 
-        ${this.results.length > 0
-          ? html`
+        ${
+          this.results.length > 0
+            ? html`
               <div class="maps-results">
                 ${this.results.map(
                   (r) => html`
@@ -73,8 +72,8 @@ export default {
                 )}
               </div>
             `
-          : ""}
-      </div>
+            : ""
+        }
     `;
   },
 };

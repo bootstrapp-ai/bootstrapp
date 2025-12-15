@@ -1,0 +1,12 @@
+{
+  "name": "@bootstrapp/integration-instagram",
+  "version": "1.0.0",
+  "description": "Instagram integration for Bootstrapp - scrape profiles, intercept API calls",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./extension/*": "./extension/*",
+    "./admin/*": "./admin/*"
+  }
+}
