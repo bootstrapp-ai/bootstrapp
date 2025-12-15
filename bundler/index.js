@@ -237,7 +237,7 @@ const bundler = {
   },
   async _bundleSPACore({ mode = "spa" }) {
     console.log(`🚀 Starting ${mode.toUpperCase()} bundle process...`);
-    const filesForDeployment = [];
+    const filesForDeployment = {};
     const filesForSW = await $APP.SW.request("SW:GET_CACHED_FILES");
     const addFilePromises = [];
     const pages = await getStaticHTML({ ssgOnly: false });
@@ -275,33 +275,23 @@ const bundler = {
         };
       } else {
         const minifiedContent = await minify(resolvedContent, resolvedMimeType);
-        filesForDeployment.push({ path, content: minifiedContent });
+        filesForDeployment[path] = { content: minifiedContent, mimeType: resolvedMimeType };
       }
     };
     const indexHTML = this._createIndexHTML($APP.settings);
     if (mode === "hybrid") {
       pages.forEach((file) => {
         if (file.ssg)
-          filesForDeployment.push({
-            path: file.path,
-            content: createStaticPage(file),
-          });
+          filesForDeployment[file.path] = { content: createStaticPage(file) };
         else
-          filesForDeployment.push({
-            path: file.path,
-            content: indexHTML,
-          });
+          filesForDeployment[file.path] = { content: indexHTML };
       });
     }
     const css = await this.extractCSS();
     addFilePromises.push(
       addFile({ path: "style.css", content: css, mimeType: "text/css" }),
     );
-    filesForDeployment.push({
-      path: "style.css",
-      content: css,
-      mimeType: "text/css",
-    });
+    filesForDeployment["style.css"] = { content: css, mimeType: "text/css" };
     const manifest = this._createManifest($APP.settings);
     manifest.icons.forEach((icon) => {
       const path = icon.src.substring(1);
@@ -315,17 +305,14 @@ const bundler = {
       skipSW: true,
     });
     await Promise.all(addFilePromises);
-    filesForDeployment.push({
-      path: "manifest.json",
-      content: JSON.stringify(manifest),
-    });
+    filesForDeployment["manifest.json"] = { content: JSON.stringify(manifest) };
     const sitemapXML = this._createSitemapXML($APP.settings, pages);
-    filesForDeployment.push({ path: "sitemap.xml", content: sitemapXML });
+    filesForDeployment["sitemap.xml"] = { content: sitemapXML };
     const robotsTXT = this._createRobotsTXT($APP.settings);
-    filesForDeployment.push({ path: "robots.txt", content: robotsTXT });
-    if (!filesForDeployment.some((file) => file.path === "index.html"))
-      filesForDeployment.push({ path: "index.html", content: indexHTML });
-    filesForDeployment.push({ path: "404.html", content: indexHTML });
+    filesForDeployment["robots.txt"] = { content: robotsTXT };
+    // Always set index.html - object assignment ensures the correct version wins
+    filesForDeployment["index.html"] = { content: indexHTML };
+    filesForDeployment["404.html"] = { content: indexHTML };
     $APP.devFiles.forEach((path) => {
       if (filesForSW[path]) {
         filesForSW[path] = { content: "export default {}" };
@@ -351,11 +338,15 @@ const bundler = {
       console.log("🔒 Obfuscating service worker (sw.js)...");
       serviceWorker = await obfuscate(serviceWorker);
     }
-    filesForDeployment.push({ path: "sw.js", content: serviceWorker });
-    console.log(
-      `✅ ${mode.toUpperCase()} bundle created with ${filesForDeployment.length} files`,
-    );
-    return filesForDeployment;
+    filesForDeployment["sw.js"] = { content: serviceWorker };
+    const fileCount = Object.keys(filesForDeployment).length;
+    console.log(`✅ ${mode.toUpperCase()} bundle created with ${fileCount} files`);
+    // Convert object to array format for deployment targets
+    return Object.entries(filesForDeployment).map(([path, file]) => ({
+      path,
+      content: file.content,
+      mimeType: file.mimeType,
+    }));
   },
   /**
    * Get all available deployment targets
@@ -407,24 +398,27 @@ const bundler = {
   },
   async bundleSSG() {
     console.log("🚀 Starting SSG bundle process...");
-    const files = [];
+    const files = {};
     const staticFiles = await getStaticHTML({ ssgOnly: true });
     staticFiles.forEach((file) => {
-      files.push({
-        path: file.path,
-        content: createStaticPage(file),
-      });
+      files[file.path] = { content: createStaticPage(file) };
     });
     const css = await this.extractCSS();
-    files.push({ path: "style.css", content: css });
+    files["style.css"] = { content: css };
     const data = {};
-    files.push({ path: "data.json", content: JSON.stringify(data, null, 2) });
+    files["data.json"] = { content: JSON.stringify(data, null, 2) };
     const sitemapXML = this._createSitemapXML($APP.settings, staticFiles);
-    files.push({ path: "sitemap.xml", content: sitemapXML });
+    files["sitemap.xml"] = { content: sitemapXML };
     const robotsTXT = this._createRobotsTXT($APP.settings);
-    files.push({ path: "robots.txt", content: robotsTXT });
-    console.log(`✅ SSG bundle created with ${files.length} files`);
-    return files;
+    files["robots.txt"] = { content: robotsTXT };
+    const fileCount = Object.keys(files).length;
+    console.log(`✅ SSG bundle created with ${fileCount} files`);
+    // Convert object to array format for deployment targets
+    return Object.entries(files).map(([path, file]) => ({
+      path,
+      content: file.content,
+      mimeType: file.mimeType,
+    }));
   },
   async bundleHybrid(credentials) {
     return this._bundleSPACore({ mode: "hybrid" });

@@ -166,6 +166,10 @@ export function initSWBackend(app, appConfig = {}) {
           const response = await localCache.match(req);
           if (response) {
             const url = new URL(req.url);
+            // Skip paths without file extensions (SPA routes like /admin/models/users)
+            const hasExtension = url.pathname.includes('.') && !url.pathname.endsWith('/');
+            if (!hasExtension) continue;
+
             const content = await response.clone().text();
             const mimeType = response.headers.get("Content-Type")?.split(";")[0] || getMimeType(url.pathname);
             files[url.pathname] = { content, mimeType };

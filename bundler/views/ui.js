@@ -98,13 +98,14 @@ $APP.define("release-creator", {
   properties: {
     version: T.string(`v${new Date().toISOString().slice(0, 10)}`),
     notes: T.string(""),
-    deployMode: T.string("hybrid"),
-    deployTarget: T.string("github"),
+    deployMode: T.string("spa"),
+    deployTarget: T.string("localhost"),
     isDeploying: T.boolean(false),
   },
 
   getTargetOptions() {
     const targets = Bundler.getTargets();
+    console.log(targets);
     return targets.map((t) => ({
       value: t.name,
       label: t.label,

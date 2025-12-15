@@ -30,9 +30,8 @@
     FETCH_INSTAGRAM_PROFILE: "ext:fetchInstagramProfile",
     UPDATE_DOC_ID: "ext:updateDocId",
 
-    // Google Maps integration
-    SCRAPE_GMAPS_SEARCH: "ext:scrapeGmapsSearch",
-    SCRAPE_GMAPS_DETAILS: "ext:scrapeGmapsDetails",
+    // Note: Google Maps interception is handled via webRequest API in background.js
+    // No content script message types needed for GMaps
   };
 
   // ============================================
@@ -629,9 +628,9 @@
     }
 
     function register() {
-      // GMaps uses API interception only (via interceptor.js)
-      // No DOM scraping handlers needed
-      console.log("[GMaps] Integration ready (API interception mode)");
+      // GMaps interception is handled automatically by webRequest API in background.js
+      // No content script action needed - just log that we're on a GMaps page
+      console.log("[GMaps] Integration ready (webRequest interception mode)");
     }
 
     return { register, isMatch };

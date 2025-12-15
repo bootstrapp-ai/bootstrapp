@@ -289,9 +289,10 @@ const createRequestHandler = (
 
         adapter.log(`📦 Deployed ${files.length} files to .deployed/`);
 
-        // Start separate port server if not running
+        // Start separate port server if not running (use 23XX port - same last 2 digits, different prefix)
+        const deployedPort = port + 1000;
         if (!deployedServer) {
-          deployedServer = startDeployedServer(projectDir, port + 2);
+          deployedServer = startDeployedServer(projectDir, deployedPort);
         }
 
         res.writeHead(200, { "Content-Type": "application/json" });
@@ -300,7 +301,7 @@ const createRequestHandler = (
             success: true,
             urls: {
               prefixed: `http://${host}:${port}/_deployed/`,
-              standalone: `http://${host}:${port + 2}/`,
+              standalone: `http://${host}:${deployedPort}/`,
             },
           }),
         );
@@ -500,6 +501,16 @@ export const serve = async (adapter, args = []) => {
         adapter.log("Dev client connected for hot-reload."),
       );
       wss.on("error", handleServerError);
+
+      // Start deployed server on load if .deployed folder exists
+      const deployedDir = adapter.join(projectDir, ".deployed");
+      if (await adapter.exists(deployedDir)) {
+        const deployedPort = port + 1000;
+        if (!deployedServer) {
+          deployedServer = startDeployedServer(projectDir, deployedPort);
+        }
+      }
+
       if (shouldWatch) {
         adapter.log("Setting up file watcher...");
         await adapter.watch(

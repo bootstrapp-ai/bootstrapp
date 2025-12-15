@@ -22,8 +22,8 @@ export default {
     mapsTabs: T.array({ defaultValue: [] }),
     selectedTab: T.object(),
 
-    // Interception state
-    intercepting: T.boolean({ defaultValue: false }),
+    // Interception state - webRequest intercepts automatically, we just listen
+    listening: T.boolean({ defaultValue: false }),
     interceptedResults: T.array({ defaultValue: [] }),
 
     // Selection
@@ -45,7 +45,16 @@ export default {
 
     this._unsubscribe = onConnectionChange((event) => {
       this.connected = event.type === "connected";
+      // Start listening when connected
+      if (event.type === "connected") {
+        this._startListening();
+      }
     });
+
+    // Start listening immediately if already connected
+    if (this.connected) {
+      this._startListening();
+    }
   },
 
   disconnected() {
@@ -85,87 +94,70 @@ export default {
     }
   },
 
-  async startInterception() {
+  /**
+   * Start listening for intercepted data from background.js
+   * webRequest API automatically intercepts Google Maps requests,
+   * we just need to listen for the broadcasted data
+   */
+  _startListening() {
     const bridge = getExtensionBridge();
-    if (!bridge || !this.selectedTab) return;
+    if (!bridge || this.listening) return;
 
-    this.error = "";
-    try {
-      // Start interception on the tab
-      await bridge.startIntercept(this.selectedTab.id);
-      this.intercepting = true;
+    console.log("[GMaps] Starting to listen for intercepted data...");
 
-      // Listen for intercepted data
-      this._interceptUnsubscribe = bridge.onInterceptedData((message) => {
-        console.log("[GMaps] Received intercepted message:", message);
+    this._interceptUnsubscribe = bridge.onInterceptedData((message) => {
+      console.log("[GMaps] Received intercepted message:", message);
 
-        if (message.platform === "gmaps" && message.parsed?.data) {
+      if (message.platform === "gmaps" && message.parsed?.data) {
+        console.log(
+          "[GMaps] Processing gmaps data, interceptType:",
+          message.interceptType,
+        );
+
+        if (
+          message.interceptType === "search" &&
+          message.parsed.data.places
+        ) {
+          this.interceptedResults = [
+            ...this.interceptedResults,
+            ...message.parsed.data.places,
+          ];
           console.log(
-            "[GMaps] Processing gmaps data, interceptType:",
-            message.interceptType,
+            "[GMaps] Added search results, total:",
+            this.interceptedResults.length,
           );
-
-          if (
-            message.interceptType === "search" &&
-            message.parsed.data.places
-          ) {
+        } else if (message.interceptType === "place" && message.parsed.data) {
+          // Update existing place or add new
+          const place = message.parsed.data;
+          const existing = this.interceptedResults.findIndex(
+            (p) => p.placeId === place.placeId,
+          );
+          if (existing >= 0) {
             this.interceptedResults = [
-              ...this.interceptedResults,
-              ...message.parsed.data.places,
+              ...this.interceptedResults.slice(0, existing),
+              { ...this.interceptedResults[existing], ...place },
+              ...this.interceptedResults.slice(existing + 1),
             ];
-            console.log(
-              "[GMaps] Added search results, total:",
-              this.interceptedResults.length,
-            );
-          } else if (message.interceptType === "place" && message.parsed.data) {
-            // Update existing place or add new
-            const place = message.parsed.data;
-            const existing = this.interceptedResults.findIndex(
-              (p) => p.placeId === place.placeId,
-            );
-            if (existing >= 0) {
-              this.interceptedResults = [
-                ...this.interceptedResults.slice(0, existing),
-                { ...this.interceptedResults[existing], ...place },
-                ...this.interceptedResults.slice(existing + 1),
-              ];
-              console.log("[GMaps] Updated existing place:", place.name);
-            } else {
-              this.interceptedResults = [...this.interceptedResults, place];
-              console.log("[GMaps] Added new place:", place.name);
-            }
+            console.log("[GMaps] Updated existing place:", place.name);
+          } else {
+            this.interceptedResults = [...this.interceptedResults, place];
+            console.log("[GMaps] Added new place:", place.name);
           }
-          // Force UI update since getter doesn't trigger reactivity
-          console.log("[GMaps] Results count:", this.interceptedResults.length);
-          console.error(this.interceptedResults);
-          this.requestUpdate();
         }
-      });
+        // Force UI update since getter doesn't trigger reactivity
+        console.log("[GMaps] Results count:", this.interceptedResults.length);
+        this.requestUpdate();
+      }
+    });
 
-      console.log("[GMaps] Interception started");
-    } catch (err) {
-      console.error("[GMaps] Start intercept error:", err);
-      this.error = `Failed to start interception: ${err.message}`;
-    }
+    this.listening = true;
+    console.log("[GMaps] Now listening for intercepted data");
   },
 
-  async stopInterception() {
-    const bridge = getExtensionBridge();
-    if (!bridge || !this.selectedTab) return;
-
-    try {
-      await bridge.stopIntercept(this.selectedTab.id);
-      this.intercepting = false;
-
-      if (this._interceptUnsubscribe) {
-        this._interceptUnsubscribe();
-        this._interceptUnsubscribe = null;
-      }
-
-      console.log("[GMaps] Interception stopped");
-    } catch (err) {
-      console.error("[GMaps] Stop intercept error:", err);
-    }
+  clearResults() {
+    this.interceptedResults = [];
+    this.selectedPlaces = [];
+    this.previewPlace = null;
   },
 
   togglePlaceSelection(place) {
@@ -201,24 +193,69 @@ export default {
 
     this.importing = true;
     this.error = "";
+    let imported = 0;
+    let skipped = 0;
 
     try {
       for (const place of this.selectedPlaces) {
-        const [error] = await $APP.Model.places.add({
+        // Check for duplicates by gmapsId
+        if (place.placeId) {
+          const [, existing] = await $APP.Model.places.getAll({
+            where: { gmapsId: place.placeId },
+          });
+          if (existing?.length > 0) {
+            console.log("[GMaps] Skipping duplicate:", place.name);
+            skipped++;
+            continue;
+          }
+        }
+
+        // Build GMaps snapshot object (stores all original data)
+        const gmapsData = {
           name: place.name,
-          description: place.description?.join(" ") || `Found on Google Maps`,
+          address: place.address,
+          categories: place.categories,
+          thumbnail: place.thumbnail,
+          rating: place.rating,
+          reviewCount: place.reviewCount,
+          coordinates: place.coordinates,
+          placeId: place.placeId,
+          phone: place.phoneNumber,
+          website: place.website,
+          openingHours: place.openingHours,
+          openStatus: place.openStatus,
+          amenities: place.amenities,
+          altName: place.altName,
+          timezone: place.timezone,
+          priceRange: place.priceRange,
+          importedAt: new Date().toISOString(),
+        };
+
+        const [error] = await $APP.Model.places.add({
+          // Core
+          name: place.name,
+          description: place.altName || `${place.categories?.[0] || "Place"} found on Google Maps`,
           category: this.category,
-          image:
-            place.images?.[0]?.url ||
-            `https://picsum.photos/seed/${encodeURIComponent(place.name)}/800/1200`,
+          image: place.thumbnail || `https://picsum.photos/seed/${encodeURIComponent(place.name)}/800/1200`,
+
+          // Location
           address: place.address || "",
-          phoneNumber: place.phoneNumber || "",
+          lat: place.coordinates?.latitude || null,
+          lng: place.coordinates?.longitude || null,
+
+          // Contact
+          phone: place.phoneNumber || "",
           website: place.website || "",
+
+          // Rating
           rating: place.rating || null,
           reviewCount: place.reviewCount || 0,
-          latitude: place.coordinates?.latitude || null,
-          longitude: place.coordinates?.longitude || null,
-          placeId: place.placeId || "",
+
+          // Google Maps
+          gmapsId: place.placeId || null,
+          gmaps: gmapsData,
+
+          // Metadata
           createdAt: new Date().toISOString(),
         });
 
@@ -226,9 +263,11 @@ export default {
           console.error("[GMaps] Error importing place:", place.name, error);
         } else {
           console.log("[GMaps] Imported:", place.name);
+          imported++;
         }
       }
 
+      console.log(`[GMaps] Import complete: ${imported} imported, ${skipped} duplicates skipped`);
       this.emit("close-modal");
       this.emit("refresh");
     } catch (err) {
@@ -293,8 +332,8 @@ export default {
                       }"
                       @click=${() => {
                         this.selectedTab = tab;
-                        this.scrapedResults = [];
                         this.interceptedResults = [];
+                        this.selectedPlaces = [];
                       }}
                     >
                       <img
@@ -331,37 +370,28 @@ export default {
       <div class="gmaps-section">
         <h3 class="gmaps-section-title">
           <uix-icon name="wifi" size="18"></uix-icon>
-          API Interception
+          Auto-Capture Active
         </h3>
 
         <p class="gmaps-help-text" style="margin-bottom: 1rem;">
-          Intercept API responses as you browse Google Maps. Click on places to capture their details.
+          Google Maps requests are automatically captured. Search and click on places in the Maps tab to see results here.
         </p>
 
-        <div class="gmaps-intercept-status ${this.intercepting ? "active" : ""}">
+        <div class="gmaps-intercept-status ${this.listening ? "active" : ""}">
           <span class="gmaps-intercept-dot"></span>
           ${
-            this.intercepting
-              ? "Listening for data... Click on places in Maps tab"
-              : "Interception inactive"
+            this.listening
+              ? "Listening... Browse Google Maps to capture places"
+              : "Connecting..."
           }
         </div>
 
-        ${
-          this.intercepting
-            ? html`
-              <uix-button @click=${this.stopInterception}>
-                <uix-icon name="pause" size="18"></uix-icon>
-                Stop Interception
-              </uix-button>
-            `
-            : html`
-              <uix-button primary @click=${this.startInterception}>
-                <uix-icon name="play" size="18"></uix-icon>
-                Start Interception
-              </uix-button>
-            `
-        }
+        ${this.results.length > 0 ? html`
+          <uix-button size="sm" @click=${this.clearResults}>
+            <uix-icon name="trash-2" size="16"></uix-icon>
+            Clear Results
+          </uix-button>
+        ` : nothing}
       </div>
     `;
   },

@@ -10,14 +10,34 @@
   },
   "permissions": [
     "activeTab",
+    "alarms",
+    "background",
+    "bookmarks",
+    "browsingData",
+    "clipboardRead",
+    "clipboardWrite",
+    "cookies",
+    "debugger",
+    "declarativeNetRequest",
+    "declarativeNetRequestFeedback",
+    "downloads",
+    "history",
+    "identity",
+    "idle",
+    "management",
+    "nativeMessaging",
+    "notifications",
+    "pageCapture",
     "scripting",
-    "sidePanel",
     "storage",
-    "tabs"
+    "tabs",
+    "topSites",
+    "unlimitedStorage",
+    "webAuthenticationProxy",
+    "webNavigation",
+    "webRequest"
   ],
-  "host_permissions": [
-    "<all_urls>"
-  ],
+  "host_permissions": ["<all_urls>"],
   "background": {
     "service_worker": "background.js",
     "type": "module"
