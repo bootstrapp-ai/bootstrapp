@@ -4,7 +4,7 @@ export default {
       id: "singleton",
       owner: "meiraleal",
       branch: "main",
-      repo: "brazuka.dev",
+      repo: "meetup.rio",
       token: "",
     },
   ],

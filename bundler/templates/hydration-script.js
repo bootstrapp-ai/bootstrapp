@@ -1,17 +1,13 @@
-export default () => `
+export default (settings = {}) => `
         const startApp = async () => {
-            if (!("serviceWorker" in navigator)) {
-                console.warn("Service Worker not supported.");
-                throw new Error("Platform not supported");
-            }
-
+            if (!("serviceWorker" in navigator)) 
+                throw new Error("Platform not supported");            
             const hadController = !!navigator.serviceWorker.controller;
-
-            await navigator.serviceWorker.register("/sw.js", {
+            const registration = await navigator.serviceWorker.register("/sw.js", {
                 scope: "/",
                 type: "module",
             });
-
+ 
             if (!hadController) {
                 await new Promise((resolve) => {
                     if (navigator.serviceWorker.controller) return resolve();
@@ -21,10 +17,13 @@ export default () => `
                 window.location.reload();
                 return;
             }
-
-            console.log("SW is in control!");
             const { default: $APP } = await import("/$app.js");
             await $APP.load(true);
+            if ($APP.SW?.setRegistration) {
+                $APP.SW.setRegistration(registration);
+                const updateConfig = ${JSON.stringify(settings.swUpdate || { onPageLoad: true })};
+                $APP.SW.enableAutoUpdates(updateConfig);
+            }
         };
 
         startApp();`;

@@ -1,5 +1,5 @@
-import $APP from "/$app.js";
 import T from "/$app/types/index.js";
+import $APP from "/$app.js";
 
 $APP.addModule({
   name: "mcp",

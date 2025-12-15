@@ -4,7 +4,7 @@ import $APP from "/$app.js";
 try {
   if (!("serviceWorker" in navigator))
     throw new Error("Platform not supported");
-  await navigator.serviceWorker.register("/backend.js", {
+  const registration = await navigator.serviceWorker.register("/backend.js", {
     type: "module",
   });
   await Promise.race([
@@ -23,6 +23,8 @@ try {
   ]);
   sessionStorage.removeItem("_sw");
   await $APP.load();
+
+  if ($APP.SW?.setRegistration) $APP.SW.setRegistration(registration);
 } catch (error) {
   console.error("Service Worker initialization error:", error);
   const retryCount = Number.parseInt(sessionStorage.getItem("_sw") || "0", 10);

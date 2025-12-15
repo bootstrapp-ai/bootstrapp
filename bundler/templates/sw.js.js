@@ -2,8 +2,20 @@ export default ({ fileMap }) =>
   "const FILE_BUNDLE = " +
   JSON.stringify(fileMap, null, 2) +
   ";" +
-  `self.addEventListener("install", (e) => e.waitUntil(self.skipWaiting()));
-self.addEventListener("activate", (e) => e.waitUntil(self.clients.claim()));
+  `self.addEventListener("install", (e) => {
+  console.log("SW: Installing new version...");
+  // Don't skipWaiting automatically - let the app control when to activate
+});
+self.addEventListener("activate", (e) => {
+  console.log("SW: Activated");
+  e.waitUntil(self.clients.claim());
+});
+self.addEventListener("message", (e) => {
+  if (e.data?.type === "SKIP_WAITING") {
+    console.log("SW: Skip waiting requested, activating...");
+    self.skipWaiting();
+  }
+});
 self.addEventListener("fetch", (e) => {
   const url = new URL(e.request.url);
   let path = url.pathname;

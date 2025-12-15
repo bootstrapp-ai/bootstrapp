@@ -116,8 +116,9 @@ export function initSWBackend(app, appConfig = {}) {
         caches.open(FILE_STORE_CACHE_NAME),
       ]).then(() => {
         console.log("Service Worker: Caches initialized");
+        // In dev mode, skip waiting automatically for faster iteration
         return self.skipWaiting();
-      })
+      }),
     );
   });
 
@@ -133,6 +134,10 @@ export function initSWBackend(app, appConfig = {}) {
   };
 
   const messageHandlers = {
+    SKIP_WAITING: async () => {
+      console.log("Service Worker: Skip waiting requested");
+      self.skipWaiting();
+    },
     "SW:BROADCAST_SYNCED_PROP": async (data, { broadcast }) => {
       broadcast({ type: "SW:SYNC_PROPS", payload: data.payload });
     },
@@ -167,11 +172,14 @@ export function initSWBackend(app, appConfig = {}) {
           if (response) {
             const url = new URL(req.url);
             // Skip paths without file extensions (SPA routes like /admin/models/users)
-            const hasExtension = url.pathname.includes('.') && !url.pathname.endsWith('/');
+            const hasExtension =
+              url.pathname.includes(".") && !url.pathname.endsWith("/");
             if (!hasExtension) continue;
 
             const content = await response.clone().text();
-            const mimeType = response.headers.get("Content-Type")?.split(";")[0] || getMimeType(url.pathname);
+            const mimeType =
+              response.headers.get("Content-Type")?.split(";")[0] ||
+              getMimeType(url.pathname);
             files[url.pathname] = { content, mimeType };
           }
         }
@@ -186,7 +194,9 @@ export function initSWBackend(app, appConfig = {}) {
             if (url.hostname === "esm.sh") {
               const esmPath = `${url.pathname}${url.search}`;
               const content = await response.clone().text();
-              const mimeType = response.headers.get("Content-Type")?.split(";")[0] || "application/javascript";
+              const mimeType =
+                response.headers.get("Content-Type")?.split(";")[0] ||
+                "application/javascript";
               files[esmPath] = { content, mimeType };
             }
           }
@@ -229,7 +239,7 @@ export function initSWBackend(app, appConfig = {}) {
             }
           },
           broadcast: broadcastToClients,
-        }
+        },
       );
     } else {
       // Emit event for custom handlers
@@ -242,7 +252,10 @@ export function initSWBackend(app, appConfig = {}) {
     const url = new URL(event.request.url);
 
     // Handle /npm/ requests - proxy to esm.sh
-    if (url.origin === self.location.origin && url.pathname.startsWith("/npm/")) {
+    if (
+      url.origin === self.location.origin &&
+      url.pathname.startsWith("/npm/")
+    ) {
       event.respondWith(
         (async () => {
           // Convert /npm/lit-html to https://esm.sh/lit-html
@@ -266,14 +279,15 @@ export function initSWBackend(app, appConfig = {}) {
             console.error("SW: ESM.sh fetch failed:", error);
             return new Response("Network error", { status: 503 });
           }
-        })()
+        })(),
       );
       return;
     }
 
     // Handle esm.sh internal paths (e.g., /lit-html@3.3.1/..., /v135/...)
-    const isEsmPath = url.origin === self.location.origin &&
-      (url.pathname.match(/^\/[^\/]+@[\d.]+/) || url.pathname.startsWith("/v1"));
+    const isEsmPath =
+      url.origin === self.location.origin &&
+      (url.pathname.match(/^\/[^/]+@[\d.]+/) || url.pathname.startsWith("/v1"));
 
     if (isEsmPath) {
       event.respondWith(
@@ -294,7 +308,7 @@ export function initSWBackend(app, appConfig = {}) {
             console.error("SW: ESM.sh internal fetch failed:", error);
             return new Response("Network error", { status: 503 });
           }
-        })()
+        })(),
       );
       return;
     }
@@ -317,7 +331,7 @@ export function initSWBackend(app, appConfig = {}) {
             console.error("SW: CDN fetch failed:", error);
             return new Response("Network error", { status: 503 });
           }
-        })()
+        })(),
       );
       return;
     }
@@ -344,7 +358,7 @@ export function initSWBackend(app, appConfig = {}) {
             console.error("SW: Local fetch failed:", error);
             return new Response("Not found", { status: 404 });
           }
-        })()
+        })(),
       );
     }
   });

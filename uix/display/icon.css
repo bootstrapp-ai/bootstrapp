@@ -58,22 +58,22 @@
   }
 
   &[size="lg"] {
-    --icon-size: calc(var(--spacing, 0.25rem) * 10);
+    --icon-size: calc(var(--spacing, 0.25rem) * 8);
   }
 
   &[size="xl"] {
-    --icon-size: calc(var(--spacing, 0.25rem) * 14);
+    --icon-size: calc(var(--spacing, 0.25rem) * 10);
   }
 
   &[size="2xl"] {
-    --icon-size: calc(var(--spacing, 0.25rem) * 24);
+    --icon-size: calc(var(--spacing, 0.25rem) * 14);
   }
 
   &[size="3xl"] {
-    --icon-size: calc(var(--spacing, 0.25rem) * 36);
+    --icon-size: calc(var(--spacing, 0.25rem) * 20);
   }
 
   &[size="4xl"] {
-    --icon-size: calc(var(--spacing, 0.25rem) * 48);
+    --icon-size: calc(var(--spacing, 0.25rem) * 30);
   }
 }

@@ -32,7 +32,7 @@ export default (settings) => minifyHTML(`<!DOCTYPE html>
     <link rel="stylesheet" href="/style.css">
     ${settings.importmap ? `<script type="importmap">${JSON.stringify({ imports: settings.importmap }, null, 2)}</script>` : ""}
     <link id="favicon" rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLW1vdW50YWluIj48cGF0aCBkPSJtOCAzIDQgOCA1LTUgNSAxNUgyTDggM3oiLz48L3N2Zz4="/>
-    <script>${hydrationScript()}</script>
+    <script>${hydrationScript(settings)}</script>
 </head>
 <body class="production flex">
     <app-container></app-container>
