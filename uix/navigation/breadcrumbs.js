@@ -52,7 +52,7 @@ export default {
               <li class="breadcrumbs-item">
                 ${
                   item.href
-                    ? html`<a href=${item.href}>${item.text}</a>`
+                    ? html`<uix-link href=${item.href}>${item.text}</uix-link>`
                     : html`<span class="current">${item.text}</span>`
                 }
                 ${

@@ -4,7 +4,6 @@
 
 :where(.uix-navbar, uix-navbar) {
   display: flex;
-  flex-grow: 1;
 
   &::part(container) {
     display: flex;

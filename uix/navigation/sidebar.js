@@ -23,11 +23,13 @@ export default {
 
   render() {
     return html`
-      <div class="sidebar-header">
+      <div part="header" class="sidebar-header">
+        <slot name="header"></slot>
         ${
           this.collapsible
             ? html`
               <button
+                part="toggle"
                 class="sidebar-toggle"
                 @click=${this.toggle}
                 aria-label=${this.collapsed ? "Expand sidebar" : "Collapse sidebar"}
@@ -47,15 +49,13 @@ export default {
             `
             : ""
         }
-        <slot name="header"></slot>
-        
       </div>
 
-      <div class="sidebar-content">
+      <div part="content" class="sidebar-content">
         <slot></slot>
       </div>
 
-      <div class="sidebar-footer">
+      <div part="footer" class="sidebar-footer">
         <slot name="footer"></slot>
       </div>
     `;

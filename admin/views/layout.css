@@ -1,66 +1,67 @@
 /**
  * Admin Layout Styles
- * Main flex container for sidebar + content
+ * Minimal overrides - relies on uix-sidebar, uix-navbar, uix-menu components
  */
 
 admin-layout {
-  display: flex;
+  display: block;
   width: 100%;
   height: 100vh;
-  background-color: var(
-    --admin-layout-background,
-    var(--color-background, #f9fafb)
-  );
   overflow: hidden;
-
-  /* --- Sidebar Brand --- */
-  .sidebar-brand {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .sidebar-title {
-    font-weight: var(--sidebar-header-font-weight, 900);
-    font-size: 1.125rem;
-    text-transform: uppercase;
-    letter-spacing: 0.025em;
-  }
-
-  /* --- Sidebar Footer --- */
-  .sidebar-footer-content {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    width: 100%;
-  }
-
-  .sidebar-text {
-    font-size: 0.75rem;
-    color: var(--text-muted, #6b7280);
-  }
-
-  /* --- Collapsed State --- */
-  uix-sidebar[collapsed] {
-    .sidebar-title,
-    .sidebar-text,
-    .sidebar-label {
-      display: none;
-    }
-
-    .sidebar-footer-content {
-      justify-content: center;
-    }
-  }
 }
 
-.admin-layout-main {
+/* Main wrapper layout */
+.admin-wrapper {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+/* Main content area */
+.admin-main {
   flex: 1;
+  display: flex;
+  flex-direction: column;
   min-width: 0;
+  background: var(--color-background, #f9fafb);
+}
+
+/* Content scroll area */
+.admin-content {
+  flex: 1;
   overflow-y: auto;
-  overflow-x: hidden;
-  background-color: var(
-    --admin-content-background,
-    var(--color-background, #f9fafb)
-  );
+  padding: 1.5rem;
+}
+
+/* Topbar slot content alignment */
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Sidebar brand alignment */
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sidebar-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Hide title when sidebar collapsed */
+uix-sidebar[collapsed] .sidebar-title {
+  display: none;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .admin-content {
+    padding: 1rem;
+  }
 }
