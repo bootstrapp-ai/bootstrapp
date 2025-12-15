@@ -18,7 +18,7 @@ const init = () => {
   Loader.initDOM();
 };
 
-if ($APP.settings.dev) $APP.events.on("APP:READY", init);
+$APP.events.on("APP:READY", init);
 
 $APP.events.set({
   moduleAdded({ module }) {

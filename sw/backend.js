@@ -157,10 +157,38 @@ export function initSWBackend(app, appConfig = {}) {
     },
     "SW:GET_CACHED_FILES": async (data, { respond }) => {
       try {
-        const cache = await fsCache.open("fileStore");
-        const keys = await cache.keys();
-        const files = keys.map((req) => req.url);
-        respond({ files });
+        const files = {};
+
+        // Get local files
+        const localCache = await fsCache.open("local");
+        const localKeys = await localCache.keys();
+        for (const req of localKeys) {
+          const response = await localCache.match(req);
+          if (response) {
+            const url = new URL(req.url);
+            const content = await response.clone().text();
+            const mimeType = response.headers.get("Content-Type")?.split(";")[0] || getMimeType(url.pathname);
+            files[url.pathname] = { content, mimeType };
+          }
+        }
+
+        // Get CDN files (esm.sh) with their esm.sh paths
+        const cdnCache = await fsCache.open("cdn");
+        const cdnKeys = await cdnCache.keys();
+        for (const req of cdnKeys) {
+          const response = await cdnCache.match(req);
+          if (response) {
+            const url = new URL(req.url);
+            if (url.hostname === "esm.sh") {
+              const esmPath = `${url.pathname}${url.search}`;
+              const content = await response.clone().text();
+              const mimeType = response.headers.get("Content-Type")?.split(";")[0] || "application/javascript";
+              files[esmPath] = { content, mimeType };
+            }
+          }
+        }
+
+        respond(files);
       } catch (error) {
         respond({ error: error.message });
       }
@@ -239,6 +267,34 @@ export function initSWBackend(app, appConfig = {}) {
       return;
     }
 
+    // Handle esm.sh internal paths (e.g., /lit-html@3.3.1/..., /v135/...)
+    const isEsmPath = url.origin === self.location.origin &&
+      (url.pathname.match(/^\/[^\/]+@[\d.]+/) || url.pathname.startsWith("/v1"));
+
+    if (isEsmPath) {
+      event.respondWith(
+        (async () => {
+          const esmUrl = `https://esm.sh${url.pathname}${url.search}`;
+          const cdnCache = await fsCache.open("cdn");
+          const cacheKey = new Request(esmUrl);
+          const cachedResponse = await cdnCache.match(cacheKey);
+          if (cachedResponse) return cachedResponse;
+
+          try {
+            const networkResponse = await fetch(esmUrl);
+            if (networkResponse.ok) {
+              cdnCache.put(cacheKey, networkResponse.clone());
+            }
+            return networkResponse;
+          } catch (error) {
+            console.error("SW: ESM.sh internal fetch failed:", error);
+            return new Response("Network error", { status: 503 });
+          }
+        })()
+      );
+      return;
+    }
+
     // Handle CDN requests
     if (ALLOWED_HOSTNAMES.includes(url.hostname)) {
       event.respondWith(
@@ -266,24 +322,20 @@ export function initSWBackend(app, appConfig = {}) {
     if (url.origin === self.location.origin) {
       event.respondWith(
         (async () => {
-          // Try staging cache first (edited files)
+          // Try staging cache first (edited files from IDE)
           const stagingCache = await fsCache.open("staging");
           const stagingResponse = await stagingCache.match(event.request);
           if (stagingResponse) return stagingResponse;
 
-          // Try local cache
-          const localCache = await fsCache.open("local");
-          const localResponse = await localCache.match(event.request);
-          if (localResponse) return localResponse;
-
-          // Try file store cache
-          const fileStoreCache = await fsCache.open("fileStore");
-          const fileStoreResponse = await fileStoreCache.match(event.request);
-          if (fileStoreResponse) return fileStoreResponse;
-
-          // Fall back to network
+          // Always fetch from network in dev (don't serve from local cache)
           try {
-            return await fetch(event.request);
+            const networkResponse = await fetch(event.request);
+            // Cache GET requests for later bundling (Cache API only supports GET)
+            if (networkResponse.ok && event.request.method === "GET") {
+              const localCache = await fsCache.open("local");
+              localCache.put(event.request, networkResponse.clone());
+            }
+            return networkResponse;
           } catch (error) {
             console.error("SW: Local fetch failed:", error);
             return new Response("Not found", { status: 404 });

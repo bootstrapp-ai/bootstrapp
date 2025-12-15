@@ -509,6 +509,10 @@ export const serve = async (adapter, args = []) => {
             persistent: true,
           },
           async (filePath) => {
+            if (filePath.startsWith(adapter.join(projectDir, ".deployed"))) {
+              return;
+            }
+
             adapter.log(
               `File changed: ${adapter.basename(filePath)}. Reloading clients...`,
             );

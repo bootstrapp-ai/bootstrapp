@@ -264,6 +264,7 @@ $APP.define("release-creator", {
 });
 
 $APP.define("release-history", {
+  dataQuery: true,
   properties: {
     rows: T.array(),
     limit: T.number(0),
@@ -506,8 +507,7 @@ export default {
         </uix-card>
 
         <release-history
-          .rows=${this.releases}
-          .limit=${5}
+          .data-query=${{ model: "bundler_releases", order: "-deployedAt", key: "rows", limit: 10 }}
         ></release-history>
       </div>
     `;
@@ -526,7 +526,7 @@ export default {
       <div class="bundler-tab-content bundler-deploy-content">
         <release-creator></release-creator>
         <release-history
-          .data-query=${{ model: "bundler_releases", order: "-deployedAt", key: "rows" }}
+          .data-query=${{ model: "bundler_releases", order: "-deployedAt", key: "rows", limit: 10 }}
         ></release-history>
       </div>
     `;

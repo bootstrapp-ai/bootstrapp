@@ -1,6 +1,5 @@
-import Github from "/$app/github/index.js";
 import $APP from "/$app.js";
-import { deployToTarget, getTarget, getTargets } from "./targets/index.js";
+import { deployToTarget, getTargets } from "./targets/index.js";
 
 // Import targets (they self-register)
 import "./targets/github.js";
@@ -9,53 +8,15 @@ import "./targets/zip.js";
 import "./targets/targz.js";
 import "./targets/localhost.js";
 
+// Import templates
+import indexHTMLTemplate from "./templates/index.html.js";
+import manifestJSONTemplate from "./templates/manifest.json.js";
+import robotsTXTTemplate from "./templates/robots.txt.js";
+import sitemapXMLTemplate from "./templates/sitemap.xml.js";
+import staticPageHTMLTemplate from "./templates/static-page.html.js";
+import swJSTemplate from "./templates/sw.js.js";
+
 const { Router } = $APP;
-
-/**
- * The script content for bootstrapping the PWA.
- * This is used in both the main index.html and statically generated pages.
- */
-const PWA_HYDRATION_SCRIPT = `
-        const ensureSWController = () => {
-            const timeoutPromise = new Promise((_, reject) => {
-                setTimeout(() => reject(new Error("Service Worker timed out.")), 100);
-            });
-            const controllerPromise = new Promise((resolve) => {
-                if (navigator.serviceWorker.controller) {
-                    return resolve();
-                }
-                navigator.serviceWorker.addEventListener("controllerchange", () => {
-                    return resolve();
-                });
-            });
-            return Promise.race([controllerPromise, timeoutPromise]);
-        };
-
-        const startApp = async () => {
-            if (!("serviceWorker" in navigator)) {
-                console.warn("Service Worker not supported.");
-                throw new Error("Platform not supported");
-            }
-
-            await navigator.serviceWorker.register("/sw.js", {
-                scope: "/",
-                type: "module",
-            });
-
-            try {
-                console.log("Waiting for Service Worker to take control...");
-                await ensureSWController();
-                console.log("✅ Service Worker is in control!");
-                const { default: $APP } = await import("/app.js");
-                await $APP.load(true);
-            } catch (error) {
-                console.log({ error });
-                console.warn("Service Worker did not take control in time. Reloading...");
-                window.location.reload();
-            }
-        };
-
-        startApp();`;
 
 // This object is now a client-side wrapper that calls our server proxy
 const Cloudflare = {
@@ -173,27 +134,6 @@ async function minify(content, mimeType) {
   }
 }
 
-const minifyHTML = (content) => {
-  if (typeof content !== "string") {
-    return "";
-  }
-  return content
-    .replace(/<!--.*?-->/gs, "")
-    .replace(/>\s+</g, "><")
-    .replace(/\s+/g, " ")
-    .replace(/ >/g, ">")
-    .replace(/< /g, "<")
-    .trim();
-};
-
-const html = (strings, ...values) => {
-  const fullHTML = strings.reduce(
-    (acc, str, i) => acc + str + (values[i] || ""),
-    "",
-  );
-  return minifyHTML(fullHTML);
-};
-
 const EMBEDDABLE_MIME_TYPES = [
   "text/css",
   "application/javascript",
@@ -228,120 +168,13 @@ const getHydrationComponents = (htmlContent) => {
 
 const bundler = {
   getHydrationComponents,
-  _createRobotsTXT(settings) {
-    if (!settings.url) {
-      console.warn("Cannot generate robots.txt: settings.url is not defined.");
-      return "User-agent: *\nAllow: /\n";
-    }
-    const sitemapURL = new URL("sitemap.xml", settings.url).href;
-    return `User-agent: *\nAllow: /\nSitemap: ${sitemapURL}`;
-  },
-  _createSitemapXML(settings, pages) {
-    if (!settings.url) {
-      console.warn("Cannot generate sitemap.xml: settings.url is not defined.");
-      return `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>`;
-    }
-    const today = new Date().toISOString().split("T")[0];
-    const urls = pages
-      .map((page) => {
-        let urlPath = page.path.replace(/index\.html$/, "");
-        if (urlPath === "") urlPath = "/";
-        if (!urlPath.startsWith("/")) urlPath = `/${urlPath}`;
-        const loc = new URL(urlPath, settings.url).href;
-        const priority = urlPath === "/" ? "1.0" : "0.8";
-        return `
-    <url>
-        <loc>${loc}</loc>
-        <lastmod>${today}</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>${priority}</priority>
-    </url>`;
-      })
-      .join("");
-    return `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls}
-</urlset>`.trim();
-  },
-  _createIndexHTML(settings) {
-    return html`<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <title>${settings.name}</title>
-    <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
-    <meta name="theme-color" content="${settings.theme_color || "#000000"}" />
-    <meta name="description" content="${settings.description || "A PWA application."}" />
-    <meta property="og:title" content="${settings.name}" />
-    <meta property="og:description" content="${settings.description || "A PWA application."}" />
-    <meta property="og:image" content="${settings.og_image || "/assets/icons/icon-512x512.png"}" />
-    <meta property="og:url" content="${settings.canonicalUrl || "/"}" />
-    <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="${settings.name}" />
-    <meta name="twitter:description" content="${settings.description || "A PWA application."}" />
-    <meta name="twitter:image" content="${settings.og_image || "/assets/icons/icon-512x512.png"}" />
-    <link rel="manifest" href="/manifest.json" />
-    <link rel="stylesheet" href="/style.css">
-    ${
-      !$APP.settings.importmap
-        ? ""
-        : html`<script type="importmap">
-            ${JSON.stringify({ imports: $APP.settings.importmap }, null, 2)}
-    </script>`
-    }
-    <link id="favicon" rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLW1vdW50YWluIj48cGF0aCBkPSJtOCAzIDQgOCA1LTUgNSAxNUgyTDggM3oiLz48L3N2Zz4="/>
-    <script>${PWA_HYDRATION_SCRIPT}</script>
-</head>
-<body class="production flex">
-    <app-container></app-container>
-</body>
-</html>`;
-  },
+  _createRobotsTXT: robotsTXTTemplate,
+  _createSitemapXML: sitemapXMLTemplate,
+  _createIndexHTML: indexHTMLTemplate,
   _createServiceWorker(fileMap) {
-    const swContent =
-      "const FILE_BUNDLE = " +
-      JSON.stringify(fileMap, null, 2) +
-      ";" +
-      `self.addEventListener("install", (e) => e.waitUntil(self.skipWaiting()));
-      self.addEventListener("activate", (e) => e.waitUntil(self.clients.claim()));
-      self.addEventListener("fetch", (e) => {
-        const url = new URL(e.request.url);
-        const file = FILE_BUNDLE[url.pathname];
-        if (file) {
-          e.respondWith(
-            new Response(file.content, {
-              headers: { 'Content-Type': file.mimeType || 'application/javascript' }
-            })
-          );
-        }
-      });`;
-    return minify(swContent, "application/javascript");
+    return minify(swJSTemplate({ fileMap }), "application/javascript");
   },
-  _createManifest(settings = {}) {
-    return {
-      name: settings.name,
-      short_name: settings.short_name || settings.name,
-      start_url: settings.url || "/",
-      scope: settings.scope || settings.url || "/",
-      display: "standalone",
-      background_color: settings.theme_color || "#ffffff",
-      theme_color: settings.theme_color || "#000000",
-      description: settings.description || "",
-      icons: [
-        {
-          src: "/assets/icons/icon-192x192.png",
-          sizes: "192x192",
-          type: "image/png",
-        },
-        {
-          src: "/assets/icons/icon-512x512.png",
-          sizes: "512x512",
-          type: "image/png",
-          purpose: "any maskable",
-        },
-      ],
-    };
-  },
+  _createManifest: manifestJSONTemplate,
   async extractCSS() {
     return Array.from(document.querySelectorAll("style"))
       .map((style) => style.innerHTML)
@@ -402,7 +235,7 @@ const bundler = {
       throw error;
     }
   },
-  async _bundleSPACore(credentials, { mode = "spa" }) {
+  async _bundleSPACore({ mode = "spa" }) {
     console.log(`🚀 Starting ${mode.toUpperCase()} bundle process...`);
     const filesForDeployment = [];
     const filesForSW = await $APP.SW.request("SW:GET_CACHED_FILES");
@@ -464,12 +297,11 @@ const bundler = {
     addFilePromises.push(
       addFile({ path: "style.css", content: css, mimeType: "text/css" }),
     );
-    if (mode === "hybrid")
-      filesForDeployment.push({
-        path: "style.css",
-        content: css,
-        mimeType: "text/css",
-      });
+    filesForDeployment.push({
+      path: "style.css",
+      content: css,
+      mimeType: "text/css",
+    });
     const manifest = this._createManifest($APP.settings);
     manifest.icons.forEach((icon) => {
       const path = icon.src.substring(1);
@@ -538,11 +370,11 @@ const bundler = {
   async build(mode) {
     switch (mode) {
       case "spa":
-        return this._bundleSPACore({}, { mode: "spa" });
+        return this._bundleSPACore({ mode: "spa" });
       case "ssg":
         return this.bundleSSG();
       case "hybrid":
-        return this._bundleSPACore({}, { mode: "hybrid" });
+        return this._bundleSPACore({ mode: "hybrid" });
       default:
         throw new Error(`Unknown build mode: ${mode}`);
     }
@@ -570,8 +402,8 @@ const bundler = {
     console.log(`✅ Deployment to ${target} completed!`, result);
     return result;
   },
-  async bundleSPA(credentials) {
-    return this._bundleSPACore(credentials, { mode: "spa" });
+  async bundleSPA() {
+    return this._bundleSPACore({ mode: "spa" });
   },
   async bundleSSG() {
     console.log("🚀 Starting SSG bundle process...");
@@ -595,7 +427,7 @@ const bundler = {
     return files;
   },
   async bundleHybrid(credentials) {
-    return this._bundleSPACore(credentials, { mode: "hybrid" });
+    return this._bundleSPACore({ mode: "hybrid" });
   },
 };
 
@@ -613,9 +445,7 @@ const _renameCustomElementTags = (htmlContent) => {
   );
   allHydrationRoots.forEach((root) => {
     exclusionSet.add(root);
-    if (root.hasAttribute("client:inject")) {
-      root.innerHTML = ""; // Remove inner content for client:inject
-    }
+    if (root.hasAttribute("client:inject")) root.innerHTML = "";
   });
   const allCustomElements = Array.from(body.querySelectorAll("*")).filter(
     (el) => el.localName.includes("-"),
@@ -654,37 +484,12 @@ const createStaticPage = ({ headContent, content }) => {
   const { content: renamedContent, hydrate } =
     _renameCustomElementTags(content);
   const needsHydration = hydrate.length > 0;
-  const hydrationScript = needsHydration
-    ? `<script>setTimeout(() => { 
-                ${PWA_HYDRATION_SCRIPT}
-            }, 2000); </script>`
-    : "";
-  return minifyHTML(
-    `<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="view-transition" content="same-origin">
-        <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
-        <meta name="theme-color" content="${$APP.settings.theme_color || "#000000"}" />
-        ${headContent}
-                                                ${
-                                                  needsHydration &&
-                                                  $APP.settings.importmap
-                                                    ? html`<script type="importmap">
-                        ${JSON.stringify({ imports: $APP.settings.importmap }, null, 2)}
-                </script>`
-                                                    : ""
-                                                }
-        <link rel="stylesheet" href="/style.css">
-            <link id="favicon" rel="icon" type="image/svg+xml" href="${$APP.settings.emojiIcon ? `data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100%22><text y=%22.9em%22 font-size=%2290%22>${$APP.settings.emojiIcon}</text></svg>` : $APP.settings.icon}"/>
-    </head>
-    <body class="production flex">
-      ${renamedContent}
-      ${hydrationScript}
-    </body>
-</html>`.trim(),
-  );
+  return staticPageHTMLTemplate({
+    headContent,
+    content: renamedContent,
+    settings: $APP.settings,
+    needsHydration,
+  });
 };
 
 const generateStaticHTMLForCurrentRoute = async () => {
