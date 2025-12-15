@@ -100,8 +100,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: var(--link-icon-size, 1em);
-    height: var(--link-icon-size, 1em);
+    width: var(--link-icon-size, 1.25rem);
+    height: var(--link-icon-size, 1.25rem);
     color: var(--link-icon-color, currentColor);
     flex-shrink: 0;
   }
