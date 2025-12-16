@@ -7,6 +7,12 @@ import { getModelSchema, getPrimaryDisplayField } from "./model-utils.js";
  * @returns {string} Input type for uix-input
  */
 export const typeToInputType = (fieldDef) => {
+  // CMS field types (from @bootstrapp/cms)
+  // These are rendered by the CMS plugin via custom field renderers
+  if (fieldDef.cmsType) {
+    return fieldDef.cmsType;
+  }
+
   // Enum fields become select
   if (fieldDef.enum) return "select";
 
@@ -89,7 +95,8 @@ export const getFormFields = (modelName, isEdit = false) => {
       if (isEdit && field.immutable) return false;
 
       // Skip fields marked as non-attribute (internal only)
-      if (field.attribute === false) return false;
+      // BUT keep CMS fields even if attribute is false (they handle their own rendering)
+      if (field.attribute === false && !field.cmsType) return false;
 
       return true;
     })
@@ -104,6 +111,11 @@ export const getFormFields = (modelName, isEdit = false) => {
       relationship: field.relationship,
       targetModel: field.targetModel,
       rows: field.rows || (typeToInputType(field) === "textarea" ? 3 : undefined),
+      // CMS-specific properties
+      cmsType: field.cmsType,
+      editor: field.editor,
+      accept: field.accept,
+      maxSize: field.maxSize,
     }));
 };
 

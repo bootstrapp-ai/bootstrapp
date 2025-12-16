@@ -18,7 +18,7 @@ import { SubscriptionManager } from "/$app/model/subscription-manager.js";
 import {
   loadRelationships,
   loadRelationshipsForMany,
-} from "/$app/model-pocketbase/relationship-loader.js";
+} from "/$app/model/relationship-loader.js";
 import T from "/$app/types/index.js";
 import $APP from "/$app.js";
 

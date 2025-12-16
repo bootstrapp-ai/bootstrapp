@@ -42,7 +42,10 @@ export default {
           href: `/admin/models/${parts[2]}`,
         });
         if (parts[3]) {
-          breadcrumbs.push({ text: parts[3] === "new" ? "New" : "Edit", href: null });
+          breadcrumbs.push({
+            text: parts[3] === "new" ? "New" : "Edit",
+            href: null,
+          });
         }
       } else {
         breadcrumbs.push({ text: capitalize(parts[1]), href: null });
@@ -58,7 +61,8 @@ export default {
     const models = getModelNames();
     const sidebarItems = getSidebarItems();
     const breadcrumbs = this.getBreadcrumbs();
-    const isDashboard = this.isActive("/admin") && !this.currentRoute?.path?.includes("/models");
+    const isDashboard =
+      this.isActive("/admin") && !this.currentRoute?.path?.includes("/models");
 
     return html`
       <div class="admin-wrapper">
@@ -102,9 +106,9 @@ export default {
               </details>
             </li>
 
-            ${sidebarItems.length > 0
-              ? html`
-                  <li class="divider"></li>
+            ${
+              sidebarItems.length > 0
+                ? html`
                   ${sidebarItems.map(
                     (item) => html`
                       <li>
@@ -117,7 +121,8 @@ export default {
                     `,
                   )}
                 `
-              : ""}
+                : ""
+            }
           </uix-menu>
 
           <div slot="footer">

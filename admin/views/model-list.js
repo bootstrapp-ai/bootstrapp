@@ -2,13 +2,13 @@ import T from "/$app/types/index.js";
 import $APP from "/$app.js";
 import { html } from "/npm/lit-html";
 import { keyed } from "/npm/lit-html/directives/keyed.js";
+import { getModelActions, getPluginModals } from "../plugins.js";
 import {
   capitalize,
   getDisplayColumns,
   getModelSchema,
   getSingularName,
 } from "../utils/model-utils.js";
-import { getModelActions, getPluginModals } from "../plugins.js";
 
 export default {
   tag: "admin-model-list",
@@ -18,7 +18,11 @@ export default {
     rows: T.array(),
     model: T.string(),
     selectedRow: T.object(),
-    selectedColumns: T.array({ sync: "local", scope: "model" }),
+    selectedColumns: T.array({
+      sync: "local",
+      scope: "model",
+      defaultValue: [],
+    }),
     viewMode: T.string({ defaultValue: "list", enum: ["list", "board"] }),
     groupByField: T.string({ sync: "local", scope: "model", defaultValue: "" }),
     modalOpen: T.boolean({ defaultValue: false }),
@@ -376,7 +380,7 @@ export default {
           <div slot="header">Delete ${capitalize(modelName)}?</div>
           <div class="admin-delete-confirm">
             <div class="admin-delete-icon">
-              <uix-icon name="alert-triangle" size="24"></uix-icon>
+              <uix-icon name="triangle-alert" size="24"></uix-icon>
             </div>
             <div>
               <p class="admin-delete-text">This action cannot be undone.</p>

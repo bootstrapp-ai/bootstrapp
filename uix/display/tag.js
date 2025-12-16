@@ -143,7 +143,7 @@ export default {
  *     Verified
  *   </uix-tag>
  *   <uix-tag variant="warning">
- *     <uix-icon name="alert-triangle" slot="icon"></uix-icon>
+ *     <uix-icon name="triangle-alert" slot="icon"></uix-icon>
  *     Warning
  *   </uix-tag>
  * </div>

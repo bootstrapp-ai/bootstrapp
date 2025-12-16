@@ -50,6 +50,13 @@ export default {
     const controls = this.getFormControls();
     const data = {};
 
+    // Include CMS field values from this.data (they update via events)
+    for (const field of this.fields || []) {
+      if (field.cmsType && this.data?.[field.name] !== undefined) {
+        data[field.name] = this.data[field.name];
+      }
+    }
+
     controls.forEach((el) => {
       const name = el.getAttribute("name") || el.name;
       if (!name) return;
@@ -200,7 +207,84 @@ export default {
     this.emit("form-submit", serialized);
   },
 
+  /**
+   * Render CMS-specific field types
+   * These are custom elements that handle their own rendering and events
+   */
+  renderCmsField(field, value) {
+    const handleChange = (e) => {
+      this.data = { ...this.data, [field.name]: e.detail };
+    };
+
+    switch (field.cmsType) {
+      case "richText":
+        return html`
+          <cms-rich-text
+            name=${field.name}
+            .value=${value || ""}
+            .field=${field}
+            @change=${handleChange}
+          ></cms-rich-text>
+        `;
+
+      case "media":
+        return html`
+          <cms-media-picker
+            name=${field.name}
+            .value=${value || ""}
+            .field=${field}
+            @change=${handleChange}
+          ></cms-media-picker>
+        `;
+
+      case "seo":
+        return html`
+          <cms-seo-fields
+            name=${field.name}
+            .value=${value || {}}
+            .field=${field}
+            @change=${handleChange}
+          ></cms-seo-fields>
+        `;
+
+      case "publishStatus":
+        return html`
+          <cms-publishing-bar
+            name=${field.name}
+            .status=${value || "draft"}
+            @status-change=${handleChange}
+          ></cms-publishing-bar>
+        `;
+
+      default:
+        // Fallback to text input for unknown CMS types
+        return html`
+          <uix-input
+            type="text"
+            name=${field.name}
+            label=${field.label}
+            value=${value || ""}
+            ?required=${field.required}
+          ></uix-input>
+        `;
+    }
+  },
+
   renderField(field, value) {
+    // Check for custom type handlers first (from typeHandlers prop)
+    if (this.typeHandlers?.[field.type]?.render) {
+      return this.typeHandlers[field.type].render(field, value, (newValue) => {
+        // This callback updates the form data when custom fields change
+        this.data = { ...this.data, [field.name]: newValue };
+      });
+    }
+
+    // Check for CMS field types (plugin-based renderers)
+    // CMS fields render themselves as custom elements
+    if (field.cmsType) {
+      return this.renderCmsField(field, value);
+    }
+
     const renderers = {
       textarea: () => html`
         <uix-textarea

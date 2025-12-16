@@ -1,0 +1,27 @@
+{
+  "name": "@bootstrapp/cms",
+  "version": "0.1.0",
+  "description": "Content Management System for Bootstrapp - rich text, media library, SEO, publishing workflow",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./schema.js": "./schema.js",
+    "./types.js": "./types.js",
+    "./plugin.js": "./plugin.js"
+  },
+  "keywords": [
+    "bootstrapp",
+    "cms",
+    "content-management",
+    "rich-text",
+    "media-library",
+    "seo"
+  ],
+  "author": "Bootstrapp",
+  "license": "MIT",
+  "peerDependencies": {
+    "@bootstrapp/types": "*",
+    "@bootstrapp/admin": "*"
+  }
+}

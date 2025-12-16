@@ -8,14 +8,11 @@ import {
   isConnected,
   onConnectionChange,
 } from "/$app/extension/extension-bridge.js";
-import Theme from "/$app/theme/index.js";
 import T from "/$app/types/index.js";
 import $APP from "/$app.js";
 import { html, nothing } from "/npm/lit-html";
 
-Theme.loadCSS("/admin/integrations/instagram/import.css", true);
-
-$APP.define("admin-instagram-import", {
+export default {
   tag: "admin-instagram-import",
 
   properties: {
@@ -443,4 +440,4 @@ $APP.define("admin-instagram-import", {
       </div>
     `;
   },
-});
+};

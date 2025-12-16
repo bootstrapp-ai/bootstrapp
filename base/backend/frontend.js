@@ -146,7 +146,7 @@ const fetchDataQuery = async (instance) => {
       const oldValue = instance.state[key];
       instance.state[key] = reactiveRow;
       instance.requestUpdate(key, oldValue);
-
+      console.log({ id, reactiveRow });
       // Subscribe to updates - handle both array and single row formats
       reactiveRow.subscribe?.((data) => {
         const row = Array.isArray(data) ? data[0] : data;

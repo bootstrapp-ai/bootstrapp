@@ -8,12 +8,11 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-
+  background: var(--card-background, inherit);
   &::part(body) {
     display: flex;
     flex-direction: column;
     flex: 1;
-    background: var(--card-background, inherit);
   }
 
   /* Header Part */
@@ -30,7 +29,7 @@
       --card-header-border-color,
       var(--card-border-primary, #504945)
     );
-    background: var(--card-header-background-color, inherit);
+    background: var(--card-header-background-color, transparent);
   }
 
   /* Footer Part */
@@ -46,7 +45,7 @@
       --card-footer-border-color,
       var(--color-surface, #504945)
     );
-    background: var(--card-footer-background-color, inherit);
+    background: var(--card-footer-background-color, transparent);
     flex-direction: row;
     gap: var(--spacing-sm, 0.5rem);
     align-items: center;

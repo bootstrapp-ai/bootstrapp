@@ -73,7 +73,7 @@ export default {
     const icons = {
       success: "circle-check",
       error: "circle-x",
-      warning: "alert-triangle",
+      warning: "triangle-alert",
       info: "info",
       default: null,
     };
