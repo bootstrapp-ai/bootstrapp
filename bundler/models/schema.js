@@ -22,7 +22,7 @@ export default {
     }),
     deployTarget: T.string({
       enum: ["github", "cloudflare", "zip", "targz", "localhost"],
-      defaultValue: "github",
+      defaultValue: "localhost",
     }),
     deployedAt: T.string(),
     files: T.array(),

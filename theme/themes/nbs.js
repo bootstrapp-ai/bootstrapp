@@ -359,6 +359,19 @@ export default {
     "nav-font-weight": "900",
   },
 
+  breadcrumbs: {
+    "font-size": "0.875rem",
+    "font-weight": "700",
+    "current-font-weight": "900",
+    "text-transform": "uppercase",
+    "letter-spacing": "0.05em",
+    "link-color": "#6b7280",
+    "link-hover-color": "#1a1a1a",
+    "current-color": "#1a1a1a",
+    "separator-color": "#9ca3af",
+    gap: "0.5rem",
+  },
+
   sidebar: {
     background: "#ffffff",
     "border-width": "3px",

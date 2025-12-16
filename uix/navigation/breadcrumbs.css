@@ -27,6 +27,9 @@
     uix-link {
       color: var(--breadcrumbs-link-color, var(--text-muted, #6b7280));
       font-size: var(--breadcrumbs-font-size, var(--text-sm, 0.875rem));
+      font-weight: var(--breadcrumbs-font-weight, var(--font-medium, 500));
+      text-transform: var(--breadcrumbs-text-transform, none);
+      letter-spacing: var(--breadcrumbs-letter-spacing, normal);
 
       &:hover {
         color: var(--breadcrumbs-link-hover-color, var(--color-primary));
@@ -36,7 +39,9 @@
     .current {
       color: var(--breadcrumbs-current-color, var(--text-color));
       font-size: var(--breadcrumbs-font-size, var(--text-sm, 0.875rem));
-      font-weight: var(--font-semibold, 600);
+      font-weight: var(--breadcrumbs-current-font-weight, var(--font-bold, 700));
+      text-transform: var(--breadcrumbs-text-transform, none);
+      letter-spacing: var(--breadcrumbs-letter-spacing, normal);
     }
 
     .separator {

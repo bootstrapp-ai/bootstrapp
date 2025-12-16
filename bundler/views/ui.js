@@ -166,8 +166,7 @@ $APP.define("release-creator", {
       deployTarget: this.deployTarget,
     };
     try {
-      const [error, newRelease] =
-        await $APP.Model.bundler_releases.add(release);
+      const [_, newRelease] = await $APP.Model.bundler_releases.add(release);
       const result = await Bundler.deploy({
         ...credentials,
         mode: this.deployMode,
@@ -175,7 +174,7 @@ $APP.define("release-creator", {
         version: this.version,
       });
       await $APP.Model.bundler_releases.edit({
-        ...newRelease,
+        id: newRelease.id,
         status: "success",
         result,
       });

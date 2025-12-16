@@ -18,12 +18,14 @@
     align-items: center;
     justify-content: space-between;
     flex: 1;
+    min-height: var(--navbar-height, auto);
     padding: var(
       --navbar-padding,
       var(--spacing-md, 0.75rem) var(--spacing-lg, 1rem)
     );
     max-width: var(--navbar-max-width, 100%);
     margin: 0 auto;
+    box-sizing: border-box;
   }
 
   &::part(brand) {
