@@ -516,13 +516,16 @@ export const serve = async (adapter, args = []) => {
         await adapter.watch(
           [projectDir],
           {
-            //ignored: /(^|[/\\])\\..|node_modules/,
+            ignored: [
+              "**/node_modules/**",
+              "**/.deployed/**",
+              "**/pb_data/**",
+              "**/pb_migrations/**",
+              "**/.git/**",
+            ],
             persistent: true,
           },
           async (filePath) => {
-            if (filePath.startsWith(adapter.join(projectDir, ".deployed"))) {
-              return;
-            }
 
             adapter.log(
               `File changed: ${adapter.basename(filePath)}. Reloading clients...`,

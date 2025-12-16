@@ -1,7 +1,8 @@
 import { initAuthBackend } from "/$app/auth/backend.js";
 import config from "/$app/base/config.js";
 import { initModelBackend } from "/$app/model/backend.js";
-import { createDatabase, registerAdapter } from "/$app/model/factory.js";
+import { loadAdapter } from "/$app/model/adapter-loader.js";
+import { createDatabase } from "/$app/model/factory.js";
 import {
   buildQueryResult,
   matchesWhere,
@@ -14,7 +15,6 @@ import {
   validateRow,
 } from "/$app/model/row-utils.js";
 import { SubscriptionManager } from "/$app/model/subscription-manager.js";
-import { IndexedDBAdapter } from "/$app/model-indexeddb/adapter.js";
 import {
   loadRelationships,
   loadRelationshipsForMany,
@@ -22,28 +22,28 @@ import {
 import T from "/$app/types/index.js";
 import $APP from "/$app.js";
 
-// Register IndexedDB adapter with injected dependencies
-registerAdapter(
-  "indexeddb",
-  class ConfiguredIndexedDBAdapter extends IndexedDBAdapter {
-    constructor(cfg) {
-      super({
-        ...cfg,
-        validateRow,
-        prepareRow,
-        generateId,
-        mergeRowUpdates,
-        buildQueryResult,
-        matchesWhere,
-        validateQueryOptions,
-        loadRelationships,
-        loadRelationshipsForMany,
-        eventEmitter: (event, data) => $APP.events.emit(event, data),
-        subscriptionManager: $APP.SubscriptionManager,
-      });
-    }
-  },
-);
+/**
+ * Load the required database adapter based on config type
+ * @param {string} type - Adapter type (indexeddb, pocketbase, hybrid)
+ * @returns {Promise<void>}
+ */
+async function loadDatabaseAdapter(type = "indexeddb") {
+  const dependencies = {
+    validateRow,
+    prepareRow,
+    generateId,
+    mergeRowUpdates,
+    buildQueryResult,
+    matchesWhere,
+    validateQueryOptions,
+    loadRelationships,
+    loadRelationshipsForMany,
+    eventEmitter: (event, data) => $APP.events.emit(event, data),
+    subscriptionManager: $APP.SubscriptionManager,
+  };
+
+  await loadAdapter(type, dependencies);
+}
 
 // Initialize model and auth backends with $APP injection
 initModelBackend($APP);
@@ -327,6 +327,12 @@ if ($APP.settings.runtime === "worker") {
       };
       const needsSystemModels = ["indexeddb", "hybrid"].includes(dbConfig.type);
 
+      // Load the required database adapter based on config type
+      // - indexeddb: loads indexeddb adapter
+      // - pocketbase: loads pocketbase adapter
+      // - hybrid: loads all three (indexeddb, pocketbase, hybrid)
+      await loadDatabaseAdapter(dbConfig.type);
+
       let app;
       if (needsSystemModels) {
         SysModel = await createDatabase({
@@ -371,6 +377,22 @@ if ($APP.settings.runtime === "worker") {
         };
         Database = await createDatabase(dbConfig);
         await Database.init();
+
+        // Migrate initial data for PocketBase (if $APP.data exists and DB is empty)
+        if ($APP.data && Object.keys($APP.data).length > 0) {
+          console.log("PocketBase: Checking for initial data migration...");
+          // Check if first model has any data
+          const firstModel = Object.keys($APP.data)[0];
+          const existing = await Database.getAll(firstModel, { limit: 1 });
+          if (existing.length === 0) {
+            console.log("PocketBase: Migrating initial data...");
+            await Database.importData($APP.data);
+            console.log("PocketBase: Initial data migration complete");
+          } else {
+            console.log("PocketBase: Data already exists, skipping migration");
+          }
+        }
+
         const env = { app, user: null, device: null };
         await $APP.events.emit("APP:BACKEND:STARTED", env);
       }

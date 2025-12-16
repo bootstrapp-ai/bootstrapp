@@ -125,14 +125,19 @@ export class PocketBaseAdapter extends DatabaseAdapterBase {
 
         if (!existingCollections.has(collectionName)) {
           console.log(`PocketBase: Creating collection "${collectionName}"...`);
-          await this.pb.collections.create({
-            name: collectionName,
-            type: "base",
-            fields: pbSchema,
-          });
-          console.log(
-            `PocketBase: Created collection "${collectionName}" with ${pbSchema.length} fields`,
-          );
+          try {
+            await this.pb.collections.create({
+              name: collectionName,
+              type: "base",
+              fields: pbSchema,
+            });
+            console.log(
+              `PocketBase: Created collection "${collectionName}" with ${pbSchema.length} fields`,
+            );
+          } catch (createError) {
+            console.error(`PocketBase: Failed to create collection "${collectionName}":`, createError.data || createError.message);
+            throw createError;
+          }
         } else {
           const existingCollection = existingCollections.get(collectionName);
           const updatedSchema = this._mergeSchemas(
@@ -169,7 +174,8 @@ export class PocketBaseAdapter extends DatabaseAdapterBase {
     const fields = [];
 
     for (const [fieldName, fieldDef] of Object.entries(modelSchema)) {
-      if (fieldName === "id") continue;
+      // Skip internal fields (id, $hooks, etc.)
+      if (fieldName === "id" || fieldName.startsWith("$")) continue;
 
       const pbType = this._mapFieldType(fieldDef);
       const field = {
@@ -353,6 +359,8 @@ export class PocketBaseAdapter extends DatabaseAdapterBase {
       if (isId) {
         const id = idOrWhere;
         const pbOptions = this._buildQueryOptions(options);
+        // Disable auto-cancellation for concurrent requests
+        pbOptions.requestKey = null;
 
         const record = await this.pb
           .collection(collection)
@@ -400,6 +408,8 @@ export class PocketBaseAdapter extends DatabaseAdapterBase {
     try {
       const collection = this._getCollectionName(model);
       const pbOptions = this._buildQueryOptions(options);
+      // Disable auto-cancellation for concurrent requests
+      pbOptions.requestKey = null;
 
       const records = await this.pb
         .collection(collection)
@@ -695,11 +705,30 @@ export class PocketBaseAdapter extends DatabaseAdapterBase {
    */
   async importData(dump, options = {}) {
     for (const [modelName, entries] of Object.entries(dump)) {
-      if (this.models[modelName]) {
-        for (const entry of entries) {
+      if (!this.models[modelName]) {
+        console.warn(`PocketBase: Skipping unknown model "${modelName}" during import`);
+        continue;
+      }
+
+      if (!entries || !Array.isArray(entries) || entries.length === 0) {
+        continue;
+      }
+
+      console.log(`PocketBase: Importing ${entries.length} records to "${modelName}"...`);
+      let imported = 0;
+      let failed = 0;
+
+      for (const entry of entries) {
+        try {
           await this.add(modelName, entry);
+          imported++;
+        } catch (error) {
+          failed++;
+          console.warn(`PocketBase: Failed to import record to "${modelName}":`, error.message);
         }
       }
+
+      console.log(`PocketBase: Imported ${imported}/${entries.length} records to "${modelName}"${failed > 0 ? ` (${failed} failed)` : ""}`);
     }
   }
 

@@ -33,7 +33,7 @@ export default {
     this.stopAutoplay();
   },
 
-  updated(changedProps) {
+  updated({ changedProps }) {
     if (changedProps.has("autoplay") || changedProps.has("variant")) {
       if (this.variant === "carousel" && this.autoplay) {
         this.startAutoplay();

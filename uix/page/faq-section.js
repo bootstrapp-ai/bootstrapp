@@ -27,7 +27,7 @@ export default {
     this.filteredFaqs = this.faqs;
   },
 
-  updated(changedProps) {
+  updated({ changedProps }) {
     if (changedProps.has("faqs")) {
       this.filterFaqs();
     }

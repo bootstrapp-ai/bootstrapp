@@ -36,17 +36,17 @@ $APP.Testing.suite("View", () => {
           this.initCalled = true;
         }
 
-        willUpdate(changedProps) {
+        willUpdate({ changedProps }) {
           this.willUpdateCalled = true;
           this.willUpdateProps = changedProps;
         }
 
-        updated(changedProps) {
+        updated({ changedProps }) {
           this.updatedCalled = true;
           this.updatedProps = changedProps;
         }
 
-        firstUpdated(changedProps) {
+        firstUpdated({ changedProps }) {
           this.firstUpdatedCalled = true;
           this.firstUpdatedProps = changedProps;
         }
@@ -214,8 +214,8 @@ $APP.Testing.suite("View", () => {
       // Create a spy on shouldUpdate
       const shouldUpdateSpy = mock.fn();
       const originalShouldUpdate = testInstance.shouldUpdate;
-      testInstance.shouldUpdate = function (changedProps) {
-        shouldUpdateSpy(changedProps);
+      testInstance.shouldUpdate = function ({ changedProps }) {
+        shouldUpdateSpy({ changedProps });
         return originalShouldUpdate.call(this, changedProps);
       };
 
