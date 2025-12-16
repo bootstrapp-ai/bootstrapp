@@ -160,7 +160,7 @@ export default {
     const seo = this.content.seo || {};
 
     return html`
-      <div class="cms-editor h-screen flex flex-col bg-gray-50 overflow-hidden">
+      <div class="cms-editor h-full flex flex-col bg-gray-50 overflow-hidden">
         <!-- Header -->
         <div class="flex-shrink-0 bg-white border-b-2 border-black px-6 py-3">
           <div class="flex items-center justify-between">

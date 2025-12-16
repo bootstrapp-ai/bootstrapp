@@ -6,8 +6,7 @@
 import T from "/$app/types/index.js";
 import $APP from "/$app.js";
 import { html } from "/npm/lit-html";
-
-$APP.define("cms-media-library", {
+export default {
   tag: "cms-media-library",
   dataQuery: true,
   style: true,
@@ -180,9 +179,11 @@ $APP.define("cms-media-library", {
               <button
                 type="button"
                 @click=${() => (this.viewMode = "grid")}
-                class="p-2 ${this.viewMode === "grid"
-                  ? "bg-black text-white"
-                  : "bg-white hover:bg-gray-100"}"
+                class="p-2 ${
+                  this.viewMode === "grid"
+                    ? "bg-black text-white"
+                    : "bg-white hover:bg-gray-100"
+                }"
               >
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                   <path
@@ -193,9 +194,11 @@ $APP.define("cms-media-library", {
               <button
                 type="button"
                 @click=${() => (this.viewMode = "list")}
-                class="p-2 ${this.viewMode === "list"
-                  ? "bg-black text-white"
-                  : "bg-white hover:bg-gray-100"}"
+                class="p-2 ${
+                  this.viewMode === "list"
+                    ? "bg-black text-white"
+                    : "bg-white hover:bg-gray-100"
+                }"
               >
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                   <path
@@ -236,19 +239,21 @@ $APP.define("cms-media-library", {
         <div class="flex gap-6">
           <!-- Media Grid/List -->
           <div class="flex-1">
-            ${items.length > 0
-              ? this.viewMode === "grid"
-                ? html`
+            ${
+              items.length > 0
+                ? this.viewMode === "grid"
+                  ? html`
                     <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                       ${items.map(
                         (item) => html`
                           <button
                             type="button"
                             @click=${() => (this.selectedItem = item)}
-                            class="relative aspect-square border-2 border-black rounded-lg overflow-hidden bg-white group ${this
-                              .selectedItem?.id === item.id
-                              ? "ring-4 ring-blue-400"
-                              : "hover:ring-2 hover:ring-gray-300"}"
+                            class="relative aspect-square border-2 border-black rounded-lg overflow-hidden bg-white group ${
+                              this.selectedItem?.id === item.id
+                                ? "ring-4 ring-blue-400"
+                                : "hover:ring-2 hover:ring-gray-300"
+                            }"
                           >
                             <img
                               src="${item.url}"
@@ -270,17 +275,18 @@ $APP.define("cms-media-library", {
                       )}
                     </div>
                   `
-                : html`
+                  : html`
                     <div class="space-y-2">
                       ${items.map(
                         (item) => html`
                           <button
                             type="button"
                             @click=${() => (this.selectedItem = item)}
-                            class="w-full flex items-center gap-4 p-3 border-2 border-black rounded-lg bg-white text-left ${this
-                              .selectedItem?.id === item.id
-                              ? "ring-2 ring-blue-400"
-                              : "hover:bg-gray-50"}"
+                            class="w-full flex items-center gap-4 p-3 border-2 border-black rounded-lg bg-white text-left ${
+                              this.selectedItem?.id === item.id
+                                ? "ring-2 ring-blue-400"
+                                : "hover:bg-gray-50"
+                            }"
                           >
                             <img
                               src="${item.url}"
@@ -301,7 +307,7 @@ $APP.define("cms-media-library", {
                       )}
                     </div>
                   `
-              : html`
+                : html`
                   <div
                     class="text-center py-20 border-2 border-dashed border-gray-300 rounded-lg"
                   >
@@ -350,12 +356,14 @@ $APP.define("cms-media-library", {
                       />
                     </label>
                   </div>
-                `}
+                `
+            }
           </div>
 
           <!-- Details Sidebar -->
-          ${this.selectedItem
-            ? html`
+          ${
+            this.selectedItem
+              ? html`
                 <div
                   class="w-80 flex-shrink-0 bg-white border-2 border-black rounded-lg p-4 h-fit sticky top-20"
                 >
@@ -403,8 +411,9 @@ $APP.define("cms-media-library", {
                         ${this.formatFileSize(this.selectedItem.size)}
                       </p>
                     </div>
-                    ${this.selectedItem.width
-                      ? html`
+                    ${
+                      this.selectedItem.width
+                        ? html`
                           <div>
                             <p class="text-xs font-bold text-gray-500 uppercase">
                               Dimensions
@@ -414,7 +423,8 @@ $APP.define("cms-media-library", {
                             </p>
                           </div>
                         `
-                      : null}
+                        : null
+                    }
                     <div>
                       <p class="text-xs font-bold text-gray-500 uppercase">
                         Uploaded
@@ -443,9 +453,10 @@ $APP.define("cms-media-library", {
                   </div>
                 </div>
               `
-            : null}
+              : null
+          }
         </div>
       </div>
     `;
   },
-});
+};

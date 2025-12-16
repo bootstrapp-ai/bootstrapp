@@ -4,10 +4,9 @@
  */
 
 import T from "/$app/types/index.js";
-import $APP from "/$app.js";
 import { html } from "/npm/lit-html";
 
-$APP.define("cms-publishing-bar", {
+export default {
   tag: "cms-publishing-bar",
   style: true,
   properties: {
@@ -99,20 +98,24 @@ $APP.define("cms-publishing-bar", {
           </div>
 
           <!-- Status Info -->
-          ${this.status === "published" && this.publishedAt
-            ? html`
+          ${
+            this.status === "published" && this.publishedAt
+              ? html`
                 <div class="text-sm ${config.text}">
                   Published on ${this.formatDate(this.publishedAt)}
                 </div>
               `
-            : null}
-          ${this.status === "scheduled" && this.scheduledAt
-            ? html`
+              : null
+          }
+          ${
+            this.status === "scheduled" && this.scheduledAt
+              ? html`
                 <div class="text-sm ${config.text}">
                   Scheduled for ${this.formatDate(this.scheduledAt)}
                 </div>
               `
-            : null}
+              : null
+          }
 
           <div class="flex-1"></div>
 
@@ -129,8 +132,9 @@ $APP.define("cms-publishing-bar", {
         </div>
 
         <!-- Schedule Modal -->
-        ${this.showScheduler
-          ? html`
+        ${
+          this.showScheduler
+            ? html`
               <div
                 class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
                 @click=${(e) => {
@@ -150,9 +154,13 @@ $APP.define("cms-publishing-bar", {
                     </label>
                     <input
                       type="datetime-local"
-                      .value=${this.scheduledAt
-                        ? new Date(this.scheduledAt).toISOString().slice(0, 16)
-                        : ""}
+                      .value=${
+                        this.scheduledAt
+                          ? new Date(this.scheduledAt)
+                              .toISOString()
+                              .slice(0, 16)
+                          : ""
+                      }
                       min=${new Date().toISOString().slice(0, 16)}
                       class="w-full p-3 border-2 border-black rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
                     />
@@ -177,8 +185,9 @@ $APP.define("cms-publishing-bar", {
                 </div>
               </div>
             `
-          : null}
+            : null
+        }
       </div>
     `;
   },
-});
+};

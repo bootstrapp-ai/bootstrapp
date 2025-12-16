@@ -7,6 +7,7 @@ import "./targets/cloudflare.js";
 import "./targets/zip.js";
 import "./targets/targz.js";
 import "./targets/localhost.js";
+import "./targets/vps.js";
 
 // Import templates
 import indexHTMLTemplate from "./templates/index.html.js";

@@ -414,7 +414,16 @@ export const createRouterCore = (adapter) => {
         };
         this.stack = updated;
       }
-      if (this.currentRoute?.route) this.currentRoute.route.title = newTitle;
+      // Reassign currentRoute to trigger reactivity in synced components
+      if (this.currentRoute?.route) {
+        this.currentRoute = {
+          ...this.currentRoute,
+          route: {
+            ...this.currentRoute.route,
+            title: newTitle,
+          },
+        };
+      }
 
       if (this.options.onTitleChange) {
         this.options.onTitleChange(fullTitle);

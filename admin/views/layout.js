@@ -1,5 +1,5 @@
-import Router from "/$app/router/index.js";
 import T from "/$app/types/index.js";
+import $APP from "/$app.js";
 import { html } from "/npm/lit-html";
 import { getSidebarItems } from "../plugins.js";
 import { capitalize, getModelNames } from "../utils/model-utils.js";
@@ -8,7 +8,7 @@ export default {
   tag: "admin-layout",
   style: true,
   properties: {
-    currentRoute: T.object({ sync: Router }),
+    currentRoute: T.object({ sync: $APP.Router }),
     sidebarCollapsed: T.boolean({ defaultValue: false, sync: "local" }),
   },
 
@@ -63,7 +63,7 @@ export default {
     const breadcrumbs = this.getBreadcrumbs();
     const isDashboard =
       this.isActive("/admin") && !this.currentRoute?.path?.includes("/models");
-
+    console.log(this.currentRoute, $APP.Router.currentRoute);
     return html`
       <div class="admin-wrapper">
         <uix-sidebar
@@ -83,7 +83,23 @@ export default {
                 class=${isDashboard ? "active" : ""}
               >Dashboard</uix-link>
             </li>
-
+            ${
+              sidebarItems.length > 0
+                ? html`
+                  ${sidebarItems.map(
+                    (item) => html`
+                      <li>
+                        <uix-link
+                          href=${item.href}
+                          icon=${item.icon}
+                          class=${this.isActive(item.href) ? "active" : ""}
+                        >${item.label}</uix-link>
+                      </li>
+                    `,
+                  )}
+                `
+                : ""
+            }
             <li>
               <details open>
                 <summary>
@@ -105,24 +121,6 @@ export default {
                 </ul>
               </details>
             </li>
-
-            ${
-              sidebarItems.length > 0
-                ? html`
-                  ${sidebarItems.map(
-                    (item) => html`
-                      <li>
-                        <uix-link
-                          href=${item.href}
-                          icon=${item.icon}
-                          class=${this.isActive(item.href) ? "active" : ""}
-                        >${item.label}</uix-link>
-                      </li>
-                    `,
-                  )}
-                `
-                : ""
-            }
           </uix-menu>
 
           <div slot="footer">

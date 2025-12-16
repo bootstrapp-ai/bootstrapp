@@ -94,6 +94,61 @@ $APP.define("cloudflare-credentials-manager", {
   },
 });
 
+$APP.define("vps-credentials-manager", {
+  dataQuery: true,
+  properties: {
+    row: T.object(),
+  },
+  render() {
+    if (!this.row)
+      return html`<div class="bundler-loading">Loading credentials...</div>`;
+    if (!this.row.vps) this.row.vps = {};
+    return html`
+      <uix-card shadow="none" borderWidth="0">
+        <h2 slot="header">VPS Credentials</h2>
+        <div class="bundler-form-grid">
+          <uix-input
+            label="Server Host/IP"
+            .value=${this.row.vps.host}
+            @change=${(e) => (this.row.vps.host = e.target.value)}
+          ></uix-input>
+          <uix-input
+            label="SSH User"
+            .value=${this.row.vps.user || "root"}
+            @change=${(e) => (this.row.vps.user = e.target.value)}
+          ></uix-input>
+          <uix-input
+            label="SSH Key Path"
+            .value=${this.row.vps.sshKeyPath || "~/.ssh/id_rsa"}
+            @change=${(e) => (this.row.vps.sshKeyPath = e.target.value)}
+          ></uix-input>
+          <uix-input
+            label="Domain"
+            .value=${this.row.vps.domain}
+            @change=${(e) => (this.row.vps.domain = e.target.value)}
+          ></uix-input>
+          <uix-input
+            class="bundler-full-width"
+            label="Remote Path"
+            .value=${this.row.vps.remotePath || "/var/www"}
+            @change=${(e) => (this.row.vps.remotePath = e.target.value)}
+          ></uix-input>
+        </div>
+        <p class="bundler-help-text">
+          Ensure your SSH key is authorized on the server and rsync is installed.
+          First deployment will install Caddy automatically if "Run Setup" is checked.
+        </p>
+        <div slot="footer">
+          <uix-button
+            @click=${() => $APP.Model.bundler_credentials.edit({ ...this.row, vps: this.row.vps })}
+            label="Save VPS Credentials"
+          ></uix-button>
+        </div>
+      </uix-card>
+    `;
+  },
+});
+
 $APP.define("release-creator", {
   properties: {
     version: T.string(`v${new Date().toISOString().slice(0, 10)}`),
@@ -101,6 +156,27 @@ $APP.define("release-creator", {
     deployMode: T.string("spa"),
     deployTarget: T.string("localhost"),
     isDeploying: T.boolean(false),
+    builds: T.array([]),
+    selectedBuildId: T.string(""),
+    runSetup: T.boolean(false),
+    rebuildDocker: T.boolean(false),
+  },
+
+  async connected() {
+    await this.loadBuilds();
+  },
+
+  async loadBuilds() {
+    try {
+      const response = await fetch("/vps/builds");
+      const result = await response.json();
+      this.builds = result.builds || [];
+      if (this.builds.length > 0 && !this.selectedBuildId) {
+        this.selectedBuildId = this.builds[0]; // Select newest by default
+      }
+    } catch {
+      this.builds = [];
+    }
   },
 
   getTargetOptions() {
@@ -109,6 +185,13 @@ $APP.define("release-creator", {
     return targets.map((t) => ({
       value: t.name,
       label: t.label,
+    }));
+  },
+
+  getBuildOptions() {
+    return this.builds.map((buildId) => ({
+      value: buildId,
+      label: buildId,
     }));
   },
 
@@ -127,6 +210,10 @@ $APP.define("release-creator", {
   needsCredentials() {
     // ZIP, TAR.GZ, and localhost don't need credentials
     return !["zip", "targz", "localhost"].includes(this.deployTarget);
+  },
+
+  isVpsTarget() {
+    return this.deployTarget === "vps";
   },
 
   async handleDeploy() {
@@ -155,6 +242,21 @@ $APP.define("release-creator", {
           this.isDeploying = false;
           return;
         }
+      } else if (this.deployTarget === "vps") {
+        if (!credentials?.vps?.host || !credentials?.vps?.domain) {
+          alert(
+            "Please provide your VPS host and domain in the Credentials tab before deploying.",
+          );
+          this.isDeploying = false;
+          return;
+        }
+        if (!this.selectedBuildId) {
+          alert(
+            "Please select a build to deploy. Run 'Deploy Locally' first to create a build.",
+          );
+          this.isDeploying = false;
+          return;
+        }
       }
     }
     const release = {
@@ -164,15 +266,43 @@ $APP.define("release-creator", {
       deployedAt: Date.now(),
       deployType: this.deployMode,
       deployTarget: this.deployTarget,
+      buildId: this.selectedBuildId || null,
     };
     try {
       const [_, newRelease] = await $APP.Model.bundler_releases.add(release);
-      const result = await Bundler.deploy({
-        ...credentials,
-        mode: this.deployMode,
-        target: this.deployTarget,
-        version: this.version,
-      });
+
+      let result;
+      if (this.deployTarget === "vps") {
+        const vps = credentials.vps || {};
+        const payload = {
+          host: vps.host,
+          user: vps.user || "root",
+          sshKeyPath: vps.sshKeyPath || "~/.ssh/id_rsa",
+          domain: vps.domain,
+          remotePath: vps.remotePath || "/var/www",
+          buildId: this.selectedBuildId,
+          runSetup: this.runSetup,
+          rebuildDocker: this.rebuildDocker,
+        };
+        console.log("VPS deploy payload:", payload);
+        const response = await fetch("/vps/deploy", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        result = await response.json();
+        if (!result.success) {
+          throw new Error(result.error || "VPS deployment failed");
+        }
+      } else {
+        result = await Bundler.deploy({
+          ...credentials,
+          mode: this.deployMode,
+          target: this.deployTarget,
+          version: this.version,
+        });
+      }
+
       await $APP.Model.bundler_releases.edit({
         id: newRelease.id,
         status: "success",
@@ -182,7 +312,14 @@ $APP.define("release-creator", {
       const targetLabel =
         Bundler.getTargets().find((t) => t.name === this.deployTarget)?.label ||
         this.deployTarget;
-      alert(`Deployment to ${targetLabel} successful!`);
+      alert(
+        `Deployment to ${targetLabel} successful!${result.url ? ` URL: ${result.url}` : ""}`,
+      );
+
+      // Refresh builds list after localhost deploy
+      if (this.deployTarget === "localhost") {
+        await this.loadBuilds();
+      }
     } catch (error) {
       console.error(`Deployment failed:`, { error });
       console.trace();
@@ -202,6 +339,7 @@ $APP.define("release-creator", {
   render() {
     const targetOptions = this.getTargetOptions();
     const modeOptions = this.getModeOptions();
+    const buildOptions = this.getBuildOptions();
 
     // Auto-switch to worker mode when cloudflare is selected
     if (this.deployTarget === "cloudflare" && this.deployMode !== "worker") {
@@ -233,13 +371,19 @@ $APP.define("release-creator", {
           ></uix-checkbox>
         </div>
         <div class="bundler-deploy-row">
-          <uix-select
-            label="Build Mode"
-            value=${this.deployMode}
-            .options=${modeOptions}
-            @change=${(e) => (this.deployMode = e.target.value)}
-          >
-          </uix-select>
+          ${
+            this.isVpsTarget()
+              ? ""
+              : html`
+            <uix-select
+              label="Build Mode"
+              value=${this.deployMode}
+              .options=${modeOptions}
+              @change=${(e) => (this.deployMode = e.target.value)}
+            >
+            </uix-select>
+          `
+          }
           <uix-select
             label="Deploy Target"
             value=${this.deployTarget}
@@ -247,6 +391,19 @@ $APP.define("release-creator", {
             @change=${(e) => (this.deployTarget = e.target.value)}
           >
           </uix-select>
+          ${
+            this.isVpsTarget()
+              ? html`
+            <uix-select
+              label="Build to Deploy"
+              value=${this.selectedBuildId}
+              .options=${buildOptions}
+              @change=${(e) => (this.selectedBuildId = e.target.value)}
+            >
+            </uix-select>
+          `
+              : ""
+          }
           <uix-button
             @click=${() => this.handleDeploy()}
             label=${this.isDeploying ? `Deploying...` : "Deploy"}
@@ -254,9 +411,39 @@ $APP.define("release-creator", {
           ></uix-button>
         </div>
         ${
-          !this.needsCredentials()
-            ? html`<p class="bundler-help-text">This target downloads directly to your browser - no credentials needed.</p>`
-            : ""
+          this.isVpsTarget()
+            ? html`
+          <div class="bundler-vps-options">
+            <uix-checkbox
+              ?checked=${this.runSetup}
+              @change=${(e) => (this.runSetup = e.target.checked)}
+              label="Run Initial Setup (installs Docker)"
+            ></uix-checkbox>
+            <uix-checkbox
+              ?checked=${this.rebuildDocker}
+              @change=${(e) => (this.rebuildDocker = e.target.checked)}
+              label="Rebuild Docker (push new config)"
+            ></uix-checkbox>
+            ${
+              this.builds.length === 0
+                ? html`
+              <p class="bundler-help-text bundler-warning">
+                No builds available. Run "Deploy Locally" first to create a build.
+              </p>
+            `
+                : html`
+              <p class="bundler-help-text">
+                Content-only updates don't need rebuild. Check "Rebuild Docker" for config changes.
+              </p>
+            `
+            }
+          </div>
+        `
+            : !this.needsCredentials()
+              ? html`
+          <p class="bundler-help-text">This target downloads directly to your browser - no credentials needed.</p>
+        `
+              : ""
         }
       </uix-card>
     `;
@@ -541,6 +728,9 @@ export default {
         <cloudflare-credentials-manager
           .data-query=${{ model: "bundler_credentials", id: "singleton", key: "row" }}
         ></cloudflare-credentials-manager>
+        <vps-credentials-manager
+          .data-query=${{ model: "bundler_credentials", id: "singleton", key: "row" }}
+        ></vps-credentials-manager>
       </div>
     `;
   },

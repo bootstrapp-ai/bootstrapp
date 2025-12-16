@@ -22,6 +22,7 @@ const KNOWN_DEFINITION_KEYS = new Set([
   "willUpdate",
   "firstUpdated",
   "updated",
+  "dataLoaded",
   "class",
   "role",
   "tag",
@@ -99,6 +100,7 @@ class View extends HTMLElement {
       willUpdate,
       firstUpdated,
       updated,
+      dataLoaded,
       class: klass,
       role,
     } = definition;
@@ -260,7 +262,7 @@ class View extends HTMLElement {
     ];
 
     component.plugins.push({
-      events: { connected, disconnected, willUpdate, firstUpdated, updated },
+      events: { connected, disconnected, willUpdate, firstUpdated, updated, dataLoaded },
       name: "base",
     });
 

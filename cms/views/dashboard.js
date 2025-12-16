@@ -8,7 +8,7 @@ import $APP from "/$app.js";
 import { html } from "/npm/lit-html";
 import { getCmsModels } from "../schema.js";
 
-$APP.define("cms-dashboard", {
+export default {
   tag: "cms-dashboard",
   style: true,
   properties: {
@@ -305,4 +305,4 @@ $APP.define("cms-dashboard", {
       </div>
     `;
   },
-});
+};

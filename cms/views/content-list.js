@@ -4,10 +4,9 @@
  */
 
 import T from "/$app/types/index.js";
-import $APP from "/$app.js";
 import { html } from "/npm/lit-html";
 
-$APP.define("cms-content-list", {
+export default {
   tag: "cms-content-list",
   style: true,
   dataQuery: true,
@@ -150,8 +149,9 @@ $APP.define("cms-content-list", {
 
         <!-- Content List -->
         <uix-card shadow="md" borderWidth="2" padding="none" class="bg-white">
-          ${filteredItems.length > 0
-            ? html`
+          ${
+            filteredItems.length > 0
+              ? html`
                 <div class="divide-y-2 divide-black">
                   ${filteredItems.map((item) => {
                     const badge = this.getStatusBadge(item.status);
@@ -161,8 +161,9 @@ $APP.define("cms-content-list", {
                         class="flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors group"
                       >
                         <!-- Cover Image (if exists) -->
-                        ${item.coverImage || item.image
-                          ? html`
+                        ${
+                          item.coverImage || item.image
+                            ? html`
                               <div
                                 class="w-16 h-16 rounded-lg bg-gray-100 border-2 border-black overflow-hidden flex-shrink-0"
                               >
@@ -173,7 +174,7 @@ $APP.define("cms-content-list", {
                                 />
                               </div>
                             `
-                          : html`
+                            : html`
                               <div
                                 class="w-16 h-16 rounded-lg bg-gray-100 border-2 border-black flex items-center justify-center flex-shrink-0"
                               >
@@ -183,7 +184,8 @@ $APP.define("cms-content-list", {
                                   class="text-gray-400"
                                 ></uix-icon>
                               </div>
-                            `}
+                            `
+                        }
 
                         <!-- Content Info -->
                         <div class="flex-1 min-w-0">
@@ -193,9 +195,7 @@ $APP.define("cms-content-list", {
                             ${this.getDisplayTitle(item)}
                           </div>
                           <div class="text-sm text-gray-500">
-                            ${this.formatDate(
-                              item.updatedAt || item.createdAt,
-                            )}
+                            ${this.formatDate(item.updatedAt || item.createdAt)}
                           </div>
                         </div>
 
@@ -217,7 +217,7 @@ $APP.define("cms-content-list", {
                   })}
                 </div>
               `
-            : html`
+              : html`
                 <div class="text-center py-16 text-gray-400">
                   <uix-icon
                     name="file-text"
@@ -226,9 +226,11 @@ $APP.define("cms-content-list", {
                   ></uix-icon>
                   <p class="text-lg font-bold">No content found</p>
                   <p class="text-sm mt-1">
-                    ${this.statusFilter !== "all"
-                      ? `No ${this.statusFilter} items`
-                      : "Create your first item to get started"}
+                    ${
+                      this.statusFilter !== "all"
+                        ? `No ${this.statusFilter} items`
+                        : "Create your first item to get started"
+                    }
                   </p>
                   <uix-link
                     href="/admin/content/${this.model}/new"
@@ -237,9 +239,10 @@ $APP.define("cms-content-list", {
                     + New ${this.capitalize(singularName)}
                   </uix-link>
                 </div>
-              `}
+              `
+          }
         </uix-card>
       </div>
     `;
   },
-});
+};
