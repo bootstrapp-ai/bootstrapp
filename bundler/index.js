@@ -176,28 +176,18 @@ const bundler = {
   },
   _createManifest: manifestJSONTemplate,
   async extractCSS() {
-    // Collect Shadow DOM component CSS separately
-    const componentCSS = new Map();
-
-    for (const [tag, entry] of View.components.entries()) {
-      // Check if component has Shadow DOM and CSS content
-      if (entry.cssContent && entry._constructor?.shadow) {
-        componentCSS.set(tag, entry.cssContent);
-      }
-    }
-
-    // Get global styles (excluding Shadow DOM component styles that will be separate)
-    const shadowTags = new Set(componentCSS.keys());
+    // Get global styles only (exclude component-specific styles)
+    // Component CSS is served from original paths (/$app/uix/*/component.css)
     const globalCSS = Array.from(document.querySelectorAll("style"))
       .filter((style) => {
+        // Exclude component-specific styles - they're already in the SW cache
         const tag = style.getAttribute("data-component-style");
-        // Include if not a Shadow DOM component style
-        return !tag || !shadowTags.has(tag);
+        return !tag;
       })
       .map((style) => style.innerHTML)
       .join("\n");
 
-    return { globalCSS, componentCSS };
+    return { globalCSS };
   },
   async deployWorker(credentials) {
     console.log("🚀 Starting Cloudflare Worker deployment process...");
@@ -308,37 +298,15 @@ const bundler = {
         else filesForDeployment[file.path] = { content: indexHTML };
       });
     }
-    // Extract CSS - separating Shadow DOM component CSS
-    const { globalCSS, componentCSS } = await this.extractCSS();
+    // Extract global CSS only (component CSS served from original paths in SW cache)
+    const { globalCSS } = await this.extractCSS();
 
-    // Create separate CSS files for Shadow DOM components
-    const componentCSSImports = [];
-    for (const [tag, cssContent] of componentCSS.entries()) {
-      const cssPath = `styles/${tag}.css`;
-      // Add to deployment files
-      filesForDeployment[cssPath] = {
-        content: cssContent,
-        mimeType: "text/css",
-      };
-      // Add to SW bundle so it can be fetched in production
-      filesForSW[`/${cssPath}`] = {
-        content: cssContent,
-        mimeType: "text/css",
-      };
-      // Track for @import in main style.css
-      componentCSSImports.push(`@import url('./${cssPath}');`);
-    }
-
-    // Generate main style.css with @imports for component CSS + global styles
-    const mainCSS =
-      (componentCSSImports.length > 0
-        ? componentCSSImports.join("\n") + "\n\n"
-        : "") + globalCSS;
-
+    // style.css contains only global styles - no component @imports needed
+    // Component CSS is already in the SW cache from original paths (/$app/uix/*/component.css)
     addFilePromises.push(
-      addFile({ path: "style.css", content: mainCSS, mimeType: "text/css" }),
+      addFile({ path: "style.css", content: globalCSS, mimeType: "text/css" }),
     );
-    filesForDeployment["style.css"] = { content: mainCSS, mimeType: "text/css" };
+    filesForDeployment["style.css"] = { content: globalCSS, mimeType: "text/css" };
     const manifest = this._createManifest($APP.settings);
     manifest.icons.forEach((icon) => {
       const path = icon.src.substring(1);
@@ -481,23 +449,11 @@ const bundler = {
       files[file.path] = { content: createStaticPage(file) };
     });
 
-    // Extract CSS - separating Shadow DOM component CSS
-    const { globalCSS, componentCSS } = await this.extractCSS();
+    // Extract global CSS only (component CSS served from original paths)
+    const { globalCSS } = await this.extractCSS();
 
-    // Create separate CSS files for Shadow DOM components
-    const componentCSSImports = [];
-    for (const [tag, cssContent] of componentCSS.entries()) {
-      const cssPath = `styles/${tag}.css`;
-      files[cssPath] = { content: cssContent, mimeType: "text/css" };
-      componentCSSImports.push(`@import url('./${cssPath}');`);
-    }
-
-    // Generate main style.css with @imports + global styles
-    const mainCSS =
-      (componentCSSImports.length > 0
-        ? componentCSSImports.join("\n") + "\n\n"
-        : "") + globalCSS;
-    files["style.css"] = { content: mainCSS };
+    // style.css contains only global styles
+    files["style.css"] = { content: globalCSS };
     const data = {};
     files["data.json"] = { content: JSON.stringify(data, null, 2) };
     const sitemapXML = this._createSitemapXML($APP.settings, staticFiles);
