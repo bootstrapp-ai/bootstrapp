@@ -1,59 +1,82 @@
 import View, { settings } from "/$app/view/index.js";
 
+// Production CSS cache for Shadow DOM components
+const productionCSSCache = new Map();
+
+/**
+ * Get component CSS content (works in both dev and production)
+ * - Dev: returns cached cssContent from View.components (populated by dev.js)
+ * - Production: fetches from /styles/{tag}.css
+ * @param {string} tag - Component tag name
+ * @returns {Promise<string|null>} CSS content
+ */
+const getComponentCSS = async (tag) => {
+  // Dev: check View.components cache (populated by theme/dev.js)
+  const entry = View.components.get(tag);
+  if (entry?.cssContent) {
+    return entry.cssContent;
+  }
+
+  // Production: check local cache
+  if (productionCSSCache.has(tag)) {
+    return productionCSSCache.get(tag);
+  }
+
+  // Production: fetch from /styles/{tag}.css
+  try {
+    const response = await fetch(`/styles/${tag}.css`);
+    if (response.ok) {
+      const css = await response.text();
+      productionCSSCache.set(tag, css);
+      return css;
+    }
+  } catch (e) {
+    // Silent fail - CSS file might not exist for all components
+  }
+
+  return null;
+};
+
+// Theme plugin - Shadow DOM CSS injection (works in both dev and production)
+// Note: The init hook for fetching CSS in dev is in theme/dev.js
 View.plugins.push({
   name: "theme",
-  init: async ({ tag, component }) => {
-    if (component.style && settings.loadStyle) {
-      const path = View.getComponentPath(tag);
-      await loadComponentCSS(`${path}.css`, tag);
-    }
-  },
   events: {
-    connected: (opts) => {
+    connected: async (opts) => {
       const { tag, component, instance } = opts;
       if (!component.style) return;
+
       const root = instance.getRootNode();
       if (!(root instanceof ShadowRoot)) return;
-      const entry = View.components.get(tag);
-      if (!entry?.cssContent) return;
+
+      // Track injected styles per shadow root
       let injected = View.shadowStylesInjected.get(root);
       if (!injected) {
         injected = new Set();
         View.shadowStylesInjected.set(root, injected);
       }
       if (injected.has(component)) return;
+
+      // Get CSS content (works in both dev and production)
+      const cssContent = await getComponentCSS(tag);
+      if (!cssContent) return;
+
       const style = document.createElement("style");
       style.setAttribute("data-component-style", component.tag);
-      style.textContent = entry.cssContent;
+      style.textContent = cssContent;
       root.prepend(style);
       injected.add(component);
     },
   },
 });
-// CSS Loading Utility (replaces $APP.fs.css)
+
+// Font Loading Utility
+const loadedFonts = new Set();
 const loadedCSSFiles = new Set();
-/**
- * Fetch CSS content as text (for shadow DOM injection)
- * @param {string} url - URL or path to CSS file
- * @returns {Promise<string|null>} CSS content as string, or null if fetch fails
- */
-const fetchCSS = async (url) => {
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      console.warn(`Failed to fetch CSS from ${url}: ${response.status}`);
-      return null;
-    }
-    return await response.text();
-  } catch (error) {
-    console.error(`Error fetching CSS from ${url}:`, error);
-    return null;
-  }
-};
 
 const loadCSS = (href, prepend = false) => {
   if (loadedCSSFiles.has(href)) {
-    return; // Already loaded
+    return;
   }
 
   const link = document.createElement("link");
@@ -69,34 +92,16 @@ const loadCSS = (href, prepend = false) => {
   loadedCSSFiles.add(href);
 };
 
-const loadComponentCSS = async (file, tag) => {
-  const css = await fetchCSS(file);
-  if (css) {
-    globalStyleTag.textContent += css;
-    const entry = View.components.get(tag);
-    if (entry) entry.cssContent = css;
-  }
-};
-
-const globalStyleTag = document.createElement("style");
-globalStyleTag.id = "compstyles";
-document.head.appendChild(globalStyleTag);
-
-// Font Loading Utility (moved from base/frontend.js)
-const loadedFonts = new Set();
-
 const loadFont = (fontFamily) => {
   if (!fontFamily || loadedFonts.has(fontFamily)) {
-    return; // Skip if no font or already loaded
+    return;
   }
 
-  // Load from Google Fonts
   const fontName = fontFamily.replace(/\s+/g, "+");
   const url = `https://fonts.googleapis.com/css2?family=${fontName}:wght@300;400;500;600;700;800&display=swap`;
 
   loadCSS(url);
 
-  // Inject CSS variables for font
   const styleId = "theme-font-vars";
   let styleTag = document.getElementById(styleId);
 
@@ -118,6 +123,7 @@ const loadFont = (fontFamily) => {
   loadedFonts.add(fontFamily);
 };
 
+// Color manipulation utilities
 const rgbToHSL = (r, g, b) => {
   const max = Math.max(r, g, b),
     min = Math.min(r, g, b);
@@ -150,34 +156,22 @@ const rgbToHSL = (r, g, b) => {
   };
 };
 
-/**
- * HELPER: HSL to CSS string
- */
 const hslToCSS = (hsl) => `hsl(${hsl.h} ${hsl.s}% ${hsl.l}%)`;
 
-/**
- * HELPER: Adjust HSL lightness (clamped to 0-100)
- */
 const adjustLightness = (hsl, delta) => ({
   h: hsl.h,
   s: hsl.s,
   l: Math.max(0, Math.min(100, hsl.l + delta)),
 });
 
-/**
- * HELPER: Mix color with white or black
- * amount: 0-1 (0 = original color, 1 = full white/black)
- */
 const mixWithColor = (hsl, mixWith, amount) => {
   if (mixWith === "white") {
-    // Mix towards white: increase lightness, decrease saturation
     return {
       h: hsl.h,
       s: Math.round(hsl.s * (1 - amount * 0.5)),
       l: Math.round(hsl.l + (100 - hsl.l) * amount),
     };
   } else if (mixWith === "black") {
-    // Mix towards black: decrease lightness, decrease saturation slightly
     return {
       h: hsl.h,
       s: Math.round(hsl.s * (1 - amount * 0.3)),
@@ -187,15 +181,11 @@ const mixWithColor = (hsl, mixWith, amount) => {
   return hsl;
 };
 
-/**
- * HELPER: Parses Hex, RGB, or HSL strings into an HSL object
- * Returns null if the string isn't a recognizable color format
- */
 const parseColor = (str) => {
   if (!str || typeof str !== "string") return null;
   const s = str.trim();
 
-  // 1. HEX
+  // HEX
   if (s.startsWith("#")) {
     let hex = s.slice(1);
     if (hex.length === 3)
@@ -209,16 +199,15 @@ const parseColor = (str) => {
     return rgbToHSL(r, g, b);
   }
 
-  // 2. RGB
+  // RGB
   if (s.startsWith("rgb")) {
     const match = s.match(/\d+/g);
     if (!match || match.length < 3) return null;
     return rgbToHSL(match[0] / 255, match[1] / 255, match[2] / 255);
   }
 
-  // 3. HSL
+  // HSL
   if (s.startsWith("hsl")) {
-    // Matches integer or float numbers
     const match = s.match(/[\d.]+/g);
     if (!match || match.length < 3) return null;
     return {
@@ -231,15 +220,7 @@ const parseColor = (str) => {
   return null;
 };
 
-/**
- * HELPER: Generate 5 shade variations from a base color
- * Supports both HSL lightness adjustment and color mixing
- * @param {Object} baseHSL - Base color in HSL format
- * @param {Object} config - Optional shade configuration
- * @returns {Object} Object with lighter, light, DEFAULT, dark, darker shades
- */
 const generateShades = (baseHSL, config = {}) => {
-  // Default configuration: HSL lightness adjustment
   const defaultConfig = {
     lighter: { lightness: 20 },
     light: { lightness: 10 },
@@ -254,7 +235,6 @@ const generateShades = (baseHSL, config = {}) => {
     if (shadeName === "DEFAULT") continue;
 
     if (shadeOpts.mix) {
-      // Mix with white/black
       const mixed = mixWithColor(
         baseHSL,
         shadeOpts.mix,
@@ -262,7 +242,6 @@ const generateShades = (baseHSL, config = {}) => {
       );
       shades[shadeName] = hslToCSS(mixed);
     } else if (shadeOpts.lightness !== undefined) {
-      // HSL lightness adjustment
       const adjusted = adjustLightness(baseHSL, shadeOpts.lightness);
       shades[shadeName] = hslToCSS(adjusted);
     }
@@ -271,11 +250,6 @@ const generateShades = (baseHSL, config = {}) => {
   return shades;
 };
 
-/**
- * GENERATOR: Traverses object and creates CSS variables
- * Automatically generates shades for colors defined in the 'color' block
- * unless explicit overrides are provided in the theme object.
- */
 const generateThemeVariables = (themeObj, prefix = "-") => {
   const variables = {};
   const shadeSuffixes = ["lighter", "light", "dark", "darker"];
@@ -283,22 +257,14 @@ const generateThemeVariables = (themeObj, prefix = "-") => {
   const traverse = (obj, currentKey) => {
     for (const [key, value] of Object.entries(obj)) {
       const newKey = currentKey ? `${currentKey}-${key}` : `${prefix}-${key}`;
-
-      // Check if we are currently iterating through the 'color' object properties
-      // prefix is usually "-" so we look for "-color"
       const isColorBlock = currentKey === `${prefix}-color`;
 
       if (typeof value === "object" && value !== null) {
-        // Recursive step
         traverse(value, newKey);
       } else {
-        // It's a value (string/number)
         variables[newKey] = value;
 
-        // If we are in the color block and the value is a string (a color),
-        // attempt to auto-generate shades.
         if (isColorBlock && typeof value === "string") {
-          // Prevent generating shades of shades (e.g. don't gen primary-dark-dark)
           const isVariant = shadeSuffixes.some((suffix) =>
             key.endsWith(`-${suffix}`),
           );
@@ -310,9 +276,6 @@ const generateThemeVariables = (themeObj, prefix = "-") => {
 
               shadeSuffixes.forEach((shade) => {
                 const variantKey = `${key}-${shade}`;
-
-                // CRITICAL: Only add the generated shade if the theme
-                // does NOT explicitly define it.
                 if (obj[variantKey] === undefined) {
                   variables[`${newKey}-${shade}`] = generatedShades[shade];
                 }
@@ -328,9 +291,6 @@ const generateThemeVariables = (themeObj, prefix = "-") => {
   return variables;
 };
 
-/**
- * INJECTOR: Updates the CSS variables in the DOM
- */
 const injectThemeCSS = (variables) => {
   const styleId = "dynamic-theme-vars";
   let styleTag = document.getElementById(styleId);
@@ -355,9 +315,6 @@ const registerTheme = (name, loader) => {
   availableThemes[name] = loader;
 };
 
-/**
- * APPLY: Apply a theme object directly (for theme generator preview)
- */
 const applyTheme = (themeData) => {
   const cssVars = generateThemeVariables(themeData);
   injectThemeCSS(cssVars);
@@ -365,10 +322,6 @@ const applyTheme = (themeData) => {
   if (themeData?.font?.family) loadFont(themeData.font.family);
 };
 
-/**
- * LOADER: Load a theme by name (string) or apply a theme object directly (object)
- * @param {string|object} themeInput - The name of a registered theme or a theme object.
- */
 const loadTheme = async (themeInput) => {
   if (!themeInput) {
     const styleTag = document.getElementById("dynamic-theme-vars");
@@ -377,14 +330,12 @@ const loadTheme = async (themeInput) => {
     return;
   }
 
-  // 1. If it's an object, apply it directly using the existing logic
   if (typeof themeInput === "object" && themeInput !== null) {
     applyTheme(themeInput);
     console.log("Custom theme object applied successfully.");
     return;
   }
 
-  // 2. If it's a string, proceed with loading a registered theme
   const themeName = themeInput;
   const themeLoader = availableThemes[themeName];
 
@@ -396,10 +347,7 @@ const loadTheme = async (themeInput) => {
   try {
     const module = await themeLoader();
     const themeData = module.default || module;
-
-    // Use applyTheme to reuse the core injection logic
     applyTheme(themeData);
-
     console.log(`Theme "${themeName}" loaded successfully.`);
   } catch (error) {
     console.error(`Failed to load theme "${themeName}":`, error);
@@ -407,7 +355,6 @@ const loadTheme = async (themeInput) => {
 };
 
 // Register default themes
-// NOTE: These imports will need to be correctly resolved in your environment
 registerTheme("gruvbox-dark", () => import("./themes/gruvbox-dark.js"));
 registerTheme("gruvbox-light", () => import("./themes/gruvbox-light.js"));
 registerTheme("nbs", () => import("./themes/nbs.js"));
@@ -422,14 +369,15 @@ export default {
 
   // Theme management
   registerTheme,
-  loadTheme, // Refactored
+  loadTheme,
   applyTheme,
   availableThemes,
-  fetchCSS,
+
   // Resource loading
   loadCSS,
   loadFont,
-  loadComponentCSS,
+  getComponentCSS,
+
   // Utility functions
   rgbToHSL,
   hslToCSS,
@@ -448,6 +396,7 @@ export {
   availableThemes,
   loadCSS,
   loadFont,
+  getComponentCSS,
   rgbToHSL,
   hslToCSS,
   adjustLightness,

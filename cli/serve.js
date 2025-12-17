@@ -811,10 +811,24 @@ CADDYFILE_EOF`);
         res.writeHead(404);
         res.end("404 Not Found");
       } else {
-        // Try serving index.html for SPA routing
-        const indexPath = adapter.join(projectDir, "index.html");
+        // SPA routing - serve appropriate index.html based on path
+        // Admin routes (/admin/*) get admin/index.html, others get index.html
+        const isAdminRoute = pathname.startsWith("/admin");
+        const indexPath = isAdminRoute
+          ? adapter.join(projectDir, "admin", "index.html")
+          : adapter.join(projectDir, "index.html");
+
         if (await adapter.exists(indexPath)) {
           serveFile(indexPath, res, false);
+        } else if (isAdminRoute) {
+          // Fallback to main index.html if admin/index.html doesn't exist
+          const mainIndexPath = adapter.join(projectDir, "index.html");
+          if (await adapter.exists(mainIndexPath)) {
+            serveFile(mainIndexPath, res, false);
+          } else {
+            res.writeHead(404);
+            res.end("404 Not Found");
+          }
         } else {
           res.writeHead(404);
           res.end("404 Not Found");

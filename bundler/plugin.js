@@ -16,7 +16,9 @@ registerPlugin("bundler", {
   routes: {
     "/admin/bundler": {
       name: "admin-bundler",
-      component: () => html`<bundler-ui></bundler-ui>`,
+      component: () => {
+        return html`<bundler-ui></bundler-ui>`;
+      },
       title: "Admin - Bundler",
       template: "admin-layout",
     },

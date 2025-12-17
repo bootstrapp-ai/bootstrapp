@@ -1,12 +1,10 @@
 import $APP from "/$app.js";
 import { html } from "/npm/lit-html";
 import { getPluginRoutes } from "./plugins.js";
-
-// Import bundler module (registers bundler-ui component)
 import "/$app/bundler/index.js";
 
-// Import admin plugins (they self-register via registerPlugin)
 import "/$app/bundler/plugin.js";
+// Import non-dev admin plugins (always loaded)
 import "/$app/theme/plugin.js";
 import "/$app/extension/admin/plugin.js";
 

@@ -52,6 +52,11 @@ View.getComponentPath = getComponentPath;
 settings.loadStyle = !$APP.settings.production;
 View.reloadComponents = !!$APP.settings.preview;
 
+// Load theme dev module in dev mode (CSS fetching for components)
+if (settings.loadStyle) {
+  import("/$app/theme/dev.js");
+}
+
 View.plugins.push({
   name: "hydrate",
   willUpdate: ({ instance }) => {

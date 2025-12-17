@@ -59,6 +59,14 @@ const main = async () => {
         break;
       }
 
+      case "analyze":
+      case "a": {
+        const { analyze, parseAnalyzeArgs } = await import("./commands/analyze.js");
+        const analyzeOptions = parseAnalyzeArgs(args.slice(1));
+        await analyze(adapter, analyzeOptions);
+        break;
+      }
+
       /*  case "test": {
         const testOptions = parseTestArgs(args.slice(1));
         const success = await test(adapter, testOptions);
@@ -77,6 +85,10 @@ const main = async () => {
 Available commands:
   bootstrapp [path]              - Start dev server
   bootstrapp serve [path]        - Start dev server (explicit)
+  bootstrapp analyze [project]   - Analyze bundle (files, deps, CSS)
+    --build <id>                 - Specific build ID (default: latest)
+    --json                       - Output as JSON
+    --verbose                    - Verbose output
   bootstrapp electron [path]     - Start Electron app
   bootstrapp electron:build      - Build Electron app
   bootstrapp generate <type> <n> - Generate code (component, page, api)

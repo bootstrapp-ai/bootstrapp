@@ -1,4 +1,5 @@
 import $APP from "/$app.js";
+import View from "/$app/view/index.js";
 import { deployToTarget, getTargets } from "./targets/index.js";
 
 // Import targets (they self-register)
@@ -170,14 +171,33 @@ const bundler = {
   _createRobotsTXT: robotsTXTTemplate,
   _createSitemapXML: sitemapXMLTemplate,
   _createIndexHTML: indexHTMLTemplate,
-  _createServiceWorker(fileMap) {
-    return minify(swJSTemplate({ fileMap }), "application/javascript");
+  _createServiceWorker(fileMap, { bundleAdmin = false } = {}) {
+    return minify(swJSTemplate({ fileMap, bundleAdmin }), "application/javascript");
   },
   _createManifest: manifestJSONTemplate,
   async extractCSS() {
-    return Array.from(document.querySelectorAll("style"))
+    // Collect Shadow DOM component CSS separately
+    const componentCSS = new Map();
+
+    for (const [tag, entry] of View.components.entries()) {
+      // Check if component has Shadow DOM and CSS content
+      if (entry.cssContent && entry._constructor?.shadow) {
+        componentCSS.set(tag, entry.cssContent);
+      }
+    }
+
+    // Get global styles (excluding Shadow DOM component styles that will be separate)
+    const shadowTags = new Set(componentCSS.keys());
+    const globalCSS = Array.from(document.querySelectorAll("style"))
+      .filter((style) => {
+        const tag = style.getAttribute("data-component-style");
+        // Include if not a Shadow DOM component style
+        return !tag || !shadowTags.has(tag);
+      })
       .map((style) => style.innerHTML)
       .join("\n");
+
+    return { globalCSS, componentCSS };
   },
   async deployWorker(credentials) {
     console.log("🚀 Starting Cloudflare Worker deployment process...");
@@ -288,11 +308,37 @@ const bundler = {
         else filesForDeployment[file.path] = { content: indexHTML };
       });
     }
-    const css = await this.extractCSS();
+    // Extract CSS - separating Shadow DOM component CSS
+    const { globalCSS, componentCSS } = await this.extractCSS();
+
+    // Create separate CSS files for Shadow DOM components
+    const componentCSSImports = [];
+    for (const [tag, cssContent] of componentCSS.entries()) {
+      const cssPath = `styles/${tag}.css`;
+      // Add to deployment files
+      filesForDeployment[cssPath] = {
+        content: cssContent,
+        mimeType: "text/css",
+      };
+      // Add to SW bundle so it can be fetched in production
+      filesForSW[`/${cssPath}`] = {
+        content: cssContent,
+        mimeType: "text/css",
+      };
+      // Track for @import in main style.css
+      componentCSSImports.push(`@import url('./${cssPath}');`);
+    }
+
+    // Generate main style.css with @imports for component CSS + global styles
+    const mainCSS =
+      (componentCSSImports.length > 0
+        ? componentCSSImports.join("\n") + "\n\n"
+        : "") + globalCSS;
+
     addFilePromises.push(
-      addFile({ path: "style.css", content: css, mimeType: "text/css" }),
+      addFile({ path: "style.css", content: mainCSS, mimeType: "text/css" }),
     );
-    filesForDeployment["style.css"] = { content: css, mimeType: "text/css" };
+    filesForDeployment["style.css"] = { content: mainCSS, mimeType: "text/css" };
     const manifest = this._createManifest($APP.settings);
     manifest.icons.forEach((icon) => {
       const path = icon.src.substring(1);
@@ -314,11 +360,39 @@ const bundler = {
     // Always set index.html - object assignment ensures the correct version wins
     filesForDeployment["index.html"] = { content: indexHTML };
     filesForDeployment["404.html"] = { content: indexHTML };
+    // Handle devFiles - stub them out
     $APP.devFiles.forEach((path) => {
       if (filesForSW[path]) {
         filesForSW[path] = { content: "export default {}" };
       }
     });
+
+    // Check bundleAdmin setting (default: false - exclude admin from production)
+    const bundleAdmin = $APP.settings.bundleAdmin === true;
+
+    if (!bundleAdmin) {
+      // Filter out admin/bundler/fflate files from production bundle
+      const adminPatterns = [
+        /^\/$app\/admin\//,
+        /^\/$app\/bundler\//,
+        /^\/fflate/,
+        /^\/npm\/fflate/,
+      ];
+
+      for (const path of Object.keys(filesForSW)) {
+        if (adminPatterns.some(pattern => pattern.test(path))) {
+          delete filesForSW[path];
+        }
+      }
+      console.log("📦 Admin excluded from bundle (bundleAdmin: false)");
+    } else {
+      // Generate admin/index.html when bundleAdmin is true
+      const adminHTML = this._createIndexHTML($APP.settings, { isAdmin: true });
+      filesForDeployment["admin/index.html"] = { content: adminHTML };
+      filesForSW["/admin/index.html"] = { content: adminHTML, mimeType: "text/html" };
+      console.log("📦 Admin included in bundle (bundleAdmin: true)");
+    }
+
     const processedSWEntries = await Promise.all(
       Object.entries(filesForSW).map(async ([path, file]) => {
         const minifiedContent = await minify(file.content, file.mimeType);
@@ -334,7 +408,7 @@ const bundler = {
       }),
     );
     const processedFilesForSW = Object.fromEntries(processedSWEntries);
-    let serviceWorker = await this._createServiceWorker(processedFilesForSW);
+    let serviceWorker = await this._createServiceWorker(processedFilesForSW, { bundleAdmin });
     if ($APP.settings.bundle?.obfuscate) {
       console.log("🔒 Obfuscating service worker (sw.js)...");
       serviceWorker = await obfuscate(serviceWorker);
@@ -406,8 +480,24 @@ const bundler = {
     staticFiles.forEach((file) => {
       files[file.path] = { content: createStaticPage(file) };
     });
-    const css = await this.extractCSS();
-    files["style.css"] = { content: css };
+
+    // Extract CSS - separating Shadow DOM component CSS
+    const { globalCSS, componentCSS } = await this.extractCSS();
+
+    // Create separate CSS files for Shadow DOM components
+    const componentCSSImports = [];
+    for (const [tag, cssContent] of componentCSS.entries()) {
+      const cssPath = `styles/${tag}.css`;
+      files[cssPath] = { content: cssContent, mimeType: "text/css" };
+      componentCSSImports.push(`@import url('./${cssPath}');`);
+    }
+
+    // Generate main style.css with @imports + global styles
+    const mainCSS =
+      (componentCSSImports.length > 0
+        ? componentCSSImports.join("\n") + "\n\n"
+        : "") + globalCSS;
+    files["style.css"] = { content: mainCSS };
     const data = {};
     files["data.json"] = { content: JSON.stringify(data, null, 2) };
     const sitemapXML = this._createSitemapXML($APP.settings, staticFiles);
