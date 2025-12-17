@@ -1,6 +1,9 @@
 import presetWind4 from "https://cdn.jsdelivr.net/npm/@unocss/preset-wind4@66.3.3/+esm";
 import $APP from "/$app.js";
 
+if (!$APP.settings.tailwind?.runtime) {
+  $APP.devFiles.add(new URL(import.meta.url).pathname);
+}
 const fontFamily = "Manrope";
 
 window.__unocss = {
@@ -115,3 +118,29 @@ window.__unocss = {
 };
 
 await import("https://cdn.jsdelivr.net/npm/@unocss/runtime/core.global.js");
+
+// Send UnoCSS-generated CSS to Service Worker for extraction during deploy
+const sendCSSToSW = () => {
+  const css = Array.from(
+    document.querySelectorAll("style[data-unocss-runtime-layer]"),
+  )
+    .map((s) => s.textContent)
+    .join("\n");
+
+  $APP.SW?.postMessage("SW:STORE_UNOCSS", { css });
+};
+
+// Observe UnoCSS style changes (debounced)
+let debounceTimer;
+const observer = new MutationObserver(() => {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(sendCSSToSW, 100);
+});
+observer.observe(document.head, {
+  childList: true,
+  subtree: true,
+  characterData: true,
+});
+
+// Send initial CSS
+sendCSSToSW();

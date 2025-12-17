@@ -42,7 +42,7 @@ export function initModelFrontend($APP, options = {}) {
 
     // Broadcast to service worker for other tabs
     if ($APP.SW) {
-      $APP.SW.request("SW:BROADCAST_QUERY_SYNC", payload);
+      $APP.SW.postMessage("SW:BROADCAST_QUERY_SYNC", payload);
     }
   });
 

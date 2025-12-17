@@ -490,6 +490,60 @@ const createRequestHandler = (
       }
     }
 
+    // GET /builds/:buildId/files - get all files from a build
+    const buildFilesMatch = pathname.match(/^\/builds\/([^/]+)\/files$/);
+    if (req.method === "GET" && buildFilesMatch) {
+      try {
+        const buildId = buildFilesMatch[1];
+        const deployedDir = adapter.join(projectDir, ".deployed");
+        const buildDir = adapter.join(deployedDir, "builds", buildId);
+
+        // Check if build exists
+        try {
+          await fs.access(buildDir);
+        } catch {
+          res.writeHead(404, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ success: false, error: `Build ${buildId} not found` }));
+          return;
+        }
+
+        // Recursively read all files
+        const files = [];
+        const readDir = async (dir, basePath = "") => {
+          const entries = await fs.readdir(dir, { withFileTypes: true });
+          for (const entry of entries) {
+            const fullPath = path.join(dir, entry.name);
+            const relativePath = basePath ? `${basePath}/${entry.name}` : entry.name;
+            if (entry.isDirectory()) {
+              await readDir(fullPath, relativePath);
+            } else {
+              const content = await fs.readFile(fullPath);
+              const mimeType = mime.getType(fullPath) || "application/octet-stream";
+              // Base64 encode binary files, utf8 for text
+              const isText = mimeType.startsWith("text/") ||
+                            mimeType === "application/javascript" ||
+                            mimeType === "application/json";
+              files.push({
+                path: relativePath,
+                content: isText ? content.toString("utf8") : content.toString("base64"),
+                encoding: isText ? "utf8" : "base64",
+                mimeType,
+              });
+            }
+          }
+        };
+
+        await readDir(buildDir);
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: true, files }));
+        return;
+      } catch (err) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+        return;
+      }
+    }
+
     // POST /vps/deploy - deploy to VPS via rsync
     if (req.method === "POST" && pathname === "/vps/deploy") {
       try {

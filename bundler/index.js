@@ -17,8 +17,6 @@ import sitemapXMLTemplate from "./templates/sitemap.xml.js";
 import staticPageHTMLTemplate from "./templates/static-page.html.js";
 import swJSTemplate from "./templates/sw.js.js";
 
-const { Router } = $APP;
-
 // This object is now a client-side wrapper that calls our server proxy
 const Cloudflare = {
   async deployWorker({ accountId, apiToken, projectName, scriptContent }) {
@@ -276,7 +274,10 @@ const bundler = {
         };
       } else {
         const minifiedContent = await minify(resolvedContent, resolvedMimeType);
-        filesForDeployment[path] = { content: minifiedContent, mimeType: resolvedMimeType };
+        filesForDeployment[path] = {
+          content: minifiedContent,
+          mimeType: resolvedMimeType,
+        };
       }
     };
     const indexHTML = this._createIndexHTML($APP.settings);
@@ -284,8 +285,7 @@ const bundler = {
       pages.forEach((file) => {
         if (file.ssg)
           filesForDeployment[file.path] = { content: createStaticPage(file) };
-        else
-          filesForDeployment[file.path] = { content: indexHTML };
+        else filesForDeployment[file.path] = { content: indexHTML };
       });
     }
     const css = await this.extractCSS();
@@ -341,7 +341,9 @@ const bundler = {
     }
     filesForDeployment["sw.js"] = { content: serviceWorker };
     const fileCount = Object.keys(filesForDeployment).length;
-    console.log(`✅ ${mode.toUpperCase()} bundle created with ${fileCount} files`);
+    console.log(
+      `✅ ${mode.toUpperCase()} bundle created with ${fileCount} files`,
+    );
     // Convert object to array format for deployment targets
     return Object.entries(filesForDeployment).map(([path, file]) => ({
       path,
@@ -521,7 +523,7 @@ const getStaticHTML = async ({ ssgOnly = false }) => {
     if (visited.has(route)) continue;
     visited.add(route);
     try {
-      await Router.go(route);
+      await $APP.Router.go(route);
       await new Promise((resolve) => setTimeout(resolve, 500));
       const file = await generateStaticHTMLForCurrentRoute();
       if (ssgOnly) {
@@ -529,7 +531,8 @@ const getStaticHTML = async ({ ssgOnly = false }) => {
       } else {
         files.push(file);
       }
-      const links = document.querySelectorAll('a[href^="/"]');
+      const links = document.querySelectorAll('uix-link[href^="/"]');
+      console.error({ links });
       for (const link of links) {
         const href = link.getAttribute("href");
         if (!visited.has(href) && !toVisit.includes(href)) {

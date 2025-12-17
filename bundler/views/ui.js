@@ -216,6 +216,11 @@ $APP.define("release-creator", {
     return this.deployTarget === "vps";
   },
 
+  requiresBuildSelector() {
+    // Targets that deploy from existing builds (not re-bundle)
+    return ["vps", "github"].includes(this.deployTarget);
+  },
+
   async handleDeploy() {
     if (this.isDeploying) return;
 
@@ -239,6 +244,13 @@ $APP.define("release-creator", {
       } else if (this.deployTarget === "github") {
         if (!credentials || !credentials.token) {
           alert("Please provide a GitHub token before deploying.");
+          this.isDeploying = false;
+          return;
+        }
+        if (!this.selectedBuildId) {
+          alert(
+            "Please select a build to deploy. Run 'Deploy Locally' first to create a build.",
+          );
           this.isDeploying = false;
           return;
         }
@@ -300,6 +312,7 @@ $APP.define("release-creator", {
           mode: this.deployMode,
           target: this.deployTarget,
           version: this.version,
+          buildId: this.selectedBuildId || null,
         });
       }
 
@@ -372,7 +385,7 @@ $APP.define("release-creator", {
         </div>
         <div class="bundler-deploy-row">
           ${
-            this.isVpsTarget()
+            this.requiresBuildSelector()
               ? ""
               : html`
             <uix-select
@@ -392,7 +405,7 @@ $APP.define("release-creator", {
           >
           </uix-select>
           ${
-            this.isVpsTarget()
+            this.requiresBuildSelector()
               ? html`
             <uix-select
               label="Build to Deploy"
@@ -439,11 +452,27 @@ $APP.define("release-creator", {
             }
           </div>
         `
-            : !this.needsCredentials()
+            : this.deployTarget === "github"
               ? html`
+          ${
+            this.builds.length === 0
+              ? html`
+            <p class="bundler-help-text bundler-warning">
+              No builds available. Run "Deploy Locally" first to create a build.
+            </p>
+          `
+              : html`
+            <p class="bundler-help-text">
+              Deploys existing build to GitHub Pages. Make sure credentials are set.
+            </p>
+          `
+          }
+        `
+              : !this.needsCredentials()
+                ? html`
           <p class="bundler-help-text">This target downloads directly to your browser - no credentials needed.</p>
         `
-              : ""
+                : ""
         }
       </uix-card>
     `;

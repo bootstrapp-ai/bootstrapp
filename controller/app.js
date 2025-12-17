@@ -71,7 +71,8 @@ export function initControllerApp($APP, Controller, View) {
   );
 
   Controller.installViewPlugin(View, {
-    onBroadcast: (data) => $APP.SW.request("SW:BROADCAST_SYNCED_PROP", data),
+    onBroadcast: (data) =>
+      $APP.SW.postMessage("SW:BROADCAST_SYNCED_PROP", data),
     onAsyncLoad: loadModelTypeAsync,
   });
 
