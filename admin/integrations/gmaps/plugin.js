@@ -4,11 +4,18 @@
  */
 
 import { registerPlugin } from "/$app/admin/plugins.js";
-import $APP from "/$app.js";
 import { html } from "/npm/lit-html";
 
-// Register plugin for actions, modals, and sidebar
+// Register plugin with routes, actions, modals, and sidebar
 registerPlugin("gmaps", {
+  routes: {
+    "/admin/maps-search": {
+      name: "admin-maps-search",
+      component: () => html`<admin-gmaps-search></admin-gmaps-search>`,
+      template: "admin-layout",
+    },
+  },
+
   sidebar: [
     {
       label: "Maps Search",
@@ -37,12 +44,3 @@ registerPlugin("gmaps", {
     },
   },
 });
-
-$APP.routes.set({
-  "/admin/maps-search": {
-    name: "admin-maps-search",
-    component: () => html`<admin-gmaps-search></admin-gmaps-search>`,
-    template: "admin-layout",
-  },
-});
-console.log($APP.routes);

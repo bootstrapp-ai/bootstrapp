@@ -63,7 +63,6 @@ export default {
     const breadcrumbs = this.getBreadcrumbs();
     const isDashboard =
       this.isActive("/admin") && !this.currentRoute?.path?.includes("/models");
-    console.log(this.currentRoute, $APP.Router.currentRoute);
     return html`
       <div class="admin-wrapper">
         <uix-sidebar
@@ -75,53 +74,55 @@ export default {
             <span class="sidebar-title">Admin</span>
           </div>
 
-          <uix-menu variant="sidebar">
-            <li>
-              <uix-link
-                href="/admin"
-                icon="layout-dashboard"
-                class=${isDashboard ? "active" : ""}
-              >Dashboard</uix-link>
-            </li>
-            ${
-              sidebarItems.length > 0
-                ? html`
-                  ${sidebarItems.map(
-                    (item) => html`
-                      <li>
-                        <uix-link
-                          href=${item.href}
-                          icon=${item.icon}
-                          class=${this.isActive(item.href) ? "active" : ""}
-                        >${item.label}</uix-link>
-                      </li>
-                    `,
-                  )}
-                `
-                : ""
-            }
-            <li>
-              <details open>
-                <summary>
-                  <uix-icon name="database"></uix-icon>
-                  <span>Models</span>
-                  <uix-icon name="chevron-right"></uix-icon>
-                </summary>
-                <ul>
-                  ${models.map(
-                    (model) => html`
-                      <li>
-                        <uix-link
-                          href="/admin/models/${model}"
-                          class=${this.isModelActive(model) ? "active" : ""}
-                        >${capitalize(model)}</uix-link>
-                      </li>
-                    `,
-                  )}
-                </ul>
-              </details>
-            </li>
-          </uix-menu>
+          <nav class="admin-nav">
+            <uix-nav-item
+              href="/admin"
+              icon="layout-dashboard"
+              label="Dashboard"
+              ?active=${isDashboard}
+              indicatorPosition="left"
+              activeBg
+              rounded
+              ?iconOnly=${this.sidebarCollapsed}
+            ></uix-nav-item>
+
+            ${sidebarItems.map(
+              (item) => html`
+                <uix-nav-item
+                  href=${item.href}
+                  icon=${item.icon}
+                  label=${item.label}
+                  ?active=${this.isActive(item.href)}
+                  indicatorPosition="left"
+                  activeBg
+                  rounded
+                  ?iconOnly=${this.sidebarCollapsed}
+                ></uix-nav-item>
+              `,
+            )}
+
+            <details class="models-accordion" ?open=${!this.sidebarCollapsed}>
+              <summary class="models-header">
+                <uix-icon name="database"></uix-icon>
+                ${!this.sidebarCollapsed ? html`<span>Models</span>` : ""}
+              </summary>
+              <div class="models-list">
+                ${models.map(
+                  (model) => html`
+                    <uix-nav-item
+                      href="/admin/models/${model}"
+                      icon="table"
+                      label=${capitalize(model)}
+                      ?active=${this.isModelActive(model)}
+                      indicatorPosition="left"
+                      activeBg
+                      rounded
+                    ></uix-nav-item>
+                  `,
+                )}
+              </div>
+            </details>
+          </nav>
 
           <div slot="footer">
             <uix-darkmode></uix-darkmode>

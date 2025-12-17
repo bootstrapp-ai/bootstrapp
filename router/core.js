@@ -449,6 +449,38 @@ export const createRouterCore = (adapter) => {
       const normalized = path.split("?")[0].split("#")[0];
       return (normalized || "/").replace(/\/+$/, "") || "/";
     },
+
+    /**
+     * Handles click events on links for SPA navigation.
+     * Use this in components that render <a> tags to enable client-side routing.
+     * @param {MouseEvent} e - The click event from the anchor element
+     * @param {Object} [options={}] - Options
+     * @param {boolean} [options.external=false] - If true, always use browser navigation
+     * @returns {boolean} True if SPA navigation was triggered, false otherwise
+     */
+    handleLinkClick(e, options = {}) {
+      const { external = false } = options;
+
+      // Let browser handle modifier keys (new tab, download, etc.)
+      if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) {
+        return false;
+      }
+
+      const link = e.currentTarget;
+      if (!link?.href) return false;
+
+      const location = this.adapter.getLocation();
+      const isLocal = link.origin === location.origin && !external;
+
+      if (isLocal) {
+        e.preventDefault();
+        const path = [link.pathname, link.search].filter(Boolean).join("");
+        this.go(path);
+        return true;
+      }
+
+      return false;
+    },
   };
 
   return router;

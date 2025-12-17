@@ -3,6 +3,8 @@
  * Simple function-based plugin registry for admin extensibility
  */
 
+import $APP from "/$app.js";
+
 // Plugin registry using closures
 const plugins = new Map();
 
@@ -10,13 +12,20 @@ const plugins = new Map();
  * Register an admin plugin
  * @param {string} name - Unique plugin name
  * @param {Object} config - Plugin configuration
+ * @param {Object} config.routes - Plugin routes { path: routeConfig }
  * @param {Object} config.actions - Model-specific actions { modelName: [{ label, icon, handler }] }
  * @param {Object} config.modals - Custom modals { name: { component } }
  * @param {Object} config.fieldTypes - Custom field type renderers
+ * @param {Array} config.sidebar - Sidebar navigation items
  */
 export const registerPlugin = (name, config) => {
   plugins.set(name, { name, ...config });
-  console.log({ plugins });
+
+  // If plugin has routes, register them immediately
+  // This handles late-registered plugins (after admin/index.js has run)
+  if (config.routes && $APP.routes) {
+    $APP.routes.set(config.routes);
+  }
 };
 
 /**

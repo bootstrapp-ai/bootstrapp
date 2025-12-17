@@ -4,10 +4,9 @@
  */
 
 import T from "/$app/types/index.js";
-import $APP from "/$app.js";
 import { html } from "/npm/lit-html";
 
-$APP.define("cms-media-picker", {
+export default {
   tag: "cms-media-picker",
   style: true,
   properties: {
@@ -63,7 +62,9 @@ $APP.define("cms-media-picker", {
     // Validate file size
     const maxSize = this.field?.maxSize || 5 * 1024 * 1024;
     if (file.size > maxSize) {
-      alert(`File too large. Maximum size: ${Math.round(maxSize / 1024 / 1024)}MB`);
+      alert(
+        `File too large. Maximum size: ${Math.round(maxSize / 1024 / 1024)}MB`,
+      );
       return;
     }
 
@@ -122,8 +123,9 @@ $APP.define("cms-media-picker", {
         <label class="block text-sm font-bold text-gray-700 mb-2">${label}</label>
 
         <div class="border-2 border-black rounded-lg overflow-hidden bg-white">
-          ${this.value
-            ? html`
+          ${
+            this.value
+              ? html`
                 <!-- Image Preview -->
                 <div class="relative">
                   <img
@@ -151,7 +153,7 @@ $APP.define("cms-media-picker", {
                   </div>
                 </div>
               `
-            : html`
+              : html`
                 <!-- Empty State -->
                 <div
                   class="h-48 flex flex-col items-center justify-center bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg m-2"
@@ -177,12 +179,14 @@ $APP.define("cms-media-picker", {
                     Choose Image
                   </button>
                 </div>
-              `}
+              `
+          }
         </div>
 
         <!-- Media Library Modal -->
-        ${this.showLibrary
-          ? html`
+        ${
+          this.showLibrary
+            ? html`
               <div
                 class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
                 @click=${(e) => {
@@ -234,26 +238,29 @@ $APP.define("cms-media-picker", {
 
                   <!-- Content -->
                   <div class="p-4 overflow-y-auto max-h-[60vh]">
-                    ${this.mediaItems.length > 0
-                      ? html`
+                    ${
+                      this.mediaItems.length > 0
+                        ? html`
                           <div class="grid grid-cols-4 gap-3">
                             ${this.mediaItems.map(
                               (item) => html`
                                 <button
                                   type="button"
                                   @click=${() => this.handleSelect(item.url)}
-                                  class="relative aspect-square border-2 border-black rounded-lg overflow-hidden hover:ring-4 ring-blue-400 transition-all ${this
-                                    .value === item.url
-                                    ? "ring-4 ring-green-400"
-                                    : ""}"
+                                  class="relative aspect-square border-2 border-black rounded-lg overflow-hidden hover:ring-4 ring-blue-400 transition-all ${
+                                    this.value === item.url
+                                      ? "ring-4 ring-green-400"
+                                      : ""
+                                  }"
                                 >
                                   <img
                                     src="${item.url}"
                                     alt="${item.name || "Media"}"
                                     class="w-full h-full object-cover"
                                   />
-                                  ${this.value === item.url
-                                    ? html`
+                                  ${
+                                    this.value === item.url
+                                      ? html`
                                         <div
                                           class="absolute inset-0 bg-green-400 bg-opacity-30 flex items-center justify-center"
                                         >
@@ -272,13 +279,14 @@ $APP.define("cms-media-picker", {
                                           </svg>
                                         </div>
                                       `
-                                    : null}
+                                      : null
+                                  }
                                 </button>
                               `,
                             )}
                           </div>
                         `
-                      : html`
+                        : html`
                           <div
                             class="text-center py-12 text-gray-500 flex flex-col items-center"
                           >
@@ -298,13 +306,15 @@ $APP.define("cms-media-picker", {
                             <p class="font-bold">No media uploaded yet</p>
                             <p class="text-sm">Upload your first image to get started</p>
                           </div>
-                        `}
+                        `
+                    }
                   </div>
                 </div>
               </div>
             `
-          : null}
+            : null
+        }
       </div>
     `;
   },
-});
+};

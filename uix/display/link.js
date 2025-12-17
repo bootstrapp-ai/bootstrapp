@@ -67,22 +67,17 @@ export default {
       return;
     }
 
-    if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) {
-      return;
+    // Use shared router link handler for SPA navigation
+    if (this.href && !this.skipRoute) {
+      const handled = Router.handleLinkClick(e, { external: this.external });
+      if (handled) return;
     }
-    const link = e.currentTarget;
-    const localLink =
-      this.href && link.origin === window.location.origin && !this.external;
-    // Prevent default for local links
-    if (!this.href || localLink) {
+
+    // Prevent default for links without href
+    if (!this.href) {
       e.preventDefault();
     }
-    // Handle local routing
-    if (localLink && !this.skipRoute) {
-      const path = [link.pathname, link.search].filter(Boolean).join("");
-      Router.go(path);
-      return;
-    }
+
     // Handle custom click handler
     if (this.click && this.type !== "submit") {
       if (this.confirmation) {

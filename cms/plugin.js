@@ -4,12 +4,8 @@
  */
 
 import { registerPlugin } from "/$app/admin/plugins.js";
+import $APP from "/$app.js";
 import { html } from "/npm/lit-html";
-
-// Import CMS field components
-import "./fields/rich-text.js";
-import "./fields/media-picker.js";
-import "./fields/seo-fields.js";
 
 $APP.addModule({ name: "cms", path: "/$app/cms/views" });
 registerPlugin("cms", {
@@ -116,4 +112,5 @@ registerPlugin("cms", {
   },
 });
 
-console.log("[CMS] Plugin registered");
+console.error("[CMS] Plugin registered");
+console.log($APP.routes);

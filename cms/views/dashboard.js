@@ -10,7 +10,6 @@ import { getCmsModels } from "../schema.js";
 
 export default {
   tag: "cms-dashboard",
-  style: true,
   properties: {
     stats: T.object({
       defaultValue: { total: 0, drafts: 0, published: 0, scheduled: 0 },

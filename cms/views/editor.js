@@ -17,7 +17,6 @@ const defaultValue = {
 export default {
   tag: "cms-editor",
   dataQuery: true,
-  style: true,
   properties: {
     model: T.string({ required: true }),
     contentId: T.string(),

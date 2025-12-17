@@ -11,8 +11,8 @@
   --nav-item-background: transparent;
   --nav-item-hover-background: var(--color-surface-dark, rgba(0, 0, 0, 0.05));
   --nav-item-hover-color: var(--text-color, inherit);
-  --nav-item-active-background: var(--color-primary, rgba(0, 0, 0, 0.1));
-  --nav-item-active-color: var(--color-surface-darker, inherit);
+  --nav-item-active-background: #111;
+  --nav-item-active-color: #fff;
   --nav-item-disabled-opacity: 0.5;
 
   /* Indicator */
@@ -113,7 +113,8 @@
     flex: 1;
     display: flex;
     flex-direction: row;
-    gap: 5px;
+    align-items: center;
+    gap: 0.5rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -170,9 +171,14 @@
     }
   }
 
-  /* Indicator positions - When using indicator, don't use active background */
-  &[indicatorPosition]:not([indicatorPosition="none"])[active] {
+  /* Indicator positions - Allow background with activeBg attribute */
+  &[indicatorPosition]:not([indicatorPosition="none"])[active]:not([activeBg]) {
     background-color: transparent;
+  }
+
+  &[indicatorPosition]:not([indicatorPosition="none"])[active][activeBg] {
+    background-color: var(--nav-item-active-background);
+    color: var(--nav-item-active-color);
   }
 
   /* Left indicator */

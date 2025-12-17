@@ -8,7 +8,6 @@ import { html } from "/npm/lit-html";
 
 export default {
   tag: "cms-content-list",
-  style: true,
   dataQuery: true,
   properties: {
     model: T.string({ required: true }),

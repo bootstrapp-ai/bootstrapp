@@ -4,12 +4,10 @@
  */
 
 import T from "/$app/types/index.js";
-import $APP from "/$app.js";
 import { html } from "/npm/lit-html";
 
-$APP.define("cms-rich-text", {
+export default {
   tag: "cms-rich-text",
-  style: true,
   properties: {
     value: T.string({ defaultValue: "" }),
     field: T.object({ attribute: false }),
@@ -38,7 +36,11 @@ $APP.define("cms-rich-text", {
     const selection = text.substring(start, end);
 
     const newText =
-      text.substring(0, start) + before + selection + after + text.substring(end);
+      text.substring(0, start) +
+      before +
+      selection +
+      after +
+      text.substring(end);
 
     this.value = newText;
     this.emit("change", this.value);
@@ -56,7 +58,8 @@ $APP.define("cms-rich-text", {
    * For production, consider using a proper markdown library
    */
   renderMarkdown(text) {
-    if (!text) return html`<p class="text-gray-400 italic">No content yet...</p>`;
+    if (!text)
+      return html`<p class="text-gray-400 italic">No content yet...</p>`;
 
     // Basic markdown parsing
     let htmlText = text
@@ -182,29 +185,33 @@ $APP.define("cms-rich-text", {
             <button
               type="button"
               @click=${() => this.togglePreview()}
-              class="px-3 py-1 text-sm font-bold rounded ${this.previewMode
-                ? "bg-black text-white"
-                : "bg-white border border-gray-300 hover:bg-gray-100"} transition-colors"
+              class="px-3 py-1 text-sm font-bold rounded ${
+                this.previewMode
+                  ? "bg-black text-white"
+                  : "bg-white border border-gray-300 hover:bg-gray-100"
+              } transition-colors"
             >
               ${this.previewMode ? "Edit" : "Preview"}
             </button>
           </div>
 
           <!-- Editor / Preview -->
-          ${this.previewMode
-            ? html`
+          ${
+            this.previewMode
+              ? html`
                 <div class="p-4 min-h-[256px] prose prose-sm max-w-none">
                   ${this.renderMarkdown(this.value)}
                 </div>
               `
-            : html`
+              : html`
                 <textarea
                   .value=${this.value}
                   @input=${(e) => this.handleInput(e)}
                   class="w-full min-h-[256px] p-4 font-mono text-sm resize-y border-none outline-none"
                   placeholder="Write your content using Markdown..."
                 ></textarea>
-              `}
+              `
+          }
         </div>
 
         <div class="mt-1 text-xs text-gray-500">
@@ -213,4 +220,4 @@ $APP.define("cms-rich-text", {
       </div>
     `;
   },
-});
+};

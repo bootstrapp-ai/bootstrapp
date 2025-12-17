@@ -4,12 +4,10 @@
  */
 
 import T from "/$app/types/index.js";
-import $APP from "/$app.js";
 import { html } from "/npm/lit-html";
 
-$APP.define("cms-seo-fields", {
+export default {
   tag: "cms-seo-fields",
-  style: true,
   properties: {
     value: T.object({ attribute: false, defaultValue: {} }),
     field: T.object({ attribute: false }),
@@ -59,9 +57,9 @@ $APP.define("cms-seo-fields", {
             <span class="uppercase text-sm">SEO Settings</span>
           </div>
           <svg
-            class="w-5 h-5 transition-transform ${this.expanded
-              ? "rotate-180"
-              : ""}"
+            class="w-5 h-5 transition-transform ${
+              this.expanded ? "rotate-180" : ""
+            }"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -75,17 +73,18 @@ $APP.define("cms-seo-fields", {
           </svg>
         </button>
 
-        ${this.expanded
-          ? html`
+        ${
+          this.expanded
+            ? html`
               <div class="mt-2 border-2 border-black rounded-lg p-4 space-y-4 bg-white">
                 <!-- Meta Title -->
                 <div>
                   <label class="flex items-center justify-between text-sm font-bold text-gray-700 mb-1">
                     <span>Meta Title</span>
                     <span
-                      class="text-xs ${titleWarning
-                        ? "text-red-500"
-                        : "text-gray-400"}"
+                      class="text-xs ${
+                        titleWarning ? "text-red-500" : "text-gray-400"
+                      }"
                     >
                       ${metaTitleLength}/60
                     </span>
@@ -96,17 +95,19 @@ $APP.define("cms-seo-fields", {
                     @input=${(e) => this.updateField("metaTitle", e.target.value)}
                     maxlength="70"
                     placeholder="Enter a compelling title for search engines..."
-                    class="w-full p-2 border-2 border-black rounded-lg text-sm focus:ring-2 focus:ring-blue-400 focus:outline-none ${titleWarning
-                      ? "border-red-500"
-                      : ""}"
+                    class="w-full p-2 border-2 border-black rounded-lg text-sm focus:ring-2 focus:ring-blue-400 focus:outline-none ${
+                      titleWarning ? "border-red-500" : ""
+                    }"
                   />
-                  ${titleWarning
-                    ? html`
+                  ${
+                    titleWarning
+                      ? html`
                         <p class="text-xs text-red-500 mt-1">
                           Title exceeds recommended length (60 characters)
                         </p>
                       `
-                    : null}
+                      : null
+                  }
                 </div>
 
                 <!-- Meta Description -->
@@ -114,9 +115,9 @@ $APP.define("cms-seo-fields", {
                   <label class="flex items-center justify-between text-sm font-bold text-gray-700 mb-1">
                     <span>Meta Description</span>
                     <span
-                      class="text-xs ${descWarning
-                        ? "text-red-500"
-                        : "text-gray-400"}"
+                      class="text-xs ${
+                        descWarning ? "text-red-500" : "text-gray-400"
+                      }"
                     >
                       ${metaDescLength}/160
                     </span>
@@ -128,17 +129,19 @@ $APP.define("cms-seo-fields", {
                     maxlength="200"
                     rows="3"
                     placeholder="Write a brief description that appears in search results..."
-                    class="w-full p-2 border-2 border-black rounded-lg text-sm resize-none focus:ring-2 focus:ring-blue-400 focus:outline-none ${descWarning
-                      ? "border-red-500"
-                      : ""}"
+                    class="w-full p-2 border-2 border-black rounded-lg text-sm resize-none focus:ring-2 focus:ring-blue-400 focus:outline-none ${
+                      descWarning ? "border-red-500" : ""
+                    }"
                   ></textarea>
-                  ${descWarning
-                    ? html`
+                  ${
+                    descWarning
+                      ? html`
                         <p class="text-xs text-red-500 mt-1">
                           Description exceeds recommended length (160 characters)
                         </p>
                       `
-                    : null}
+                      : null
+                  }
                 </div>
 
                 <!-- OG Image -->
@@ -154,8 +157,9 @@ $APP.define("cms-seo-fields", {
                       placeholder="https://example.com/image.jpg"
                       class="flex-1 p-2 border-2 border-black rounded-lg text-sm focus:ring-2 focus:ring-blue-400 focus:outline-none"
                     />
-                    ${v.ogImage
-                      ? html`
+                    ${
+                      v.ogImage
+                        ? html`
                           <div
                             class="w-12 h-12 border-2 border-black rounded-lg overflow-hidden"
                           >
@@ -166,7 +170,8 @@ $APP.define("cms-seo-fields", {
                             />
                           </div>
                         `
-                      : null}
+                        : null
+                    }
                   </div>
                   <p class="text-xs text-gray-500 mt-1">
                     Recommended size: 1200x630 pixels
@@ -192,8 +197,9 @@ $APP.define("cms-seo-fields", {
                 </div>
 
                 <!-- Social Preview -->
-                ${v.ogImage
-                  ? html`
+                ${
+                  v.ogImage
+                    ? html`
                       <div class="pt-4 border-t-2 border-dashed border-gray-200">
                         <p class="text-xs font-bold text-gray-500 mb-2 uppercase">
                           Social Share Preview
@@ -220,11 +226,13 @@ $APP.define("cms-seo-fields", {
                         </div>
                       </div>
                     `
-                  : null}
+                    : null
+                }
               </div>
             `
-          : null}
+            : null
+        }
       </div>
     `;
   },
-});
+};

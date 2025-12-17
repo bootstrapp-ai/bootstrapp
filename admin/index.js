@@ -8,15 +8,12 @@ import "/$app/bundler/plugin.js";
 import "/$app/theme/plugin.js";
 import "/$app/extension/admin/plugin.js";
 
-// Register admin module
 $APP.addModule({
   name: "admin",
   path: "/$app/admin/views",
 });
 
-// Core admin routes (dashboard, models, legacy)
 const coreRoutes = {
-  // Dashboard
   "/admin": {
     name: "admin-dashboard",
     component: () => html`<admin-dashboard></admin-dashboard>`,
@@ -24,7 +21,6 @@ const coreRoutes = {
     template: "admin-layout",
   },
 
-  // Model CRUD
   "/admin/models/:model": {
     name: "admin-model-list",
     component: ({ model }) => html`
@@ -49,43 +45,9 @@ const coreRoutes = {
     title: "Admin - Edit",
     template: "admin-layout",
   },
-
-  // Legacy CMS routes (for backward compatibility)
-  "/admin/cms": {
-    component: () => html`<admin-dashboard></admin-dashboard>`,
-    title: "Admin",
-    template: "admin-layout",
-  },
-
-  "/admin/cms/:model": {
-    component: ({ model }) => html`
-      <admin-model-list
-        model=${model}
-        .data-query=${{ model, key: "rows" }}
-      ></admin-model-list>
-    `,
-    title: "Admin",
-    template: "admin-layout",
-  },
-
-  "/admin/cms/:model/:id": {
-    name: "cms_item",
-    component: ({ model, id }) => html`
-      <admin-model-list
-        model=${model}
-        selectedId=${id}
-        .data-query=${{ model, key: "rows" }}
-      ></admin-model-list>
-    `,
-    title: "Admin",
-    template: "admin-layout",
-  },
 };
-
-// Merge core routes with plugin routes
 const routes = { ...coreRoutes, ...getPluginRoutes() };
 
-// Register routes
 $APP.routes.set(routes);
-
+globalThis.$APP = $APP;
 export default routes;

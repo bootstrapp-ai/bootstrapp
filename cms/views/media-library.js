@@ -9,7 +9,6 @@ import { html } from "/npm/lit-html";
 export default {
   tag: "cms-media-library",
   dataQuery: true,
-  style: true,
   properties: {
     media: T.array({ defaultValue: [] }),
     uploading: T.boolean({ defaultValue: false }),

@@ -8,7 +8,6 @@ import { html } from "/npm/lit-html";
 
 export default {
   tag: "cms-publishing-bar",
-  style: true,
   properties: {
     status: T.string({ defaultValue: "draft" }),
     publishedAt: T.string(),
