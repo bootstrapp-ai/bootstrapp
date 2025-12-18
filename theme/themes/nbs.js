@@ -233,6 +233,13 @@ export default {
     },
   },
 
+  avatar: {
+    border: "3px solid #000000",
+    shadow: "3px 3px 0px 0px #000",
+    ring: "3px",
+    "ring-color": "#ffffff",
+  },
+
   modal: {
     background: "#ffffff",
     "border-width": "3px",
@@ -250,6 +257,27 @@ export default {
     "body-padding": "1.5rem",
     "body-color": "#4b5563",
     "footer-padding": "1rem 1.5rem",
+    "footer-border-width": "3px",
+    "footer-background": "#f9fafb",
+  },
+
+  drawer: {
+    background: "#ffffff",
+    "border-width": "3px",
+    "border-color": "#000000",
+    "border-radius": "0",
+    shadow: "6px 6px 0px 0px rgba(0,0,0,1)",
+    "overlay-background": "rgba(0, 0, 0, 0.6)",
+    "header-padding": "1rem 1.25rem",
+    "header-border-width": "3px",
+    "header-border-color": "#000000",
+    "header-background": "#ffffff",
+    "header-font-size": "1.125rem",
+    "header-font-weight": "900",
+    "header-color": "#1a1a1a",
+    "body-padding": "1rem",
+    "body-color": "#4b5563",
+    "footer-padding": "1rem 1.25rem",
     "footer-border-width": "3px",
     "footer-background": "#f9fafb",
   },

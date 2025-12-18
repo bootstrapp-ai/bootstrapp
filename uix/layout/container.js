@@ -16,7 +16,6 @@ export default {
       enum: ["visible", "hidden", "auto", "scroll"],
     }),
     variant: T.string({
-      defaultValue: "default",
       enum: ["default", "filled", "outlined", "elevated"],
     }),
   },

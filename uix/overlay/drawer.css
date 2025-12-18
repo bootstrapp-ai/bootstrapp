@@ -37,6 +37,7 @@
     z-index: var(--drawer-overlay-z-index, 100);
     animation: drawer-backdrop-fade-in var(--drawer-animation-duration, 0.25s) ease-out;
     cursor: pointer;
+    pointer-events: auto;
   }
 
   /* --- 4. Panel Part --- */

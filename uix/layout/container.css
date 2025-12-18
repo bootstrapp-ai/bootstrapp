@@ -44,38 +44,4 @@
   &[overflow="scroll"] {
     --container-overflow: scroll;
   }
-
-  /* Variant: default */
-  &[variant="default"] {
-    --container-background: inherit;
-    --container-border-color: var(--color-surface-dark);
-  }
-
-  /* Variant: filled */
-  &[variant="filled"] {
-    --container-background: var(--color-surface-light);
-    --container-border-color: var(--color-surface);
-  }
-
-  /* Variant: outlined */
-  &[variant="outlined"] {
-    --container-background: transparent;
-    --container-border-color: var(--color-surface);
-  }
-
-  /* Variant: elevated */
-  &[variant="elevated"] {
-    --container-background: var(--color-surface-lighter);
-    --container-border-color: var(--color-surface-dark);
-    box-shadow:
-      0 1px 3px rgba(0, 0, 0, 0.12),
-      0 1px 2px rgba(0, 0, 0, 0.24);
-
-    &:hover {
-      box-shadow:
-        0 3px 6px rgba(0, 0, 0, 0.16),
-        0 3px 6px rgba(0, 0, 0, 0.23);
-      transition: box-shadow 0.3s ease;
-    }
-  }
 }
