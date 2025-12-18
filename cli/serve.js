@@ -798,6 +798,33 @@ CADDYFILE_EOF`);
       }
     }
 
+    // Handle /npm/ requests - proxy to esm.sh (mirrors Service Worker behavior)
+    if (safeSuffix.startsWith("/npm/")) {
+      try {
+        const packagePath = safeSuffix.slice(5); // Remove "/npm/"
+        const esmUrl = `https://esm.sh/${packagePath}${urlObj.search}`;
+        const response = await fetch(esmUrl);
+        const body = await response.text();
+
+        // Copy headers but ensure correct content type
+        const headers = { "Content-Type": "text/javascript" };
+        for (const [key, value] of response.headers.entries()) {
+          if (key.toLowerCase() !== "content-encoding") {
+            headers[key] = value;
+          }
+        }
+
+        res.writeHead(response.status, headers);
+        res.end(body);
+        return;
+      } catch (err) {
+        adapter.error("Error proxying to esm.sh:", err.message);
+        res.writeHead(502);
+        res.end("Bad Gateway: Could not fetch from esm.sh");
+        return;
+      }
+    }
+
     const requestPath = safeSuffix === "/" ? "index.html" : safeSuffix;
     const requestPathWithoutQuery = requestPath.split("?")[0];
     const filePath = adapter.join(projectDir, requestPathWithoutQuery);

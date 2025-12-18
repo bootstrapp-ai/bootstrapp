@@ -1,0 +1,25 @@
+{
+  "name": "@bootstrapp/notifications",
+  "version": "1.0.0",
+  "description": "Notifications system for Bootstrapp framework",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./plugin": "./plugin.js",
+    "./models/schema": "./models/schema.js"
+  },
+  "files": [
+    "index.js",
+    "plugin.js",
+    "models/",
+    "views/"
+  ],
+  "keywords": [
+    "bootstrapp",
+    "notifications",
+    "admin"
+  ],
+  "author": "",
+  "license": "MIT"
+}

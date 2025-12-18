@@ -10,11 +10,18 @@ import puppeteer from "puppeteer";
  */
 export async function runBrowserTests(adapter, options = {}) {
   const {
-    testUrl = "http://localhost:1315/$app/base/test.html",
     testFiles = [],
     suite = null,
     headless = true,
+    projectPath = null, // Path to project directory for project tests
+    port = 1315,
   } = options;
+
+  // Use project-test.html for project tests, test.html for framework tests
+  const testPage = projectPath
+    ? `http://localhost:${port}/$app/base/test/project-test.html`
+    : `http://localhost:${port}/$app/base/test.html`;
+  const testUrl = options.testUrl || testPage;
 
   console.log("\x1b[1m\x1b[36mRunning Browser Tests\x1b[0m");
   console.log("\x1b[90m(Headless Chrome - Full Browser APIs)\x1b[0m\n");
@@ -63,7 +70,12 @@ export async function runBrowserTests(adapter, options = {}) {
 
     if (testFiles.length > 0) {
       params.set("run", "file");
-      params.set("filePath", testFiles[0]); // Run first file for now
+      // For project tests, convert absolute path to project-relative path
+      let filePath = testFiles[0];
+      if (projectPath && filePath.startsWith(projectPath)) {
+        filePath = filePath.slice(projectPath.length + 1); // Remove project path + /
+      }
+      params.set("filePath", filePath);
       if (suite) {
         params.set("suiteName", suite);
       }

@@ -1,7 +1,7 @@
 import { generate } from "@bootstrapp/generator/commands/generate.js";
 import { newProject } from "@bootstrapp/generator/commands/new.js";
 import * as adapter from "./adapter.js";
-//import { parseTestArgs, test } from "./commands/test.js";
+import { parseTestArgs, test } from "./commands/test.js";
 
 export const electron = async (adapter, args = []) => {
   await adapter.spawn("npx", ["electron", ...args], {
@@ -67,12 +67,12 @@ const main = async () => {
         break;
       }
 
-      /*  case "test": {
+      case "test": {
         const testOptions = parseTestArgs(args.slice(1));
         const success = await test(adapter, testOptions);
         process.exit(success ? 0 : 1);
         break;
-      } */
+      }
 
       case "serve":
       case undefined:

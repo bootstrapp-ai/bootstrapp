@@ -1,4 +1,8 @@
-import $APP from "/$app.js";
+// Conditionally import $APP for browser environment
+let $APP;
+if (typeof window !== "undefined") {
+  $APP = (await import("/$app.js")).default;
+}
 
 const mock = {
   fn: (implementation) => {
@@ -106,6 +110,9 @@ const mock = {
   },
 };
 
-$APP.devFiles.add(new URL(import.meta.url).pathname);
+// Register with $APP if in browser environment
+if ($APP) {
+  $APP.devFiles.add(new URL(import.meta.url).pathname);
+}
 
 export default mock;

@@ -1,4 +1,8 @@
-import $APP from "/$app.js";
+// Conditionally import $APP for browser environment
+let $APP;
+if (typeof window !== "undefined") {
+  $APP = (await import("/$app.js")).default;
+}
 
 function assert(condition, message) {
   if (!condition) throw new Error(message || "Assertion failed");
@@ -129,8 +133,47 @@ Object.assign(assert, {
   notOk: (val, msg) =>
     throwIf(val, `Expected falsy, got: ${val} (${typeof val})`, msg),
   isNotOk: (val, msg) => assert.notOk(val, msg),
+  throws: (fn, expectedPattern, msg) => {
+    let threw = false;
+    let error;
+    try {
+      fn();
+    } catch (e) {
+      threw = true;
+      error = e;
+    }
+    throwIf(!threw, "Expected function to throw, but it did not", msg);
+    if (expectedPattern instanceof RegExp) {
+      throwIf(
+        !expectedPattern.test(error.message),
+        `Expected error message to match ${expectedPattern}, got: ${error.message}`,
+        msg,
+      );
+    }
+  },
+  rejects: async (promise, expectedPattern, msg) => {
+    let rejected = false;
+    let error;
+    try {
+      await promise;
+    } catch (e) {
+      rejected = true;
+      error = e;
+    }
+    throwIf(!rejected, "Expected promise to reject, but it resolved", msg);
+    if (expectedPattern instanceof RegExp) {
+      throwIf(
+        !expectedPattern.test(error.message),
+        `Expected error message to match ${expectedPattern}, got: ${error.message}`,
+        msg,
+      );
+    }
+  },
 });
 
-$APP.devFiles.add(new URL(import.meta.url).pathname);
+// Register with $APP if in browser environment
+if ($APP) {
+  $APP.devFiles.add(new URL(import.meta.url).pathname);
+}
 
 export default assert;

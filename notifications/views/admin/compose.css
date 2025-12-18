@@ -1,0 +1,306 @@
+/**
+ * @bootstrapp/notifications - Admin Compose Page Styles
+ */
+
+.notifications-compose {
+  padding: var(--notifications-compose-padding, 1.5rem);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Header */
+.notifications-compose-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.notifications-compose-back {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--color-surface, white);
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.notifications-compose-back:hover {
+  background: var(--color-surface-hover, #f9fafb);
+}
+
+.notifications-compose-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-color, #1a1a1a);
+  margin: 0;
+}
+
+/* Content layout */
+.notifications-compose-content {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 1.5rem;
+}
+
+@media (max-width: 900px) {
+  .notifications-compose-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Form */
+.notifications-compose-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.notifications-compose-error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 0.5rem;
+  color: #dc2626;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Field */
+.notifications-compose-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.notifications-compose-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-color, #1a1a1a);
+}
+
+.notifications-compose-input,
+.notifications-compose-select,
+.notifications-compose-textarea {
+  padding: 0.75rem;
+  background: var(--color-surface, white);
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  transition: all 0.15s ease;
+}
+
+.notifications-compose-input:focus,
+.notifications-compose-select:focus,
+.notifications-compose-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary, #3b82f6);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.notifications-compose-input:disabled,
+.notifications-compose-select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.notifications-compose-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* Type selection */
+.notifications-compose-types {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.notifications-compose-type {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--color-surface, white);
+  border: 2px solid var(--color-border, #e5e7eb);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.notifications-compose-type:hover {
+  border-color: var(--color-primary, #3b82f6);
+}
+
+.notifications-compose-type.active {
+  background: var(--color-primary, #3b82f6);
+  border-color: var(--color-primary, #3b82f6);
+  color: white;
+}
+
+/* Target selection */
+.notifications-compose-targets {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.notifications-compose-target {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: var(--color-surface, white);
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.notifications-compose-target:hover {
+  background: var(--color-surface-hover, #f9fafb);
+}
+
+.notifications-compose-target input {
+  accent-color: var(--color-primary, #3b82f6);
+}
+
+/* User selection */
+.notifications-compose-users {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: 0.5rem;
+}
+
+.notifications-compose-user {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.notifications-compose-user:hover {
+  background: var(--color-surface-hover, #f9fafb);
+}
+
+.notifications-compose-user.selected {
+  background: #eff6ff;
+}
+
+.notifications-compose-user input {
+  accent-color: var(--color-primary, #3b82f6);
+}
+
+.notifications-compose-user-name {
+  font-weight: 500;
+  color: var(--text-color, #1a1a1a);
+}
+
+.notifications-compose-user-email {
+  font-size: 0.75rem;
+  color: var(--text-color-muted, #6b7280);
+}
+
+/* Section */
+.notifications-compose-section {
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border, #e5e7eb);
+}
+
+.notifications-compose-section-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-color-muted, #6b7280);
+  margin: 0 0 1rem 0;
+}
+
+.notifications-compose-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 600px) {
+  .notifications-compose-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Preview */
+.notifications-compose-preview {
+  position: sticky;
+  top: 1.5rem;
+}
+
+.notifications-compose-preview-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-color-muted, #6b7280);
+  margin: 0 0 0.75rem 0;
+  text-transform: uppercase;
+}
+
+.notifications-compose-preview-card {
+  background: var(--color-surface, white);
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.notifications-compose-preview-empty {
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-color-muted, #9ca3af);
+  font-style: italic;
+}
+
+/* Summary */
+.notifications-compose-summary {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.notifications-compose-summary-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  background: var(--color-surface-alt, #f9fafb);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+}
+
+.notifications-compose-summary-label {
+  color: var(--text-color-muted, #6b7280);
+}
+
+.notifications-compose-summary-value {
+  font-weight: 600;
+  color: var(--text-color, #1a1a1a);
+}
+
+/* Actions */
+.notifications-compose-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border, #e5e7eb);
+}

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" style="width: 100%; height: 100%">
+<head>
+  <meta charset="utf-8" />
+  <title>Project Test Runner</title>
+  <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0" />
+  <script type="module">
+    // Wait for Service Worker to be ready before running tests
+    async function waitForServiceWorker() {
+      if (!("serviceWorker" in navigator)) {
+        console.warn("Service Worker not supported");
+        return;
+      }
+
+      // Register Service Worker
+      await navigator.serviceWorker.register("/backend.js", { type: "module" });
+
+      // Wait for it to be controlling the page
+      if (!navigator.serviceWorker.controller) {
+        await new Promise((resolve) => {
+          navigator.serviceWorker.addEventListener("controllerchange", resolve, { once: true });
+        });
+      }
+
+      // Additional wait for SW to be fully ready
+      await navigator.serviceWorker.ready;
+    }
+
+    // Initialize and run tests
+    async function main() {
+      // Wait for Service Worker first
+      await waitForServiceWorker();
+
+      // Now import test dependencies (Service Worker will handle /npm/ paths)
+      const [{ default: $APP }, { default: T }, { default: Testing }, { default: assert }, { default: mock }] = await Promise.all([
+        import("/$app.js"),
+        import("/$app/types/index.js"),
+        import("/$app/base/test/index.js"),
+        import("/$app/base/test/assert.js"),
+        import("/$app/base/test/mock.js"),
+      ]);
+
+      // Expose globals for tests
+      window.$APP = $APP;
+      window.Testing = Testing;
+      window.assert = assert;
+      window.mock = mock;
+      window.T = T;
+
+      // Parse URL parameters
+      const params = new URLSearchParams(location.search);
+      const run = params.get("run");
+      const filePath = params.get("filePath");
+      const suiteName = params.get("suiteName");
+
+      // Run tests based on parameters
+      if (run === "file" && filePath) {
+        // filePath is relative to project root, e.g., "tests/utils.test.js"
+        const results = await Testing.runFile("/" + filePath, suiteName);
+        // Set window.testResults for Puppeteer to detect test completion
+        window.testResults = results;
+      } else if (run === "suite" && suiteName) {
+        const results = await Testing.run(suiteName);
+        window.testResults = results;
+      } else {
+        console.log("Project Test Runner");
+        console.log("Usage: ?run=file&filePath=tests/utils.test.js");
+        console.log("       ?run=suite&suiteName=MySuite");
+        window.testResults = { passed: 0, failed: 0, total: 0 };
+      }
+    }
+
+    main().catch(console.error);
+  </script>
+</head>
+<body>
+  <div id="test-container"></div>
+</body>
+</html>

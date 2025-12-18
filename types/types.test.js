@@ -1,4 +1,4 @@
-import Testing from "../test/index.js";
+import Testing from "../base/test/index.js";
 import T from "./index.js";
 
 const { describe, it, assert } = Testing;

@@ -1,0 +1,117 @@
+/**
+ * @bootstrapp/notifications - Drawer Component Styles
+ */
+
+.notifications-drawer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Header */
+.notifications-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--notifications-drawer-header-padding, 1rem);
+  border-bottom: var(--notifications-drawer-header-border-width, 3px) solid var(--notifications-drawer-header-border-color, black);
+  background: var(--notifications-drawer-header-bg, white);
+}
+
+.notifications-drawer-title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.notifications-drawer-title {
+  font-size: var(--notifications-drawer-title-size, 1.125rem);
+  font-weight: var(--notifications-drawer-title-weight, 900);
+  color: var(--notifications-drawer-title-color, #1a1a1a);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.notifications-drawer-badge {
+  padding: 0.125rem 0.5rem;
+  background: var(--notifications-drawer-badge-bg, #ef4444);
+  color: var(--notifications-drawer-badge-color, white);
+  font-size: var(--notifications-drawer-badge-size, 0.75rem);
+  font-weight: var(--notifications-drawer-badge-weight, 700);
+  border-radius: 9999px;
+}
+
+.notifications-drawer-close {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.notifications-drawer-close:hover {
+  background: var(--notifications-drawer-close-hover-bg, #f3f4f6);
+}
+
+/* Content */
+.notifications-drawer-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Empty state */
+.notifications-drawer-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--notifications-drawer-empty-padding, 3rem 1.5rem);
+  text-align: center;
+}
+
+.notifications-drawer-empty-icon {
+  color: var(--notifications-drawer-empty-icon-color, #9ca3af);
+  margin-bottom: 0.75rem;
+}
+
+.notifications-drawer-empty-message {
+  color: var(--notifications-drawer-empty-message-color, #6b7280);
+  font-weight: var(--notifications-drawer-empty-message-weight, 500);
+  margin: 0;
+}
+
+/* Footer */
+.notifications-drawer-footer {
+  padding: var(--notifications-drawer-footer-padding, 1rem);
+  border-top: var(--notifications-drawer-footer-border-width, 3px) solid var(--notifications-drawer-footer-border-color, black);
+  background: var(--notifications-drawer-footer-bg, white);
+}
+
+.notifications-drawer-view-all {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--notifications-drawer-btn-bg, white);
+  border: var(--notifications-drawer-btn-border-width, 3px) solid var(--notifications-drawer-btn-border-color, black);
+  border-radius: var(--notifications-drawer-btn-radius, 0.75rem);
+  font-weight: var(--notifications-drawer-btn-weight, 900);
+  font-size: var(--notifications-drawer-btn-size, 0.875rem);
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: var(--notifications-drawer-btn-shadow, 3px 3px 0px 0px rgba(0, 0, 0, 1));
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.notifications-drawer-view-all:hover {
+  transform: translate(1px, 1px);
+  box-shadow: var(--notifications-drawer-btn-hover-shadow, 2px 2px 0px 0px rgba(0, 0, 0, 1));
+}
+
+.notifications-drawer-view-all:active {
+  transform: translate(2px, 2px);
+  box-shadow: var(--notifications-drawer-btn-active-shadow, 1px 1px 0px 0px rgba(0, 0, 0, 1));
+}

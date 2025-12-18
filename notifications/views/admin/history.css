@@ -1,0 +1,229 @@
+/**
+ * @bootstrapp/notifications - Admin History Page Styles
+ */
+
+.notifications-admin {
+  padding: var(--notifications-admin-padding, 1.5rem);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.notifications-admin-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem;
+}
+
+/* Header */
+.notifications-admin-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.notifications-admin-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-color, #1a1a1a);
+  margin: 0;
+}
+
+.notifications-admin-subtitle {
+  font-size: 0.875rem;
+  color: var(--text-color-muted, #6b7280);
+  margin: 0.25rem 0 0 0;
+}
+
+/* Stats */
+.notifications-admin-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.notifications-admin-stat-card {
+  text-align: center;
+  padding: 1rem;
+}
+
+.notifications-admin-stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-color, #1a1a1a);
+}
+
+.notifications-admin-stat-label {
+  font-size: 0.875rem;
+  color: var(--text-color-muted, #6b7280);
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* Filters */
+.notifications-admin-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.notifications-admin-filter {
+  padding: 0.5rem 1rem;
+  background: var(--color-surface, white);
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.notifications-admin-filter:hover {
+  background: var(--color-surface-hover, #f9fafb);
+}
+
+.notifications-admin-filter.active {
+  background: var(--color-primary, #3b82f6);
+  color: white;
+  border-color: var(--color-primary, #3b82f6);
+}
+
+.notifications-admin-filter span {
+  opacity: 0.7;
+  font-size: 0.75rem;
+  margin-left: 0.25rem;
+}
+
+/* Table */
+.notifications-admin-table-card {
+  overflow: hidden;
+}
+
+.notifications-admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.notifications-admin-table th {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  background: var(--color-surface-alt, #f9fafb);
+  font-weight: 600;
+  color: var(--text-color-muted, #6b7280);
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  border-bottom: 1px solid var(--color-border, #e5e7eb);
+}
+
+.notifications-admin-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--color-border, #e5e7eb);
+  vertical-align: middle;
+}
+
+.notifications-admin-table tbody tr:hover {
+  background: var(--color-surface-hover, #f9fafb);
+}
+
+.notifications-admin-cell-title {
+  font-weight: 600;
+  color: var(--text-color, #1a1a1a);
+}
+
+.notifications-admin-cell-message {
+  color: var(--text-color-muted, #6b7280);
+}
+
+.notifications-admin-cell-date {
+  font-size: 0.75rem;
+  color: var(--text-color-muted, #9ca3af);
+  white-space: nowrap;
+}
+
+/* Type badges */
+.notifications-admin-type-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.notifications-admin-type-badge.system {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.notifications-admin-type-badge.announcement {
+  background: #fce7f3;
+  color: #db2777;
+}
+
+.notifications-admin-type-badge.update {
+  background: #e0e7ff;
+  color: #4f46e5;
+}
+
+.notifications-admin-type-badge.like {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.notifications-admin-type-badge.join {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.notifications-admin-type-badge.follow {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.notifications-admin-type-badge.mention {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+/* Delete button */
+.notifications-admin-delete {
+  padding: 0.375rem;
+  background: transparent;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  color: var(--text-color-muted, #9ca3af);
+  transition: all 0.15s ease;
+}
+
+.notifications-admin-delete:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* Empty state */
+.notifications-admin-empty {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.notifications-admin-empty-icon {
+  color: var(--text-color-muted, #9ca3af);
+  margin-bottom: 1rem;
+}
+
+.notifications-admin-empty-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-color, #1a1a1a);
+  margin: 0 0 0.5rem 0;
+}
+
+.notifications-admin-empty-message {
+  color: var(--text-color-muted, #6b7280);
+  margin: 0 0 1.5rem 0;
+}

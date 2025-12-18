@@ -1,7 +1,12 @@
-import $APP from "/$app.js";
-import config from "../config.js";
 import assert from "./assert.js";
-import mock from "./assert.js";
+import mock from "./mock.js";
+
+// Conditionally import $APP and config for browser environment
+let $APP, config;
+if (typeof window !== "undefined") {
+  $APP = (await import("/$app.js")).default;
+  config = (await import("../config.js")).default;
+}
 
 function createTestEngine({ terminal = console } = {}) {
   // Private state
@@ -313,29 +318,33 @@ function createTestEngine({ terminal = console } = {}) {
     }
   }
 
-  const iframe = {
+  // Browser-only iframe utilities
+  const iframe = typeof window !== "undefined" ? {
     run(suiteName) {
+      const testUrl = config?.test?.getUrl?.("/test.html") || "/$app/base/test.html";
       const iframe = document.createElement("iframe");
-      iframe.src = `${config.test.getUrl("/test.html")}?run=suite&suiteName=${encodeURIComponent(suiteName ?? "")}`;
+      iframe.src = `${testUrl}?run=suite&suiteName=${encodeURIComponent(suiteName ?? "")}`;
       iframe.style.width = "100%";
       iframe.style.height = "600px";
       document.body.appendChild(iframe);
     },
     runFile(filePath, suiteName) {
+      const testUrl = config?.test?.getUrl?.("/test.html") || "/$app/base/test.html";
       const iframe = document.createElement("iframe");
-      iframe.src = `${config.test.getUrl("/test.html")}?run=file&filePath=${encodeURIComponent(filePath ?? "")}&suiteName=${encodeURIComponent(suiteName ?? "")}`;
+      iframe.src = `${testUrl}?run=file&filePath=${encodeURIComponent(filePath ?? "")}&suiteName=${encodeURIComponent(suiteName ?? "")}`;
       iframe.style.width = "100%";
       iframe.style.height = "600px";
       document.body.appendChild(iframe);
     },
     runDescribe(filePath, suiteName) {
+      const testUrl = config?.test?.getUrl?.("/test.html") || "/$app/base/test.html";
       const iframe = document.createElement("iframe");
-      iframe.src = `${config.test.getUrl("/test.html")}?run=describe&filePath=${encodeURIComponent(filePath ?? "")}&suiteName=${encodeURIComponent(suiteName ?? "")}`;
+      iframe.src = `${testUrl}?run=describe&filePath=${encodeURIComponent(filePath ?? "")}&suiteName=${encodeURIComponent(suiteName ?? "")}`;
       iframe.style.width = "100%";
       iframe.style.height = "600px";
       document.body.appendChild(iframe);
     },
-  };
+  } : null;
   async function runDescribe(filePath, describeName, suiteName) {
     terminal.clear();
     terminal.info("%c🧪 TEST ENGINE RUNNING SPECIFIC DESCRIBE", styles.title);
@@ -566,12 +575,16 @@ function createTestEngine({ terminal = console } = {}) {
 
 const Testing = createTestEngine();
 Testing.createTestEngine = createTestEngine;
-$APP.addModule({
-  name: "test",
-  alias: "Testing",
-  base: Testing,
-  dev: true,
-});
 
-$APP.devFiles.add(new URL(import.meta.url).pathname);
+// Register with $APP if in browser environment
+if ($APP) {
+  $APP.addModule({
+    name: "test",
+    alias: "Testing",
+    base: Testing,
+    dev: true,
+  });
+  $APP.devFiles.add(new URL(import.meta.url).pathname);
+}
+
 export default Testing;
