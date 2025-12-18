@@ -5,9 +5,8 @@ import { deployToTarget, getTargets } from "./targets/index.js";
 // Import targets (they self-register)
 import "./targets/github.js";
 import "./targets/cloudflare.js";
-import "./targets/zip.js";
 import "./targets/targz.js";
-import "./targets/localhost.js";
+import "./targets/localhost.js"; // Internal only, used by build()
 import "./targets/vps.js";
 
 // Import templates
@@ -245,11 +244,74 @@ const bundler = {
     }
   },
   async _bundleSPACore({ mode = "spa" }) {
-    console.log(`🚀 Starting ${mode.toUpperCase()} bundle process...`);
+    console.log(`📦 Building ${mode.toUpperCase()} in isolated iframe...`);
+
+    // Cache lifecycle: Clear → Enable → Create iframe → Navigate → Get files → Cleanup
+    console.log("📦 Step 1: Clearing existing local cache...");
+    await $APP.SW.clearLocalCache();
+
+    console.log("📦 Step 2: Enabling local caching...");
+    await $APP.SW.enableLocalCaching();
+
+    let buildContext = null;
+
+    try {
+      console.log("📦 Step 3: Creating build iframe...");
+      const { createBuildIframe, navigateIframeRoutes } = await import(
+        "./iframe-builder.js"
+      );
+      buildContext = await createBuildIframe();
+
+      console.log("📦 Step 4: Waiting for iframe app initialization...");
+      await this._waitForIframeReady(buildContext.iframe);
+
+      console.log("📦 Step 5: Navigating routes in iframe...");
+      const pages = await navigateIframeRoutes(buildContext.iframe);
+
+      // Small delay to ensure all async resources are cached
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      console.log("📦 Step 6: Retrieving cached files...");
+      const filesForSW = await $APP.SW.request("SW:GET_CACHED_FILES");
+
+      // Process the bundle
+      return await this._processBundleFiles({ filesForSW, pages, mode });
+    } finally {
+      // Cleanup iframe
+      if (buildContext?.cleanup) {
+        buildContext.cleanup();
+      }
+      console.log("📦 Step 7: Cleanup - disabling caching and clearing cache...");
+      await $APP.SW.disableLocalCaching();
+      await $APP.SW.clearLocalCache();
+    }
+  },
+
+  async _waitForIframeReady(iframe, timeout = 30000) {
+    const startTime = Date.now();
+    return new Promise((resolve, reject) => {
+      const check = () => {
+        if (Date.now() - startTime > timeout) {
+          reject(new Error("Iframe initialization timed out"));
+          return;
+        }
+        if (iframe.contentWindow.$APP?.Router?.routes?.length > 0) {
+          resolve();
+          return;
+        }
+        setTimeout(check, 100);
+      };
+      check();
+    });
+  },
+
+  /**
+   * Process collected files into deployment bundle
+   * @private
+   */
+  async _processBundleFiles({ filesForSW, pages, mode }) {
     const filesForDeployment = {};
-    const filesForSW = await $APP.SW.request("SW:GET_CACHED_FILES");
     const addFilePromises = [];
-    const pages = await getStaticHTML({ ssgOnly: false });
     const addFile = async ({ path, content, mimeType, skipSW = false }) => {
       if (!path) {
         console.error("addFile requires a 'path' property.");
@@ -399,11 +461,10 @@ const bundler = {
   getTargets,
 
   /**
-   * Build files for deployment
-   * @param {string} mode - Build mode: spa, ssg, hybrid
-   * @returns {Array} Files ready for deployment [{path, content}]
+   * Build files internally (without deploying)
+   * @private
    */
-  async build(mode) {
+  async _buildFiles(mode) {
     switch (mode) {
       case "spa":
         return this._bundleSPACore({ mode: "spa" });
@@ -417,24 +478,66 @@ const bundler = {
   },
 
   /**
-   * Deploy to a target
+   * Build and save to localhost (creates versioned build in .deployed/builds/)
+   * @param {string} mode - Build mode: spa, ssg, hybrid
+   * @returns {Object} Build result with buildId and file count
+   */
+  async build(mode) {
+    const files = await this._buildFiles(mode);
+
+    // Deploy to localhost to create versioned build
+    const result = await deployToTarget("localhost", files, {
+      name: $APP.settings.name,
+      version: Date.now(),
+    });
+
+    return {
+      buildId: result.buildId,
+      fileCount: files.length,
+      mode,
+      timestamp: Date.now(),
+    };
+  },
+
+  /**
+   * Deploy an existing build to a target
    * @param {Object} options - Deployment options
-   * @param {string} options.mode - Build mode: spa, ssg, hybrid, worker
-   * @param {string} options.target - Deploy target: github, cloudflare, zip, targz
+   * @param {string} options.buildId - Existing build ID to deploy (required)
+   * @param {string} options.target - Deploy target: github, cloudflare, vps, targz
    * @param {Object} options.credentials - Target-specific credentials
    */
-  async deploy({ mode, target = "github", ...credentials }) {
-    console.log(`🚀 Deploying: mode=${mode}, target=${target}`);
-    if (target === "cloudflare" || mode === "worker")
-      return this.deployWorker({ cloudflare: credentials });
+  async deploy({ buildId, target = "github", ...credentials }) {
+    console.log(`🚀 Deploying build ${buildId} to ${target}...`);
 
-    const files = await this.build(mode);
+    // Cloudflare worker is special case
+    if (target === "cloudflare") {
+      return this.deployWorker({ cloudflare: credentials });
+    }
+
+    if (!buildId) {
+      throw new Error("buildId is required. Run build() first to create a build.");
+    }
+
+    // Targets that need actual file content (fetch from build)
+    let files = [];
+    if (target === "targz") {
+      console.log(`📦 Fetching files from build ${buildId}...`);
+      const response = await fetch(`/builds/${buildId}/files`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch build files: ${response.status}`);
+      }
+      const data = await response.json();
+      files = data.files || [];
+    }
+
+    // Deploy from existing build
     const result = await deployToTarget(target, files, {
       ...credentials,
+      buildId,
       name: $APP.settings.name,
       version: credentials.version || Date.now(),
     });
-    console.log({ result });
+
     console.log(`✅ Deployment to ${target} completed!`, result);
     return result;
   },
@@ -442,32 +545,47 @@ const bundler = {
     return this._bundleSPACore({ mode: "spa" });
   },
   async bundleSSG() {
-    console.log("🚀 Starting SSG bundle process...");
+    console.log("📦 Building SSG in isolated iframe...");
     const files = {};
-    const staticFiles = await getStaticHTML({ ssgOnly: true });
-    staticFiles.forEach((file) => {
-      files[file.path] = { content: createStaticPage(file) };
-    });
 
-    // Extract global CSS only (component CSS served from original paths)
-    const { globalCSS } = await this.extractCSS();
+    // Use iframe to navigate routes
+    const { createBuildIframe, navigateIframeRoutes } = await import(
+      "./iframe-builder.js"
+    );
+    const buildContext = await createBuildIframe();
 
-    // style.css contains only global styles
-    files["style.css"] = { content: globalCSS };
-    const data = {};
-    files["data.json"] = { content: JSON.stringify(data, null, 2) };
-    const sitemapXML = this._createSitemapXML($APP.settings, staticFiles);
-    files["sitemap.xml"] = { content: sitemapXML };
-    const robotsTXT = this._createRobotsTXT($APP.settings);
-    files["robots.txt"] = { content: robotsTXT };
-    const fileCount = Object.keys(files).length;
-    console.log(`✅ SSG bundle created with ${fileCount} files`);
-    // Convert object to array format for deployment targets
-    return Object.entries(files).map(([path, file]) => ({
-      path,
-      content: file.content,
-      mimeType: file.mimeType,
-    }));
+    try {
+      await this._waitForIframeReady(buildContext.iframe);
+      const allPages = await navigateIframeRoutes(buildContext.iframe);
+
+      // Filter only SSG pages
+      const staticFiles = allPages.filter((file) => file.ssg);
+      staticFiles.forEach((file) => {
+        files[file.path] = { content: createStaticPage(file) };
+      });
+
+      // Extract global CSS only (component CSS served from original paths)
+      const { globalCSS } = await this.extractCSS();
+
+      // style.css contains only global styles
+      files["style.css"] = { content: globalCSS };
+      const data = {};
+      files["data.json"] = { content: JSON.stringify(data, null, 2) };
+      const sitemapXML = this._createSitemapXML($APP.settings, staticFiles);
+      files["sitemap.xml"] = { content: sitemapXML };
+      const robotsTXT = this._createRobotsTXT($APP.settings);
+      files["robots.txt"] = { content: robotsTXT };
+      const fileCount = Object.keys(files).length;
+      console.log(`✅ SSG bundle created with ${fileCount} files`);
+      // Convert object to array format for deployment targets
+      return Object.entries(files).map(([path, file]) => ({
+        path,
+        content: file.content,
+        mimeType: file.mimeType,
+      }));
+    } finally {
+      buildContext?.cleanup?.();
+    }
   },
   async bundleHybrid(credentials) {
     return this._bundleSPACore({ mode: "hybrid" });
@@ -533,63 +651,6 @@ const createStaticPage = ({ headContent, content }) => {
     settings: $APP.settings,
     needsHydration,
   });
-};
-
-const generateStaticHTMLForCurrentRoute = async () => {
-  const route = window.location.pathname;
-  const bodyContent = document.body.innerHTML;
-  const ssg = $APP.Router.currentRoute.route.ssg || false;
-  const titleTag =
-    document.querySelector("title")?.outerHTML ||
-    `<title>${$APP.settings.name}</title>`;
-  const metaTags = Array.from(
-    document.querySelectorAll("head meta[name], head meta[property]"),
-  )
-    .map((tag) => tag.outerHTML)
-    .join("\n");
-  const canonicalLink =
-    document.querySelector('head link[rel="canonical"]')?.outerHTML || "";
-  const headSeoContent = `${titleTag}\n${metaTags}\n${canonicalLink}`;
-  const filePath =
-    route === "/" ? "index.html" : `${route.slice(1)}/index.html`;
-  return {
-    path: filePath,
-    content: bodyContent,
-    headContent: headSeoContent,
-    ssg,
-  };
-};
-
-const getStaticHTML = async ({ ssgOnly = false }) => {
-  const visited = new Set();
-  const toVisit = ["/"];
-  const files = [];
-  while (toVisit.length > 0) {
-    const route = toVisit.pop();
-    if (visited.has(route)) continue;
-    visited.add(route);
-    try {
-      await $APP.Router.go(route);
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      const file = await generateStaticHTMLForCurrentRoute();
-      if (ssgOnly) {
-        if (file.ssg) files.push(file);
-      } else {
-        files.push(file);
-      }
-      const links = document.querySelectorAll('uix-link[href^="/"]');
-      console.error({ links });
-      for (const link of links) {
-        const href = link.getAttribute("href");
-        if (!visited.has(href) && !toVisit.includes(href)) {
-          toVisit.push(href);
-        }
-      }
-    } catch (error) {
-      console.error(`Error generating static HTML for route ${route}:`, error);
-    }
-  }
-  return files;
 };
 
 $APP.devFiles.add(new URL(import.meta.url).pathname);

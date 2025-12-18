@@ -82,6 +82,9 @@ export function initSWBackend(app, appConfig = {}) {
     "cdnjs.cloudflare.com",
   ];
 
+  // Build-time caching state (opt-in, disabled by default)
+  let localCachingEnabled = false;
+
   // File system cache helpers
   const fsCache = {
     open: async (type) => {
@@ -156,6 +159,29 @@ export function initSWBackend(app, appConfig = {}) {
         });
         await cache.put(url, response);
         respond({ success: true });
+      } catch (error) {
+        respond({ error: error.message });
+      }
+    },
+    "SW:ENABLE_LOCAL_CACHING": async (data, { respond }) => {
+      localCachingEnabled = true;
+      console.log("Service Worker: Local caching ENABLED for build");
+      respond({ success: true, enabled: true });
+    },
+    "SW:DISABLE_LOCAL_CACHING": async (data, { respond }) => {
+      localCachingEnabled = false;
+      console.log("Service Worker: Local caching DISABLED");
+      respond({ success: true, enabled: false });
+    },
+    "SW:CLEAR_LOCAL_CACHE": async (data, { respond }) => {
+      try {
+        const localCache = await fsCache.open("local");
+        const keys = await localCache.keys();
+        await Promise.all(keys.map((key) => localCache.delete(key)));
+        console.log(
+          `Service Worker: Cleared ${keys.length} entries from local cache`,
+        );
+        respond({ success: true, clearedCount: keys.length });
       } catch (error) {
         respond({ error: error.message });
       }
@@ -348,8 +374,12 @@ export function initSWBackend(app, appConfig = {}) {
           // Always fetch from network in dev (don't serve from local cache)
           try {
             const networkResponse = await fetch(event.request);
-            // Cache GET requests for later bundling (Cache API only supports GET)
-            if (networkResponse.ok && event.request.method === "GET") {
+            // Only cache GET requests when build-time caching is enabled
+            if (
+              localCachingEnabled &&
+              networkResponse.ok &&
+              event.request.method === "GET"
+            ) {
               const localCache = await fsCache.open("local");
               localCache.put(event.request, networkResponse.clone());
             }

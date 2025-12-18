@@ -154,8 +154,9 @@ $APP.define("release-creator", {
     version: T.string(`v${new Date().toISOString().slice(0, 10)}`),
     notes: T.string(""),
     deployMode: T.string("spa"),
-    deployTarget: T.string("localhost"),
+    deployTarget: T.string("github"),
     isDeploying: T.boolean(false),
+    isBuilding: T.boolean(false),
     builds: T.array([]),
     selectedBuildId: T.string(""),
     runSetup: T.boolean(false),
@@ -176,6 +177,38 @@ $APP.define("release-creator", {
       }
     } catch {
       this.builds = [];
+    }
+  },
+
+  async handleBuild() {
+    if (this.isBuilding) return;
+    this.isBuilding = true;
+    try {
+      const result = await Bundler.build(this.deployMode);
+      await this.loadBuilds();
+      this.selectedBuildId = result.buildId;
+      alert(`Build complete: ${result.fileCount} files (${result.buildId})`);
+    } catch (error) {
+      console.error("Build failed:", error);
+      alert(`Build failed: ${error.message}`);
+    } finally {
+      this.isBuilding = false;
+    }
+  },
+
+  async handleDownload() {
+    if (!this.selectedBuildId) {
+      alert("Please select a build to download.");
+      return;
+    }
+    try {
+      await Bundler.deploy({
+        buildId: this.selectedBuildId,
+        target: "targz",
+      });
+    } catch (error) {
+      console.error("Download failed:", error);
+      alert(`Download failed: ${error.message}`);
     }
   },
 
@@ -208,8 +241,8 @@ $APP.define("release-creator", {
   },
 
   needsCredentials() {
-    // ZIP, TAR.GZ, and localhost don't need credentials
-    return !["zip", "targz", "localhost"].includes(this.deployTarget);
+    // tar.gz doesn't need credentials (download only)
+    return this.deployTarget !== "targz";
   },
 
   isVpsTarget() {
@@ -217,12 +250,18 @@ $APP.define("release-creator", {
   },
 
   requiresBuildSelector() {
-    // Targets that deploy from existing builds (not re-bundle)
-    return ["vps", "github"].includes(this.deployTarget);
+    // All deploy targets require a build (except cloudflare worker)
+    return this.deployTarget !== "cloudflare";
   },
 
   async handleDeploy() {
     if (this.isDeploying) return;
+
+    // All targets except cloudflare require a build
+    if (this.requiresBuildSelector() && !this.selectedBuildId) {
+      alert("Please select a build to deploy. Click 'Build' first to create one.");
+      return;
+    }
 
     this.isDeploying = true;
     const credentials = await $APP.Model.bundler_credentials.get("singleton");
@@ -247,24 +286,10 @@ $APP.define("release-creator", {
           this.isDeploying = false;
           return;
         }
-        if (!this.selectedBuildId) {
-          alert(
-            "Please select a build to deploy. Run 'Deploy Locally' first to create a build.",
-          );
-          this.isDeploying = false;
-          return;
-        }
       } else if (this.deployTarget === "vps") {
         if (!credentials?.vps?.host || !credentials?.vps?.domain) {
           alert(
             "Please provide your VPS host and domain in the Credentials tab before deploying.",
-          );
-          this.isDeploying = false;
-          return;
-        }
-        if (!this.selectedBuildId) {
-          alert(
-            "Please select a build to deploy. Run 'Deploy Locally' first to create a build.",
           );
           this.isDeploying = false;
           return;
@@ -309,10 +334,9 @@ $APP.define("release-creator", {
       } else {
         result = await Bundler.deploy({
           ...credentials,
-          mode: this.deployMode,
           target: this.deployTarget,
           version: this.version,
-          buildId: this.selectedBuildId || null,
+          buildId: this.selectedBuildId,
         });
       }
 
@@ -328,11 +352,6 @@ $APP.define("release-creator", {
       alert(
         `Deployment to ${targetLabel} successful!${result.url ? ` URL: ${result.url}` : ""}`,
       );
-
-      // Refresh builds list after localhost deploy
-      if (this.deployTarget === "localhost") {
-        await this.loadBuilds();
-      }
     } catch (error) {
       console.error(`Deployment failed:`, { error });
       console.trace();
@@ -383,27 +402,31 @@ $APP.define("release-creator", {
             label="Obfuscate"
           ></uix-checkbox>
         </div>
+
+        <!-- Build Section -->
+        <div class="bundler-build-row">
+          <uix-select
+            label="Build Mode"
+            value=${this.deployMode}
+            .options=${modeOptions}
+            @change=${(e) => (this.deployMode = e.target.value)}
+          ></uix-select>
+          <uix-button
+            @click=${() => this.handleBuild()}
+            label=${this.isBuilding ? "Building..." : "Build"}
+            ?disabled=${this.isBuilding}
+            variant="secondary"
+          ></uix-button>
+        </div>
+
+        <!-- Deploy Section -->
         <div class="bundler-deploy-row">
-          ${
-            this.requiresBuildSelector()
-              ? ""
-              : html`
-            <uix-select
-              label="Build Mode"
-              value=${this.deployMode}
-              .options=${modeOptions}
-              @change=${(e) => (this.deployMode = e.target.value)}
-            >
-            </uix-select>
-          `
-          }
           <uix-select
             label="Deploy Target"
             value=${this.deployTarget}
             .options=${targetOptions}
             @change=${(e) => (this.deployTarget = e.target.value)}
-          >
-          </uix-select>
+          ></uix-select>
           ${
             this.requiresBuildSelector()
               ? html`
@@ -412,17 +435,23 @@ $APP.define("release-creator", {
               value=${this.selectedBuildId}
               .options=${buildOptions}
               @change=${(e) => (this.selectedBuildId = e.target.value)}
-            >
-            </uix-select>
+            ></uix-select>
           `
               : ""
           }
           <uix-button
             @click=${() => this.handleDeploy()}
-            label=${this.isDeploying ? `Deploying...` : "Deploy"}
-            ?disabled=${this.isDeploying}
+            label=${this.isDeploying ? "Deploying..." : "Deploy"}
+            ?disabled=${this.isDeploying || (this.requiresBuildSelector() && !this.selectedBuildId)}
+          ></uix-button>
+          <uix-button
+            @click=${() => this.handleDownload()}
+            label="Download tar.gz"
+            ?disabled=${!this.selectedBuildId}
+            variant="secondary"
           ></uix-button>
         </div>
+
         ${
           this.isVpsTarget()
             ? html`
@@ -441,7 +470,7 @@ $APP.define("release-creator", {
               this.builds.length === 0
                 ? html`
               <p class="bundler-help-text bundler-warning">
-                No builds available. Run "Deploy Locally" first to create a build.
+                No builds available. Click "Build" first to create a build.
               </p>
             `
                 : html`
@@ -452,27 +481,13 @@ $APP.define("release-creator", {
             }
           </div>
         `
-            : this.deployTarget === "github"
+            : this.requiresBuildSelector() && this.builds.length === 0
               ? html`
-          ${
-            this.builds.length === 0
-              ? html`
-            <p class="bundler-help-text bundler-warning">
-              No builds available. Run "Deploy Locally" first to create a build.
-            </p>
-          `
-              : html`
-            <p class="bundler-help-text">
-              Deploys existing build to GitHub Pages. Make sure credentials are set.
-            </p>
-          `
-          }
+          <p class="bundler-help-text bundler-warning">
+            No builds available. Click "Build" first to create a build.
+          </p>
         `
-              : !this.needsCredentials()
-                ? html`
-          <p class="bundler-help-text">This target downloads directly to your browser - no credentials needed.</p>
-        `
-                : ""
+              : ""
         }
       </uix-card>
     `;

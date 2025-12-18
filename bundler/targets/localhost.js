@@ -16,6 +16,7 @@ registerTarget("localhost", {
   label: "Deploy Locally",
   icon: "server",
   credentials: [],
+  internal: true, // Not shown in UI, used by build() internally
   async deploy(files, options) {
     // Convert files to JSON-serializable format
     const payload = await Promise.all(
@@ -44,7 +45,8 @@ registerTarget("localhost", {
 
     return {
       success: true,
-      type: "remote",
+      type: "local",
+      buildId: result.buildId,
       url: result.urls.prefixed,
       standaloneUrl: result.urls.standalone,
     };

@@ -25,9 +25,10 @@ export const registerTarget = (name, config) => {
 export const getTarget = (name) => targets.get(name);
 
 /**
- * Get all registered targets
+ * Get all registered targets (excludes internal targets)
  */
-export const getTargets = () => [...targets.values()];
+export const getTargets = () =>
+  [...targets.values()].filter((t) => !t.internal);
 
 /**
  * Get all target names

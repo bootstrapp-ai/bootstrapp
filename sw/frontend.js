@@ -329,6 +329,10 @@ export function initSWFrontend(app) {
     applyUpdate,
     hasUpdate,
     getRegistration,
+    // Build-time caching control
+    enableLocalCaching: () => requestToSW("SW:ENABLE_LOCAL_CACHING"),
+    disableLocalCaching: () => requestToSW("SW:DISABLE_LOCAL_CACHING"),
+    clearLocalCache: () => requestToSW("SW:CLEAR_LOCAL_CACHE"),
   };
 
   $APP.addModule({
