@@ -54,9 +54,10 @@ export function createBuildIframe() {
 /**
  * Navigate through all routes in the iframe
  * @param {HTMLIFrameElement} iframe
+ * @param {Function} onProgress - Optional callback for progress updates
  * @returns {Promise<Array>} Array of page info objects
  */
-export async function navigateIframeRoutes(iframe) {
+export async function navigateIframeRoutes(iframe, onProgress) {
   const iframeWindow = iframe.contentWindow;
   const iframeRouter = iframeWindow.$APP?.Router;
 
@@ -68,24 +69,33 @@ export async function navigateIframeRoutes(iframe) {
   const toVisit = ["/"];
   const pages = [];
 
+  // Single pass: discover routes and collect page info with progress
+  let routeCount = 0;
+
   while (toVisit.length > 0) {
     const route = toVisit.pop();
     if (visited.has(route)) continue;
     visited.add(route);
+    routeCount++;
+
+    // Report progress (count and current route only)
+    if (onProgress) {
+      onProgress({
+        current: routeCount,
+        route,
+      });
+    }
 
     try {
-      // Navigate in iframe context
+      // Navigate and collect page info
       iframeRouter.go(route);
       await new Promise((resolve) => setTimeout(resolve, ROUTE_WAIT_TIME));
 
-      // Collect page info from iframe
-      const pageInfo = collectPageInfo(iframeWindow, route);
-      pages.push(pageInfo);
+      // Collect page info
+      pages.push(collectPageInfo(iframeWindow, route));
 
       // Discover new routes from links in iframe
-      const links = iframeWindow.document.querySelectorAll(
-        'uix-link[href^="/"]',
-      );
+      const links = iframeWindow.document.querySelectorAll('[href^="/"]');
       for (const link of links) {
         const href = link.getAttribute("href");
         if (!visited.has(href) && !toVisit.includes(href)) {
@@ -93,8 +103,16 @@ export async function navigateIframeRoutes(iframe) {
         }
       }
     } catch (error) {
-      console.error(`Error navigating iframe to ${route}:`, error);
+      console.error(`Error processing route ${route}:`, error);
     }
+  }
+
+  // Final progress update
+  if (onProgress) {
+    onProgress({
+      current: routeCount,
+      route: "Complete",
+    });
   }
 
   return pages;

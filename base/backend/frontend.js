@@ -92,7 +92,6 @@ const fetchDataQuery = async (instance) => {
 
   const isMany = query.many ?? (!id && !single);
   const opts = { limit: single ? 1 : limit, offset, includes, order, where };
-  console.error({ isMany, opts });
   if (instance._dataQuerySub && instance._dataQuerySubHandler) {
     instance._dataQuerySub.unsubscribe(instance._dataQuerySubHandler);
     instance._dataQuerySub = null;

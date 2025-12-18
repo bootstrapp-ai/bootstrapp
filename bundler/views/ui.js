@@ -161,6 +161,21 @@ $APP.define("release-creator", {
     selectedBuildId: T.string(""),
     runSetup: T.boolean(false),
     rebuildDocker: T.boolean(false),
+    // Progress tracking
+    buildProgress: T.number(0),
+    buildingRoute: T.string(""),
+    // Deploy progress
+    deployProgress: T.string(""),
+    // Unified notification {type: 'success'|'error'|'warning', message: string, details?: string}
+    notification: T.object({ attribute: false }),
+  },
+
+  showNotification(type, message, details = "") {
+    this.notification = { type, message, details };
+  },
+
+  clearNotification() {
+    this.notification = null;
   },
 
   async connected() {
@@ -183,22 +198,34 @@ $APP.define("release-creator", {
   async handleBuild() {
     if (this.isBuilding) return;
     this.isBuilding = true;
+    this.buildProgress = 0;
+    this.buildingRoute = "";
+    this.clearNotification();
+
     try {
-      const result = await Bundler.build(this.deployMode);
+      const result = await Bundler.build(
+        this.deployMode,
+        ({ current, route }) => {
+          this.buildProgress = current;
+          this.buildingRoute = route;
+        },
+      );
       await this.loadBuilds();
       this.selectedBuildId = result.buildId;
-      alert(`Build complete: ${result.fileCount} files (${result.buildId})`);
+      this.showNotification("success", "Build complete", `${result.fileCount} files (${result.buildId})`);
     } catch (error) {
       console.error("Build failed:", error);
-      alert(`Build failed: ${error.message}`);
+      this.showNotification("error", "Build failed", error.message);
     } finally {
       this.isBuilding = false;
+      this.buildProgress = 0;
+      this.buildingRoute = "";
     }
   },
 
   async handleDownload() {
     if (!this.selectedBuildId) {
-      alert("Please select a build to download.");
+      this.showNotification("warning", "No build selected", "Please select a build to download.");
       return;
     }
     try {
@@ -206,15 +233,15 @@ $APP.define("release-creator", {
         buildId: this.selectedBuildId,
         target: "targz",
       });
+      this.showNotification("success", "Download started", this.selectedBuildId);
     } catch (error) {
       console.error("Download failed:", error);
-      alert(`Download failed: ${error.message}`);
+      this.showNotification("error", "Download failed", error.message);
     }
   },
 
   getTargetOptions() {
     const targets = Bundler.getTargets();
-    console.log(targets);
     return targets.map((t) => ({
       value: t.name,
       label: t.label,
@@ -259,11 +286,13 @@ $APP.define("release-creator", {
 
     // All targets except cloudflare require a build
     if (this.requiresBuildSelector() && !this.selectedBuildId) {
-      alert("Please select a build to deploy. Click 'Build' first to create one.");
+      this.showNotification("warning", "No build selected", "Please select a build to deploy. Click 'Build' first to create one.");
       return;
     }
 
     this.isDeploying = true;
+    this.deployProgress = "Loading credentials...";
+    this.clearNotification();
     const credentials = await $APP.Model.bundler_credentials.get("singleton");
 
     // Validate credentials for targets that need them
@@ -274,28 +303,31 @@ $APP.define("release-creator", {
           !credentials?.cloudflare?.accountId ||
           !credentials?.cloudflare?.projectName
         ) {
-          alert(
-            "Please provide your Cloudflare Account ID, API Token, and a Project Name before deploying.",
-          );
+          this.showNotification("warning", "Missing Cloudflare credentials", "Please provide your Cloudflare Account ID, API Token, and Project Name.");
           this.isDeploying = false;
+          this.deployProgress = "";
           return;
         }
       } else if (this.deployTarget === "github") {
         if (!credentials || !credentials.token) {
-          alert("Please provide a GitHub token before deploying.");
+          this.showNotification("warning", "Missing GitHub credentials", "Please provide a GitHub token before deploying.");
           this.isDeploying = false;
+          this.deployProgress = "";
           return;
         }
       } else if (this.deployTarget === "vps") {
         if (!credentials?.vps?.host || !credentials?.vps?.domain) {
-          alert(
-            "Please provide your VPS host and domain in the Credentials tab before deploying.",
-          );
+          this.showNotification("warning", "Missing VPS credentials", "Please provide your VPS host and domain in the Credentials tab.");
           this.isDeploying = false;
+          this.deployProgress = "";
           return;
         }
       }
     }
+
+    const targetLabel = Bundler.getTargets().find((t) => t.name === this.deployTarget)?.label || this.deployTarget;
+    this.deployProgress = `Deploying to ${targetLabel}...`;
+
     const release = {
       version: this.version,
       notes: this.notes,
@@ -310,6 +342,7 @@ $APP.define("release-creator", {
 
       let result;
       if (this.deployTarget === "vps") {
+        this.deployProgress = "Connecting to VPS...";
         const vps = credentials.vps || {};
         const payload = {
           host: vps.host,
@@ -321,7 +354,7 @@ $APP.define("release-creator", {
           runSetup: this.runSetup,
           rebuildDocker: this.rebuildDocker,
         };
-        console.log("VPS deploy payload:", payload);
+        this.deployProgress = "Uploading files to VPS...";
         const response = await fetch("/vps/deploy", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -332,6 +365,7 @@ $APP.define("release-creator", {
           throw new Error(result.error || "VPS deployment failed");
         }
       } else {
+        this.deployProgress = `Uploading to ${targetLabel}...`;
         result = await Bundler.deploy({
           ...credentials,
           target: this.deployTarget,
@@ -346,16 +380,10 @@ $APP.define("release-creator", {
         result,
       });
 
-      const targetLabel =
-        Bundler.getTargets().find((t) => t.name === this.deployTarget)?.label ||
-        this.deployTarget;
-      alert(
-        `Deployment to ${targetLabel} successful!${result.url ? ` URL: ${result.url}` : ""}`,
-      );
+      this.showNotification("success", `Deployed to ${targetLabel}`, result.url || "Deployment successful!");
     } catch (error) {
       console.error(`Deployment failed:`, { error });
-      console.trace();
-      alert(`Deployment failed: ${error.message}`);
+      this.showNotification("error", "Deployment failed", error.message);
       if (release?._id) {
         await $APP.Model.bundler_releases.add({
           ...release,
@@ -365,6 +393,7 @@ $APP.define("release-creator", {
       }
     } finally {
       this.isDeploying = false;
+      this.deployProgress = "";
     }
   },
 
@@ -397,6 +426,11 @@ $APP.define("release-creator", {
             @change=${(e) => (this.notes = e.target.value)}
           ></uix-textarea>
           <uix-checkbox
+            ?checked=${$APP.settings.minify !== false}
+            @change=${(e) => ($APP.settings.minify = e.target.checked)}
+            label="Minify"
+          ></uix-checkbox>
+          <uix-checkbox
             ?checked=${!!$APP.settings.obfuscate}
             @change=${(e) => ($APP.settings.obfuscate = e.target.checked)}
             label="Obfuscate"
@@ -404,7 +438,7 @@ $APP.define("release-creator", {
         </div>
 
         <!-- Build Section -->
-        <div class="bundler-build-row">
+        <div class="bundler-build-row bundler-deploy-row">
           <uix-select
             label="Build Mode"
             value=${this.deployMode}
@@ -417,7 +451,51 @@ $APP.define("release-creator", {
             ?disabled=${this.isBuilding}
             variant="secondary"
           ></uix-button>
+
+          <uix-button
+            @click=${() => this.handleDownload()}
+            label="Download tar.gz"
+            ?disabled=${!this.selectedBuildId}
+            variant="secondary"
+          ></uix-button>
         </div>
+
+        ${
+          this.isBuilding
+            ? html`
+          <div class="bundler-progress-section" style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 1rem;">
+            <uix-circular-progress
+              indeterminate
+              size="sm"
+            ></uix-circular-progress>
+            <p class="bundler-progress-label" style="margin: 0; text-align: center;">
+              ${this.buildingRoute
+                ? `Building: ${this.buildingRoute} (${this.buildProgress} routes)`
+                : "Starting build..."}
+            </p>
+          </div>
+        `
+            : ""
+        }
+
+        ${this.notification ? html`
+          <div class="bundler-notification" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 1rem; background: ${
+            this.notification.type === "success" ? "var(--color-success-light, #d4edda)" :
+            this.notification.type === "error" ? "var(--color-danger-light, #f8d7da)" :
+            "var(--color-warning-light, #fff3cd)"
+          };">
+            <span style="color: ${
+              this.notification.type === "success" ? "var(--color-success, #28a745)" :
+              this.notification.type === "error" ? "var(--color-danger, #dc3545)" :
+              "var(--color-warning, #856404)"
+            };">${
+              this.notification.type === "success" ? "✓" :
+              this.notification.type === "error" ? "✕" : "⚠"
+            }</span>
+            <span><strong>${this.notification.message}</strong>${this.notification.details ? `: ${this.notification.details}` : ""}</span>
+            <button style="margin-left: auto; background: none; border: none; cursor: pointer; opacity: 0.6;" @click=${() => this.clearNotification()}>✕</button>
+          </div>
+        ` : ""}
 
         <!-- Deploy Section -->
         <div class="bundler-deploy-row">
@@ -444,13 +522,19 @@ $APP.define("release-creator", {
             label=${this.isDeploying ? "Deploying..." : "Deploy"}
             ?disabled=${this.isDeploying || (this.requiresBuildSelector() && !this.selectedBuildId)}
           ></uix-button>
-          <uix-button
-            @click=${() => this.handleDownload()}
-            label="Download tar.gz"
-            ?disabled=${!this.selectedBuildId}
-            variant="secondary"
-          ></uix-button>
         </div>
+
+        ${this.isDeploying && this.deployProgress ? html`
+          <div class="bundler-progress-section" style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 1rem;">
+            <uix-circular-progress
+              indeterminate
+              size="sm"
+            ></uix-circular-progress>
+            <p class="bundler-progress-label" style="margin: 0; text-align: center;">
+              ${this.deployProgress}
+            </p>
+          </div>
+        ` : ""}
 
         ${
           this.isVpsTarget()
@@ -554,6 +638,7 @@ $APP.define("release-history", {
 $APP.define("settings-editor", {
   properties: {
     _settings: T.object(null),
+    _notification: T.object({ attribute: false }),
   },
   connected() {
     this._settings = $APP.settings;
@@ -561,10 +646,10 @@ $APP.define("settings-editor", {
   async handleSave() {
     try {
       await $APP.settings.set(this._settings);
-      alert("Settings saved successfully!");
+      this._notification = { type: "success", message: "Settings saved successfully!" };
     } catch (error) {
       console.error("Failed to save settings:", error);
-      alert("Error saving settings. Check the console for details.");
+      this._notification = { type: "error", message: "Error saving settings. Check the console for details." };
     }
   },
   render() {
@@ -619,6 +704,17 @@ $APP.define("settings-editor", {
             @change=${(e) => (this._settings.description = e.target.value)}
           ></uix-textarea>
         </div>
+        ${this._notification ? html`
+          <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; border-radius: 0.5rem; margin-top: 1rem; background: ${
+            this._notification.type === "success" ? "var(--color-success-light, #d4edda)" : "var(--color-danger-light, #f8d7da)"
+          };">
+            <span style="color: ${
+              this._notification.type === "success" ? "var(--color-success, #28a745)" : "var(--color-danger, #dc3545)"
+            };">${this._notification.type === "success" ? "✓" : "✕"}</span>
+            <span>${this._notification.message}</span>
+            <button style="margin-left: auto; background: none; border: none; cursor: pointer; opacity: 0.6;" @click=${() => this._notification = null}>✕</button>
+          </div>
+        ` : ""}
         <div slot="footer">
           <uix-button
             @click=${this.handleSave.bind(this)}

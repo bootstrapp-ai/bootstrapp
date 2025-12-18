@@ -1,5 +1,4 @@
 import $APP from "/$app.js";
-import View from "/$app/view/index.js";
 import { deployToTarget, getTargets } from "./targets/index.js";
 
 // Import targets (they self-register)
@@ -113,13 +112,20 @@ async function obfuscate(content) {
 }
 
 async function minify(content, mimeType) {
+  // Skip minification if disabled in settings (default: enabled)
+  if ($APP.settings.minify === false) return content;
+
   await esbuildReady;
   if (typeof content !== "string") return content;
   const loaderMap = {
     "application/javascript": "js",
+    "text/javascript": "js",
+    "application/x-javascript": "js",
     "text/css": "css",
   };
-  const loader = loaderMap[mimeType];
+  // Handle mime types with charset (e.g., "text/javascript; charset=utf-8")
+  const baseMimeType = mimeType?.split(";")[0]?.trim();
+  const loader = loaderMap[baseMimeType];
   if (!loader) return content;
   try {
     const result = await window.esbuild.transform(content, {
@@ -171,22 +177,42 @@ const bundler = {
   _createSitemapXML: sitemapXMLTemplate,
   _createIndexHTML: indexHTMLTemplate,
   _createServiceWorker(fileMap, { bundleAdmin = false } = {}) {
-    return minify(swJSTemplate({ fileMap, bundleAdmin }), "application/javascript");
+    return minify(
+      swJSTemplate({ fileMap, bundleAdmin }),
+      "application/javascript",
+    );
   },
   _createManifest: manifestJSONTemplate,
-  async extractCSS() {
-    // Get global styles only (exclude component-specific styles)
-    // Component CSS is served from original paths (/$app/uix/*/component.css)
-    const globalCSS = Array.from(document.querySelectorAll("style"))
-      .filter((style) => {
-        // Exclude component-specific styles - they're already in the SW cache
-        const tag = style.getAttribute("data-component-style");
-        return !tag;
+  async extractCSS(targetDocument = document) {
+    // Collect UnoCSS/Tailwind styles (generated at runtime)
+    const unoStyles = Array.from(
+      targetDocument.querySelectorAll("style[data-unocss-runtime-layer]")
+    ).map(s => s.textContent).join("\n");
+
+    // Collect other global styles (theme, base styles)
+    const globalStyles = Array.from(targetDocument.querySelectorAll("style"))
+      .filter(style => {
+        const isComponent = style.getAttribute("data-component-style");
+        const isUno = style.getAttribute("data-unocss-runtime-layer");
+        return !isComponent && !isUno;
       })
-      .map((style) => style.innerHTML)
+      .map(style => style.innerHTML)
       .join("\n");
 
-    return { globalCSS };
+    // Collect component CSS paths for @import
+    const componentPaths = Array.from(
+      targetDocument.querySelectorAll("style[data-component-style]")
+    ).map(style => style.getAttribute("data-component-style"));
+
+    // Generate @import statements for component CSS (deduplicated)
+    const componentImports = [...new Set(componentPaths)]
+      .map(path => `@import url("${path}");`)
+      .join("\n");
+
+    return {
+      globalCSS: `${componentImports}\n${unoStyles}\n${globalStyles}`,
+      componentPaths: [...new Set(componentPaths)]
+    };
   },
   async deployWorker(credentials) {
     console.log("🚀 Starting Cloudflare Worker deployment process...");
@@ -243,7 +269,7 @@ const bundler = {
       throw error;
     }
   },
-  async _bundleSPACore({ mode = "spa" }) {
+  async _bundleSPACore({ mode = "spa", onProgress }) {
     console.log(`📦 Building ${mode.toUpperCase()} in isolated iframe...`);
 
     // Cache lifecycle: Clear → Enable → Create iframe → Navigate → Get files → Cleanup
@@ -266,22 +292,28 @@ const bundler = {
       await this._waitForIframeReady(buildContext.iframe);
 
       console.log("📦 Step 5: Navigating routes in iframe...");
-      const pages = await navigateIframeRoutes(buildContext.iframe);
+      const pages = await navigateIframeRoutes(buildContext.iframe, onProgress);
 
       // Small delay to ensure all async resources are cached
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      console.log("📦 Step 6: Retrieving cached files...");
+      console.log("📦 Step 6: Extracting CSS from iframe...");
+      const iframeDoc = buildContext.iframe.contentWindow.document;
+      const { globalCSS, componentPaths } = await this.extractCSS(iframeDoc);
+
+      console.log("📦 Step 7: Retrieving cached files...");
       const filesForSW = await $APP.SW.request("SW:GET_CACHED_FILES");
 
       // Process the bundle
-      return await this._processBundleFiles({ filesForSW, pages, mode });
+      return await this._processBundleFiles({ filesForSW, pages, mode, globalCSS, componentPaths });
     } finally {
       // Cleanup iframe
       if (buildContext?.cleanup) {
         buildContext.cleanup();
       }
-      console.log("📦 Step 7: Cleanup - disabling caching and clearing cache...");
+      console.log(
+        "📦 Step 7: Cleanup - disabling caching and clearing cache...",
+      );
       await $APP.SW.disableLocalCaching();
       await $APP.SW.clearLocalCache();
     }
@@ -309,7 +341,7 @@ const bundler = {
    * Process collected files into deployment bundle
    * @private
    */
-  async _processBundleFiles({ filesForSW, pages, mode }) {
+  async _processBundleFiles({ filesForSW, pages, mode, globalCSS, componentPaths }) {
     const filesForDeployment = {};
     const addFilePromises = [];
     const addFile = async ({ path, content, mimeType, skipSW = false }) => {
@@ -360,15 +392,14 @@ const bundler = {
         else filesForDeployment[file.path] = { content: indexHTML };
       });
     }
-    // Extract global CSS only (component CSS served from original paths in SW cache)
-    const { globalCSS } = await this.extractCSS();
-
-    // style.css contains only global styles - no component @imports needed
-    // Component CSS is already in the SW cache from original paths (/$app/uix/*/component.css)
+    // style.css contains @imports for component CSS + UnoCSS/Tailwind + global styles
     addFilePromises.push(
       addFile({ path: "style.css", content: globalCSS, mimeType: "text/css" }),
     );
-    filesForDeployment["style.css"] = { content: globalCSS, mimeType: "text/css" };
+    filesForDeployment["style.css"] = {
+      content: globalCSS,
+      mimeType: "text/css",
+    };
     const manifest = this._createManifest($APP.settings);
     manifest.icons.forEach((icon) => {
       const path = icon.src.substring(1);
@@ -410,7 +441,7 @@ const bundler = {
       ];
 
       for (const path of Object.keys(filesForSW)) {
-        if (adminPatterns.some(pattern => pattern.test(path))) {
+        if (adminPatterns.some((pattern) => pattern.test(path))) {
           delete filesForSW[path];
         }
       }
@@ -419,7 +450,10 @@ const bundler = {
       // Generate admin/index.html when bundleAdmin is true
       const adminHTML = this._createIndexHTML($APP.settings, { isAdmin: true });
       filesForDeployment["admin/index.html"] = { content: adminHTML };
-      filesForSW["/admin/index.html"] = { content: adminHTML, mimeType: "text/html" };
+      filesForSW["/admin/index.html"] = {
+        content: adminHTML,
+        mimeType: "text/html",
+      };
       console.log("📦 Admin included in bundle (bundleAdmin: true)");
     }
 
@@ -438,7 +472,9 @@ const bundler = {
       }),
     );
     const processedFilesForSW = Object.fromEntries(processedSWEntries);
-    let serviceWorker = await this._createServiceWorker(processedFilesForSW, { bundleAdmin });
+    let serviceWorker = await this._createServiceWorker(processedFilesForSW, {
+      bundleAdmin,
+    });
     if ($APP.settings.bundle?.obfuscate) {
       console.log("🔒 Obfuscating service worker (sw.js)...");
       serviceWorker = await obfuscate(serviceWorker);
@@ -464,14 +500,14 @@ const bundler = {
    * Build files internally (without deploying)
    * @private
    */
-  async _buildFiles(mode) {
+  async _buildFiles(mode, onProgress) {
     switch (mode) {
       case "spa":
-        return this._bundleSPACore({ mode: "spa" });
+        return this._bundleSPACore({ mode: "spa", onProgress });
       case "ssg":
-        return this.bundleSSG();
+        return this.bundleSSG(onProgress);
       case "hybrid":
-        return this._bundleSPACore({ mode: "hybrid" });
+        return this._bundleSPACore({ mode: "hybrid", onProgress });
       default:
         throw new Error(`Unknown build mode: ${mode}`);
     }
@@ -480,10 +516,11 @@ const bundler = {
   /**
    * Build and save to localhost (creates versioned build in .deployed/builds/)
    * @param {string} mode - Build mode: spa, ssg, hybrid
+   * @param {Function} onProgress - Optional callback for progress updates
    * @returns {Object} Build result with buildId and file count
    */
-  async build(mode) {
-    const files = await this._buildFiles(mode);
+  async build(mode, onProgress) {
+    const files = await this._buildFiles(mode, onProgress);
 
     // Deploy to localhost to create versioned build
     const result = await deployToTarget("localhost", files, {
@@ -515,7 +552,9 @@ const bundler = {
     }
 
     if (!buildId) {
-      throw new Error("buildId is required. Run build() first to create a build.");
+      throw new Error(
+        "buildId is required. Run build() first to create a build.",
+      );
     }
 
     // Targets that need actual file content (fetch from build)
@@ -544,7 +583,7 @@ const bundler = {
   async bundleSPA() {
     return this._bundleSPACore({ mode: "spa" });
   },
-  async bundleSSG() {
+  async bundleSSG(onProgress) {
     console.log("📦 Building SSG in isolated iframe...");
     const files = {};
 
@@ -556,7 +595,10 @@ const bundler = {
 
     try {
       await this._waitForIframeReady(buildContext.iframe);
-      const allPages = await navigateIframeRoutes(buildContext.iframe);
+      const allPages = await navigateIframeRoutes(
+        buildContext.iframe,
+        onProgress,
+      );
 
       // Filter only SSG pages
       const staticFiles = allPages.filter((file) => file.ssg);
@@ -564,10 +606,11 @@ const bundler = {
         files[file.path] = { content: createStaticPage(file) };
       });
 
-      // Extract global CSS only (component CSS served from original paths)
-      const { globalCSS } = await this.extractCSS();
+      // Extract CSS from iframe (where UnoCSS generated styles)
+      const iframeDoc = buildContext.iframe.contentWindow.document;
+      const { globalCSS } = await this.extractCSS(iframeDoc);
 
-      // style.css contains only global styles
+      // style.css contains @imports + UnoCSS/Tailwind + global styles
       files["style.css"] = { content: globalCSS };
       const data = {};
       files["data.json"] = { content: JSON.stringify(data, null, 2) };

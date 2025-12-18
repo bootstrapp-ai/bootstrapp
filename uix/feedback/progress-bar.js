@@ -19,7 +19,6 @@ export default {
     animated: T.boolean(false),
   },
   style: true,
-  shadow: true,
 
   getPercentage() {
     return Math.min(100, Math.max(0, (this.value / this.max) * 100));

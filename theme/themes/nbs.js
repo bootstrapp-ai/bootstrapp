@@ -359,6 +359,18 @@ export default {
     "nav-font-weight": "900",
   },
 
+  progress: {
+    "border-width": "3px",
+    "border-color": "#000000",
+    "border-radius": "0.75rem",
+    background: "#ffffff",
+    "fill-background": "var(--color-primary)",
+    shadow: "3px 3px 0px 0px rgba(0,0,0,1)",
+    height: "1.25rem",
+    "height-sm": "0.75rem",
+    "height-lg": "1.75rem",
+  },
+
   breadcrumbs: {
     "font-size": "0.875rem",
     "font-weight": "700",

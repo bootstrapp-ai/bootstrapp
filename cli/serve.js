@@ -954,6 +954,7 @@ export const serve = async (adapter, args = []) => {
             ignored: [
               "**/node_modules/**",
               "**/.deployed/**",
+              ".deployed/**",
               "**/pb_data/**",
               "**/pb_migrations/**",
               "**/.git/**",
@@ -961,6 +962,10 @@ export const serve = async (adapter, args = []) => {
             persistent: true,
           },
           async (filePath) => {
+            // Skip .deployed directory changes (fallback if ignore pattern fails)
+            if (filePath.includes("/.deployed/") || filePath.includes("\\.deployed\\")) {
+              return;
+            }
 
             adapter.log(
               `File changed: ${adapter.basename(filePath)}. Reloading clients...`,

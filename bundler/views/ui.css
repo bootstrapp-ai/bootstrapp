@@ -199,3 +199,30 @@
   color: var(--text-color, #374151);
   margin: 0.5rem 0 0 0;
 }
+
+/* Progress Section */
+.bundler-progress-section {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: var(--color-surface-light, #f9fafb);
+  border-radius: var(--radius-md, 0.5rem);
+}
+
+.bundler-progress-label {
+  font-size: 0.875rem;
+  color: var(--text-muted, #6b7280);
+  margin: 0.75rem 0 0 0;
+  text-align: center;
+}
+
+/* VPS Options */
+.bundler-vps-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.bundler-warning {
+  color: var(--color-warning-dark, #b45309);
+}

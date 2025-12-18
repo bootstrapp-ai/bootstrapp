@@ -18,7 +18,6 @@ export default {
     showValue: T.boolean(false),
   },
   style: true,
-  shadow: false,
 
   _getSizeValue() {
     const sizes = {
