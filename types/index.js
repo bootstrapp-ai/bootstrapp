@@ -437,6 +437,37 @@ const proxyHandler = {
 
     const type = prop.toLowerCase();
     if (relationshipTypes.includes(prop)) return createRelationType(prop);
+
+    // T.union(T.string(), T.number()) => "string | number"
+    if (prop === "union") {
+      return (...types) => {
+        const typeDef = {
+          type: "union",
+          types, // Array of T.* type definitions
+          persist: true,
+          attribute: false,
+        };
+        Object.setPrototypeOf(typeDef, TypeDefinitionPrototype);
+        return typeDef;
+      };
+    }
+
+    // T.function({ args: [T.string()], returns: T.boolean() })
+    if (prop === "function") {
+      return (options = {}) => {
+        const typeDef = {
+          type: "function",
+          args: options.args || [], // Array of T.* type definitions
+          returns: options.returns || null, // Return type (T.*)
+          persist: false,
+          attribute: false,
+          ...options,
+        };
+        Object.setPrototypeOf(typeDef, TypeDefinitionPrototype);
+        return typeDef;
+      };
+    }
+
     return (options = {}) => {
       if (!typeHandlers[type]) throw new Error(`Unknown type: ${type}`);
       return createType(type, options);

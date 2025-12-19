@@ -82,6 +82,16 @@ const main = async () => {
         break;
       }
 
+      case "types:generate": {
+        const { generateAllPackageTypes, parseTypesGenerateArgs } = await import(
+          "./commands/types.js"
+        );
+        const generateOptions = parseTypesGenerateArgs(args.slice(1));
+        const success = await generateAllPackageTypes(adapter, generateOptions);
+        process.exit(success ? 0 : 1);
+        break;
+      }
+
       case "serve":
       case undefined:
         await serve(adapter, args.slice(command === "serve" ? 1 : 0));
@@ -100,6 +110,9 @@ Available commands:
   bootstrapp types [options]     - Generate .d.ts from schema.js
     --input <file>               - Input schema file (default: ./models/schema.js)
     --output <file>              - Output file (default: ./types/global.d.ts)
+    --verbose                    - Verbose output
+  bootstrapp types:generate      - Generate .d.ts for framework packages
+    --package <name>             - Generate for specific package only
     --verbose                    - Verbose output
   bootstrapp electron [path]     - Start Electron app
   bootstrapp electron:build      - Build Electron app

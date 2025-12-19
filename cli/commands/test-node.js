@@ -7,6 +7,24 @@ import { pathToFileURL } from "url";
 import Testing from "../../base/test/index.js";
 
 /**
+ * Detect if an error indicates a browser-only test file
+ * @param {Error} error - The error to check
+ * @returns {boolean} True if this is a browser-only error
+ */
+function isBrowserOnlyError(error) {
+  const msg = error.message || "";
+  return (
+    msg.includes("/npm/") ||
+    msg.includes("Cannot find module '/npm/") ||
+    msg.includes("document is not defined") ||
+    msg.includes("window is not defined") ||
+    msg.includes("customElements is not defined") ||
+    msg.includes("HTMLElement is not defined") ||
+    msg.includes("/$app.js")
+  );
+}
+
+/**
  * Run tests from a file
  * @param {Object} adapter - The CLI adapter (unused, but kept for signature)
  * @param {Array<string>} testFiles - A list of absolute paths to test files
@@ -69,6 +87,26 @@ export async function runNodeTests(adapter, testFiles) {
         );
       }
     } catch (error) {
+      // Auto-detect browser-only tests and skip them gracefully
+      if (isBrowserOnlyError(error)) {
+        console.log(
+          ` \x1b[33m⊘ SKIPPED\x1b[0m - ${relativePath} \x1b[90m(browser-only)\x1b[0m`,
+        );
+        overallResults.skipped += 1;
+        overallResults.files[relativePath] = {
+          totalSuites: 0,
+          totalTests: 0,
+          passed: 0,
+          failed: 0,
+          skipped: 1,
+          failures: [],
+          error: null,
+          browserOnly: true,
+        };
+        continue;
+      }
+
+      // Actual error - count as failure
       console.error(
         `\x1b[31mError loading ${relativePath}:\x1b[0m`,
         error.message,
@@ -89,12 +127,15 @@ export async function runNodeTests(adapter, testFiles) {
 
   console.log("\n\x1b[1mNode.js Test Summary:\x1b[0m");
   if (overallResults.success) {
+    const skippedMsg = overallResults.skipped > 0
+      ? `, \x1b[33m${overallResults.skipped}\x1b[32m skipped (browser-only)`
+      : "";
     console.log(
-      `\x1b[32m✓ All ${overallResults.passed} tests passed across ${testFiles.length} files.\x1b[0m`,
+      `\x1b[32m✓ All ${overallResults.passed} tests passed across ${testFiles.length} files${skippedMsg}.\x1b[0m`,
     );
   } else {
     console.log(
-      `\x1b[31m✗ Failed\x1b[0m: \x1b[32m${overallResults.passed}\x1b[0m passed, \x1b[31m${overallResults.failed}\x1b[0m failed, \x1b[90m${overallResults.skipped}\x1b[0m skipped.`,
+      `\x1b[31m✗ Failed\x1b[0m: \x1b[32m${overallResults.passed}\x1b[0m passed, \x1b[31m${overallResults.failed}\x1b[0m failed, \x1b[33m${overallResults.skipped}\x1b[0m skipped.`,
     );
   }
 

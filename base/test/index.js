@@ -35,7 +35,7 @@ function createTestEngine({ terminal = console } = {}) {
   };
 
   // Create the API
-  function suite(name, fn) {
+  function suite(name, fn, options = {}) {
     if (suites.has(name)) {
       throw new Error(`Suite '${name}' already exists`);
     }
@@ -47,11 +47,26 @@ function createTestEngine({ terminal = console } = {}) {
       afterEach: null,
       beforeAll: [],
       afterAll: [],
+      env: options.env || null, // "browser" | "node" | null (any)
     };
 
     suites.set(name, currentSuite);
     fn();
     currentSuite = null;
+  }
+
+  // Get suite environment requirement
+  function getSuiteEnv(suiteName) {
+    const suite = suites.get(suiteName);
+    return suite?.env || null;
+  }
+
+  // Get all registered suites with metadata
+  function getSuites() {
+    return Array.from(suites.entries()).map(([name, suite]) => ({
+      name,
+      env: suite.env,
+    }));
   }
 
   function describe(description, fn) {
@@ -562,6 +577,8 @@ function createTestEngine({ terminal = console } = {}) {
     run,
     runFile,
     runDescribe,
+    getSuiteEnv,
+    getSuites,
     assert,
     mock,
     iframe,

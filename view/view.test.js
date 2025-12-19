@@ -1,5 +1,6 @@
 import { html } from "/npm/lit-html";
 
+// Browser-only: Uses DOM APIs and browser import maps
 $APP.Testing.suite("View", () => {
   let TestView;
   let testInstance;
@@ -493,4 +494,4 @@ $APP.Testing.suite("View", () => {
       document.body.removeChild(userInstance);
     });
   });
-});
+}, { env: "browser" });

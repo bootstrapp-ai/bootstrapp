@@ -74,7 +74,10 @@ export function extractType(typeDef, options = {}) {
       return extractObjectType(typeDef, options);
 
     case "function":
-      return "(...args: any[]) => any";
+      return extractFunctionType(typeDef, options);
+
+    case "union":
+      return extractUnionType(typeDef, options);
 
     case "any":
     default:
@@ -184,6 +187,69 @@ export function extractObjectFields(schema, options = {}) {
       return `${key}${optional}: ${tsType}`;
     })
     .join("; ");
+}
+
+/**
+ * Extracts TypeScript type for union types
+ * @param {Object} typeDef - Union type definition with types array
+ * @param {Object} options - Extraction options
+ * @returns {string} TypeScript union type string
+ */
+export function extractUnionType(typeDef, options = {}) {
+  const { types = [] } = typeDef;
+
+  if (types.length === 0) {
+    return "any";
+  }
+
+  return types.map((t) => extractType(t, options)).join(" | ");
+}
+
+/**
+ * Extracts TypeScript type for function types with args/returns
+ * @param {Object} typeDef - Function type definition
+ * @param {Object} options - Extraction options
+ * @returns {string} TypeScript function signature
+ */
+export function extractFunctionType(typeDef, options = {}) {
+  const { args = [], returns } = typeDef;
+
+  // Generate argument list with proper names
+  const argTypes = args
+    .map((arg, i) => {
+      const argType = extractType(arg, options);
+      const argName = arg.name || `arg${i}`;
+      return `${argName}: ${argType}`;
+    })
+    .join(", ");
+
+  // Generate return type
+  const returnType = returns ? extractType(returns, options) : "void";
+
+  return `(${argTypes}) => ${returnType}`;
+}
+
+/**
+ * Converts arrow function syntax to method signature syntax
+ * Handles nested parentheses in parameters (e.g., callback types)
+ * @param {string} fnType - Arrow function type like "(a: string) => void"
+ * @returns {string} Method signature like "(a: string): void"
+ */
+export function arrowToMethodSignature(fnType) {
+  // Find the closing ) that matches the opening ( at depth 0
+  let depth = 0;
+  for (let i = 0; i < fnType.length; i++) {
+    if (fnType[i] === "(") depth++;
+    else if (fnType[i] === ")") depth--;
+
+    // When depth returns to 0, we found the end of params
+    if (depth === 0 && fnType.slice(i, i + 5) === ") => ") {
+      const params = fnType.slice(0, i + 1); // includes the )
+      const returnType = fnType.slice(i + 5); // after ") => "
+      return `${params}: ${returnType}`;
+    }
+  }
+  return fnType; // fallback if no match
 }
 
 // =============================================================================
@@ -429,4 +495,199 @@ export function generateJsConfig(options = {}) {
   };
 
   return pretty ? JSON.stringify(config, null, 2) : JSON.stringify(config);
+}
+
+// =============================================================================
+// Package Type Generation (for framework packages)
+// =============================================================================
+
+/**
+ * Generates export declaration based on type definition
+ * @param {string} name - Export name
+ * @param {Object} typeDef - Type definition or object with $class/$interface
+ * @param {Object} options - Generation options
+ * @returns {string} TypeScript declaration
+ */
+function generateExportDeclaration(name, typeDef, options = {}) {
+  const indent = options.indent || "  ";
+  const isDefaultExport = name === "default";
+
+  // Handle $class marker
+  if (typeDef.$class) {
+    return generateClassDeclaration(name, typeDef, { ...options, isDefaultExport });
+  }
+
+  // Handle $interface marker
+  if (typeDef.$interface) {
+    return generateInterfaceDeclaration(name, typeDef, { ...options, isDefaultExport });
+  }
+
+  // Handle function type
+  if (typeDef.type === "function") {
+    const fnType = extractFunctionType(typeDef, options);
+    if (isDefaultExport) {
+      return `${indent}declare const _default: ${fnType};\n${indent}export default _default;`;
+    }
+    return `${indent}export const ${name}: ${fnType};`;
+  }
+
+  // Handle object with properties (generate as interface)
+  if (typeDef.type === "object" && typeDef.properties) {
+    const iface = generateInterfaceDeclaration(name, typeDef.properties, {
+      ...options,
+      indent,
+      isDefaultExport,
+    });
+    return iface;
+  }
+
+  // Handle plain object with T.* fields (likely an interface)
+  if (typeof typeDef === "object" && !typeDef.type) {
+    return generateInterfaceDeclaration(name, typeDef, { ...options, isDefaultExport });
+  }
+
+  // Simple type (constant)
+  const tsType = extractType(typeDef, options);
+  if (isDefaultExport) {
+    return `${indent}declare const _default: ${tsType};\n${indent}export default _default;`;
+  }
+  return `${indent}export const ${name}: ${tsType};`;
+}
+
+/**
+ * Generates a class declaration
+ */
+function generateClassDeclaration(name, schema, options = {}) {
+  const indent = options.indent || "  ";
+  const isDefaultExport = options.isDefaultExport || false;
+
+  // For default export, use a named class then export default
+  const className = isDefaultExport ? "_Default" : name;
+  const lines = [`${indent}export class ${className} {`];
+
+  for (const [key, fieldDef] of Object.entries(schema)) {
+    if (key.startsWith("$")) continue;
+
+    if (key === "constructor") {
+      // Constructor
+      const args = fieldDef.args || [];
+      const argStr = args
+        .map((arg, i) => `${arg.name || `arg${i}`}: ${extractType(arg, options)}`)
+        .join(", ");
+      lines.push(`${indent}  constructor(${argStr});`);
+    } else if (fieldDef.type === "function") {
+      // Method
+      const fnType = extractFunctionType(fieldDef, options);
+      // Convert arrow function to method signature (handles nested parens)
+      const methodSig = arrowToMethodSignature(fnType);
+      lines.push(`${indent}  ${key}${methodSig};`);
+    } else {
+      // Property
+      const tsType = extractType(fieldDef, options);
+      const optional = !fieldDef.required ? "?" : "";
+      lines.push(`${indent}  ${key}${optional}: ${tsType};`);
+    }
+  }
+
+  lines.push(`${indent}}`);
+
+  // Add default export if needed
+  if (isDefaultExport) {
+    lines.push(`${indent}export default ${className};`);
+  }
+
+  return lines.join("\n");
+}
+
+/**
+ * Generates an interface declaration
+ */
+function generateInterfaceDeclaration(name, schema, options = {}) {
+  const indent = options.indent || "  ";
+  const isDefaultExport = options.isDefaultExport || false;
+
+  // For default export, use a named interface then export default
+  const interfaceName = isDefaultExport ? "_DefaultExport" : name;
+  const lines = [`${indent}export interface ${interfaceName} {`];
+
+  for (const [key, fieldDef] of Object.entries(schema)) {
+    if (key.startsWith("$")) continue;
+
+    if (fieldDef.type === "function") {
+      // Method signature (handles nested parens in callbacks)
+      const fnType = extractFunctionType(fieldDef, options);
+      const methodSig = arrowToMethodSignature(fnType);
+      lines.push(`${indent}  ${key}${methodSig};`);
+    } else {
+      // Property
+      const tsType = extractType(fieldDef, options);
+      const optional = !fieldDef.required ? "?" : "";
+      lines.push(`${indent}  ${key}${optional}: ${tsType};`);
+    }
+  }
+
+  lines.push(`${indent}}`);
+
+  // Add default export if needed
+  if (isDefaultExport) {
+    lines.push(`${indent}declare const _default: ${interfaceName};`);
+    lines.push(`${indent}export default _default;`);
+  }
+
+  return lines.join("\n");
+}
+
+/**
+ * Generates .d.ts content from a package schema defined in a test file
+ * @param {Object} schema - Package schema
+ * @param {string} schema.name - Package name (e.g., "@bootstrapp/types")
+ * @param {Object} schema.exports - Export definitions
+ * @param {Object} [options={}] - Generation options
+ * @returns {{ content: string, exportCount: number }}
+ */
+export function generatePackageTypes(schema, options = {}) {
+  const { name, exports: exportDefs } = schema;
+
+  if (!name || !exportDefs) {
+    throw new Error("Schema must have 'name' and 'exports' properties");
+  }
+
+  const lines = [
+    "/**",
+    ` * Generated from ${name} test file`,
+    " * @generated",
+    " */",
+    "",
+    `declare module "${name}" {`,
+  ];
+
+  let exportCount = 0;
+
+  for (const [exportName, typeDef] of Object.entries(exportDefs)) {
+    const declaration = generateExportDeclaration(exportName, typeDef, {
+      indent: "  ",
+    });
+    lines.push(declaration);
+    lines.push("");
+    exportCount++;
+  }
+
+  // Check for default export
+  if (exportDefs.default) {
+    // Already handled above
+  } else {
+    // Add default export if there's a main export matching package name
+    const baseName = name.split("/").pop();
+    if (exportDefs[baseName]) {
+      lines.push(`  export default ${baseName};`);
+    }
+  }
+
+  lines.push("}");
+  lines.push("");
+
+  return {
+    content: lines.join("\n"),
+    exportCount,
+  };
 }
