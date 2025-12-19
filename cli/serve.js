@@ -7,6 +7,7 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import mime from "mime";
 import WebSocket, { WebSocketServer } from "ws";
+import { generateTypes } from "./commands/types.js";
 
 // --- Build Versioning Helpers ---
 
@@ -973,6 +974,21 @@ export const serve = async (adapter, args = []) => {
         }
       }
 
+      // Generate types from schema on startup if schema.js exists
+      const schemaPath = adapter.join(projectDir, "models/schema.js");
+      if (await adapter.exists(schemaPath)) {
+        adapter.log("Generating types from schema...");
+        try {
+          await generateTypes(adapter, {
+            input: schemaPath,
+            output: adapter.join(projectDir, "types/global.d.ts"),
+            verbose: false,
+          });
+        } catch (err) {
+          adapter.error("Failed to generate types:", err.message);
+        }
+      }
+
       if (shouldWatch) {
         adapter.log("Setting up file watcher...");
         await adapter.watch(
@@ -1001,6 +1017,20 @@ export const serve = async (adapter, args = []) => {
             if (filePath.startsWith(adapter.join(projectDir, "server"))) {
               adapter.log("Server plugin changed, reloading plugins...");
               serverModules = await loadServerModules(adapter, projectDir);
+            }
+
+            // Regenerate types when schema.js changes
+            if (filePath.endsWith("models/schema.js") || filePath.endsWith("models\\schema.js")) {
+              adapter.log("Schema changed, regenerating types...");
+              try {
+                await generateTypes(adapter, {
+                  input: adapter.join(projectDir, "models/schema.js"),
+                  output: adapter.join(projectDir, "types/global.d.ts"),
+                  verbose: false,
+                });
+              } catch (err) {
+                adapter.error("Failed to regenerate types:", err.message);
+              }
             }
 
             wss.clients.forEach((client) => {

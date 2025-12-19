@@ -74,6 +74,14 @@ const main = async () => {
         break;
       }
 
+      case "types": {
+        const { generateTypes, parseTypesArgs } = await import("./commands/types.js");
+        const typesOptions = parseTypesArgs(args.slice(1));
+        const success = await generateTypes(adapter, typesOptions);
+        process.exit(success ? 0 : 1);
+        break;
+      }
+
       case "serve":
       case undefined:
         await serve(adapter, args.slice(command === "serve" ? 1 : 0));
@@ -88,6 +96,10 @@ Available commands:
   bootstrapp analyze [project]   - Analyze bundle (files, deps, CSS)
     --build <id>                 - Specific build ID (default: latest)
     --json                       - Output as JSON
+    --verbose                    - Verbose output
+  bootstrapp types [options]     - Generate .d.ts from schema.js
+    --input <file>               - Input schema file (default: ./models/schema.js)
+    --output <file>              - Output file (default: ./types/global.d.ts)
     --verbose                    - Verbose output
   bootstrapp electron [path]     - Start Electron app
   bootstrapp electron:build      - Build Electron app

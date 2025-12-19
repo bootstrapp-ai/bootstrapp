@@ -6,7 +6,8 @@
   "module": "./index.js",
   "type": "module",
   "exports": {
-    ".": "./index.js"
+    ".": "./index.js",
+    "./codegen": "./codegen.js"
   },
   "keywords": [
     "types",
@@ -14,6 +15,8 @@
     "coercion",
     "schema",
     "type-system",
+    "codegen",
+    "typescript",
     "bootstrapp"
   ],
   "author": "Alan Leal",

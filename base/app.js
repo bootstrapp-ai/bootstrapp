@@ -182,15 +182,14 @@ const prototypeAPP = {
     return this;
   },
   async loadModuleSchemas() {
-    console.log(this.settings.dev, { runtime });
     if (!this.settings.dev || !this._packageJson) return;
 
-    console.log(this.settings.dev, { runtime });
     const { discoverSchemaModules, namespaceModels } = await import(
       "/$app/model/schema-loader.js"
     );
+
+    // Load package schemas
     const modules = await discoverSchemaModules(this._packageJson);
-    console.log({ modules });
     for (const mod of modules) {
       try {
         const schemaPath = `/node_modules/${mod.packageName}/models/schema.js`;
@@ -210,6 +209,19 @@ const prototypeAPP = {
         console.warn(`Failed to load schema from ${mod.packageName}:`, e);
       }
     }
+
+    // Load project schema (supports both default export and legacy $APP.models.set)
+    try {
+      const projectSchema = await import("/models/schema.js");
+      if (projectSchema.default) {
+        // New pattern: export default {}
+        this.models.set(projectSchema.default);
+        this.log?.("Loaded project schema from /models/schema.js");
+      }
+      // else: legacy pattern already called $APP.models.set()
+    } catch (e) {
+      // No project schema found, that's ok
+    }
   },
   async loadModuleData() {
     if (!this.settings.dev || !this._packageJson) return;
@@ -217,8 +229,9 @@ const prototypeAPP = {
     const { discoverSchemaModules, namespaceData } = await import(
       "/$app/model/schema-loader.js"
     );
-    const modules = await discoverSchemaModules(this._packageJson);
 
+    // Load package seed data
+    const modules = await discoverSchemaModules(this._packageJson);
     for (const mod of modules) {
       try {
         const seedPath = `/node_modules/${mod.packageName}/models/seed.js`;
@@ -240,6 +253,19 @@ const prototypeAPP = {
           console.warn(`Failed to load seed from ${mod.packageName}:`, e);
         }
       }
+    }
+
+    // Load project seed data (supports both default export and legacy $APP.data.set)
+    try {
+      const projectSeed = await import("/models/seed.js");
+      if (projectSeed.default) {
+        // New pattern: export default {}
+        this.data.set(projectSeed.default);
+        this.log?.("Loaded project seed from /models/seed.js");
+      }
+      // else: legacy pattern already called $APP.data.set()
+    } catch (e) {
+      // No project seed found, that's ok
     }
   },
   addModule(module) {
