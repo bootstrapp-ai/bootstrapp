@@ -1,18 +1,8 @@
-/**
- * @file Service Worker Backend Module
- * @description Service Worker backend with caching, fetch handling, and messaging
- */
-
 import createFSHandlers from "./filesystem.js";
 
 let $APP;
 let config;
 
-/**
- * Get MIME type for a file path
- * @param {string} path - File path
- * @returns {string} MIME type
- */
 const getMimeType = (path) => {
   const ext = path.split(".").pop()?.toLowerCase();
   const mimeTypes = {
@@ -45,27 +35,16 @@ const getMimeType = (path) => {
   return mimeTypes[ext] || "application/octet-stream";
 };
 
-/**
- * Get local URL for a path
- * @param {string} path - File path
- * @returns {string} Full URL
- */
 const getLocalUrl = (path) => {
   const origin = self.location.origin;
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
   return `${origin}${normalizedPath}`;
 };
 
-/**
- * Initialize Service Worker backend
- * @param {Object} app - $APP instance
- * @param {Object} appConfig - App configuration
- */
 export function initSWBackend(app, appConfig = {}) {
   $APP = app;
   config = appConfig;
 
-  // Only run in service worker runtime
   if ($APP.settings?.runtime !== "serviceworker") {
     return;
   }
@@ -82,10 +61,8 @@ export function initSWBackend(app, appConfig = {}) {
     "cdnjs.cloudflare.com",
   ];
 
-  // Build-time caching state (opt-in, disabled by default)
   let localCachingEnabled = false;
 
-  // File system cache helpers
   const fsCache = {
     open: async (type) => {
       const cacheNames = {
@@ -105,10 +82,8 @@ export function initSWBackend(app, appConfig = {}) {
     },
   };
 
-  // Create filesystem event handlers
   const FSHandlers = createFSHandlers({ getMimeType, fsCache, getLocalUrl });
 
-  // Service Worker install event
   self.addEventListener("install", (event) => {
     console.log("Service Worker: Installing...");
     event.waitUntil(
@@ -119,19 +94,16 @@ export function initSWBackend(app, appConfig = {}) {
         caches.open(FILE_STORE_CACHE_NAME),
       ]).then(() => {
         console.log("Service Worker: Caches initialized");
-        // In dev mode, skip waiting automatically for faster iteration
         return self.skipWaiting();
       }),
     );
   });
 
-  // Service Worker activate event
   self.addEventListener("activate", (event) => {
     console.log("Service Worker: Activating...");
     event.waitUntil(self.clients.claim());
   });
 
-  // Message handler
   const respond = (client) => (payload, type) => {
     client.postMessage({ payload, type });
   };
@@ -190,14 +162,12 @@ export function initSWBackend(app, appConfig = {}) {
       try {
         const files = {};
 
-        // Get local files
         const localCache = await fsCache.open("local");
         const localKeys = await localCache.keys();
         for (const req of localKeys) {
           const response = await localCache.match(req);
           if (response) {
             const url = new URL(req.url);
-            // Skip paths without file extensions (SPA routes like /admin/models/users)
             const hasExtension =
               url.pathname.includes(".") && !url.pathname.endsWith("/");
             if (!hasExtension) continue;
@@ -210,7 +180,6 @@ export function initSWBackend(app, appConfig = {}) {
           }
         }
 
-        // Get CDN files (esm.sh) with their esm.sh paths
         const cdnCache = await fsCache.open("cdn");
         const cdnKeys = await cdnCache.keys();
         for (const req of cdnKeys) {
@@ -268,33 +237,27 @@ export function initSWBackend(app, appConfig = {}) {
         },
       );
     } else {
-      // Emit event for custom handlers
       $APP.events?.emit(type, { payload, eventId, client });
     }
   });
 
-  // Fetch handler
   self.addEventListener("fetch", (event) => {
     const url = new URL(event.request.url);
 
-    // Handle /npm/ requests - proxy to esm.sh
     if (
       url.origin === self.location.origin &&
       url.pathname.startsWith("/npm/")
     ) {
       event.respondWith(
         (async () => {
-          // Convert /npm/lit-html to https://esm.sh/lit-html
-          const packagePath = url.pathname.slice(5); // Remove "/npm/"
+          const packagePath = url.pathname.slice(5);
           const esmUrl = `https://esm.sh/${packagePath}${url.search}`;
 
-          // Check CDN cache first
           const cdnCache = await fsCache.open("cdn");
           const cacheKey = new Request(esmUrl);
           const cachedResponse = await cdnCache.match(cacheKey);
           if (cachedResponse) return cachedResponse;
 
-          // Fetch from esm.sh
           try {
             const networkResponse = await fetch(esmUrl);
             if (networkResponse.ok) {
@@ -310,7 +273,6 @@ export function initSWBackend(app, appConfig = {}) {
       return;
     }
 
-    // Handle esm.sh internal paths (e.g., /lit-html@3.3.1/..., /v135/...)
     const isEsmPath =
       url.origin === self.location.origin &&
       (url.pathname.match(/^\/[^/]+@[\d.]+/) || url.pathname.startsWith("/v1"));
@@ -339,7 +301,6 @@ export function initSWBackend(app, appConfig = {}) {
       return;
     }
 
-    // Handle CDN requests
     if (ALLOWED_HOSTNAMES.includes(url.hostname)) {
       event.respondWith(
         (async () => {
@@ -362,19 +323,15 @@ export function initSWBackend(app, appConfig = {}) {
       return;
     }
 
-    // Handle local requests
     if (url.origin === self.location.origin) {
       event.respondWith(
         (async () => {
-          // Try staging cache first (edited files from IDE)
           const stagingCache = await fsCache.open("staging");
           const stagingResponse = await stagingCache.match(event.request);
           if (stagingResponse) return stagingResponse;
 
-          // Always fetch from network in dev (don't serve from local cache)
           try {
             const networkResponse = await fetch(event.request);
-            // Only cache GET requests when build-time caching is enabled
             if (
               localCachingEnabled &&
               networkResponse.ok &&

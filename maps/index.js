@@ -1,9 +1,3 @@
-/**
- * @bootstrapp/maps - Provider-Agnostic Maps Client
- * Prototype implementation with Nominatim (OpenStreetMap)
- */
-
-// Provider implementations
 const providers = {
   nominatim: {
     search: async (query) => {
@@ -29,11 +23,6 @@ const providers = {
   },
 };
 
-/**
- * Create a maps client instance
- * @param {string} provider - Provider name (default: 'nominatim')
- * @returns {Object} Maps client with search method
- */
 export const createMapsClient = (provider = "nominatim") => {
   const impl = providers[provider];
   if (!impl) throw new Error(`Unknown maps provider: ${provider}`);
@@ -44,11 +33,6 @@ export const createMapsClient = (provider = "nominatim") => {
   };
 };
 
-/**
- * Register a custom maps provider
- * @param {string} name - Provider name
- * @param {Object} impl - Provider implementation { search: async (query) => [...] }
- */
 export const registerProvider = (name, impl) => {
   providers[name] = impl;
 };

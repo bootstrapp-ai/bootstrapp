@@ -1,28 +1,17 @@
 import View, { settings } from "/$app/view/index.js";
 
-// Production CSS cache for Shadow DOM components
 const productionCSSCache = new Map();
 
-/**
- * Get component CSS content (works in both dev and production)
- * - Dev: returns cached cssContent from View.components (populated by dev.js)
- * - Production: fetches from /styles/{tag}.css
- * @param {string} tag - Component tag name
- * @returns {Promise<string|null>} CSS content
- */
 const getComponentCSS = async (tag) => {
-  // Dev: check View.components cache (populated by theme/dev.js)
   const entry = View.components.get(tag);
   if (entry?.cssContent) {
     return entry.cssContent;
   }
 
-  // Production: check local cache
   if (productionCSSCache.has(tag)) {
     return productionCSSCache.get(tag);
   }
 
-  // Production: fetch from /styles/{tag}.css
   try {
     const response = await fetch(`/styles/${tag}.css`);
     if (response.ok) {
@@ -31,14 +20,11 @@ const getComponentCSS = async (tag) => {
       return css;
     }
   } catch (e) {
-    // Silent fail - CSS file might not exist for all components
   }
 
   return null;
 };
 
-// Theme plugin - Shadow DOM CSS injection (works in both dev and production)
-// Note: The init hook for fetching CSS in dev is in theme/dev.js
 View.plugins.push({
   name: "theme",
   events: {
@@ -49,7 +35,6 @@ View.plugins.push({
       const root = instance.getRootNode();
       if (!(root instanceof ShadowRoot)) return;
 
-      // Track injected styles per shadow root
       let injected = View.shadowStylesInjected.get(root);
       if (!injected) {
         injected = new Set();
@@ -57,7 +42,6 @@ View.plugins.push({
       }
       if (injected.has(component)) return;
 
-      // Get CSS content (works in both dev and production)
       const cssContent = await getComponentCSS(tag);
       if (!cssContent) return;
 
@@ -70,7 +54,6 @@ View.plugins.push({
   },
 });
 
-// Font Loading Utility
 const loadedFonts = new Set();
 const loadedCSSFiles = new Set();
 
@@ -123,7 +106,6 @@ const loadFont = (fontFamily) => {
   loadedFonts.add(fontFamily);
 };
 
-// Color manipulation utilities
 const rgbToHSL = (r, g, b) => {
   const max = Math.max(r, g, b),
     min = Math.min(r, g, b);
@@ -185,7 +167,6 @@ const parseColor = (str) => {
   if (!str || typeof str !== "string") return null;
   const s = str.trim();
 
-  // HEX
   if (s.startsWith("#")) {
     let hex = s.slice(1);
     if (hex.length === 3)
@@ -199,14 +180,12 @@ const parseColor = (str) => {
     return rgbToHSL(r, g, b);
   }
 
-  // RGB
   if (s.startsWith("rgb")) {
     const match = s.match(/\d+/g);
     if (!match || match.length < 3) return null;
     return rgbToHSL(match[0] / 255, match[1] / 255, match[2] / 255);
   }
 
-  // HSL
   if (s.startsWith("hsl")) {
     const match = s.match(/[\d.]+/g);
     if (!match || match.length < 3) return null;
@@ -308,7 +287,6 @@ const injectThemeCSS = (variables) => {
   styleTag.textContent = `:root {\n  ${cssRules}\n}`;
 };
 
-// Theme registry
 const availableThemes = {};
 
 const registerTheme = (name, loader) => {
@@ -354,31 +332,22 @@ const loadTheme = async (themeInput) => {
   }
 };
 
-// Register default themes
 registerTheme("gruvbox-dark", () => import("./themes/gruvbox-dark.js"));
 registerTheme("gruvbox-light", () => import("./themes/gruvbox-light.js"));
 registerTheme("nbs", () => import("./themes/nbs.js"));
 
-// Public API
 export default {
-  // Core functions
   parseColor,
   generateShades,
   generateThemeVariables,
   injectThemeCSS,
-
-  // Theme management
   registerTheme,
   loadTheme,
   applyTheme,
   availableThemes,
-
-  // Resource loading
   loadCSS,
   loadFont,
   getComponentCSS,
-
-  // Utility functions
   rgbToHSL,
   hslToCSS,
   adjustLightness,

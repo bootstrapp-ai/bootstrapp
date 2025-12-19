@@ -1,28 +1,17 @@
-/**
- * @file Service Worker Frontend Module
- * @description Frontend communication with Service Worker
- */
-
 let $APP;
 const pendingSWRequests = {};
 let nextRequestId = 1;
 
-// Update management state
 let swRegistration = null;
 let waitingWorker = null;
 let updateCheckInterval = null;
 let visibilityHandler = null;
 let updateInProgress = false;
 
-/**
- * Handle incoming messages from Service Worker
- * @param {MessageEvent} message - Message event from SW
- */
 const handleSWMessage = async (message = {}) => {
   const { data } = message;
   const { eventId, type, payload } = data;
 
-  // Handle response to pending request
   if (eventId && pendingSWRequests[eventId]) {
     try {
       pendingSWRequests[eventId].resolve(payload);
@@ -34,16 +23,10 @@ const handleSWMessage = async (message = {}) => {
     return;
   }
 
-  // Handle incoming event
   const handler = $APP.swEvents.get(type);
   if (handler) await handler({ payload });
 };
 
-/**
- * Post a message to the Service Worker (fire and forget)
- * @param {string} type - Message type
- * @param {any} payload - Message payload
- */
 const postMessageToSW = (type, payload) => {
   if (!navigator.serviceWorker?.controller) {
     console.warn("SW: No active service worker controller");
@@ -52,13 +35,6 @@ const postMessageToSW = (type, payload) => {
   navigator.serviceWorker.controller.postMessage({ type, payload });
 };
 
-/**
- * Send a request to the Service Worker and wait for response
- * @param {string} type - Request type
- * @param {any} payload - Request payload
- * @param {number} timeout - Timeout in milliseconds (default: 30000)
- * @returns {Promise<any>} Response from SW
- */
 const requestToSW = (type, payload, timeout = 30000) => {
   if (!navigator.serviceWorker?.controller) {
     return Promise.reject(new Error("No active service worker controller"));
@@ -76,7 +52,6 @@ const requestToSW = (type, payload, timeout = 30000) => {
       }
     }, timeout);
 
-    // Clear timeout on resolution
     const originalResolve = pendingSWRequests[eventId].resolve;
     pendingSWRequests[eventId].resolve = (value) => {
       clearTimeout(timeoutId);
@@ -91,10 +66,6 @@ const requestToSW = (type, payload, timeout = 30000) => {
   });
 };
 
-/**
- * Check for Service Worker updates
- * @returns {Promise<boolean>} True if update check was triggered
- */
 const checkForUpdates = async () => {
   if (!swRegistration) return false;
   try {
@@ -106,31 +77,21 @@ const checkForUpdates = async () => {
   }
 };
 
-/**
- * Notify that an update is available
- * @param {ServiceWorker} worker - The waiting worker
- */
 const notifyUpdateAvailable = (worker) => {
-  if (waitingWorker === worker) return; // Already notified for this worker
+  if (waitingWorker === worker) return;
   console.log("SW: Update available! Emitting SW:UPDATE_AVAILABLE event");
   waitingWorker = worker;
   $APP?.events?.emit("SW:UPDATE_AVAILABLE", { worker });
 };
 
-/**
- * Handle when a new Service Worker is found
- * @param {ServiceWorker} newWorker - The installing/waiting worker
- */
 const handleNewWorker = (newWorker) => {
   console.log("SW: handleNewWorker called, state:", newWorker.state, "hasController:", !!navigator.serviceWorker.controller);
 
-  // If already installed and we have a controller, it's waiting
   if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
     notifyUpdateAvailable(newWorker);
     return;
   }
 
-  // Listen for state changes (use once to prevent memory leaks)
   newWorker.addEventListener(
     "statechange",
     () => {
@@ -146,11 +107,6 @@ const handleNewWorker = (newWorker) => {
   );
 };
 
-/**
- * Apply pending update - activates waiting SW and reloads page
- * @param {number} timeout - Timeout in ms before giving up (default: 10000)
- * @returns {boolean} True if update was initiated
- */
 const applyUpdate = (timeout = 10000) => {
   if (!waitingWorker) {
     console.warn("SW: No waiting worker to activate");
@@ -164,16 +120,13 @@ const applyUpdate = (timeout = 10000) => {
 
   updateInProgress = true;
 
-  // Tell the waiting SW to skip waiting
   waitingWorker.postMessage({ type: "SKIP_WAITING" });
 
-  // Set up timeout in case activation fails
   const timeoutId = setTimeout(() => {
     console.error("SW: Update timed out, reload manually");
     updateInProgress = false;
   }, timeout);
 
-  // Reload once the new SW takes control
   navigator.serviceWorker.addEventListener(
     "controllerchange",
     () => {
@@ -186,13 +139,6 @@ const applyUpdate = (timeout = 10000) => {
   return true;
 };
 
-/**
- * Enable automatic update checking
- * @param {Object} config - Update configuration
- * @param {boolean} config.onPageLoad - Check on initial page load (default: true)
- * @param {number} config.pollingInterval - Polling interval in ms (0 to disable, default: 0)
- * @param {boolean} config.onVisibilityChange - Check when tab becomes visible (default: false)
- */
 const enableAutoUpdates = (config = {}) => {
   const {
     onPageLoad = true,
@@ -205,20 +151,16 @@ const enableAutoUpdates = (config = {}) => {
     return;
   }
 
-  // Clean up existing listeners first
   disableAutoUpdates();
 
-  // Check on page load
   if (onPageLoad) {
     checkForUpdates();
   }
 
-  // Set up polling
   if (pollingInterval > 0) {
     updateCheckInterval = setInterval(checkForUpdates, pollingInterval);
   }
 
-  // Check on visibility change
   if (onVisibilityChange) {
     visibilityHandler = () => {
       if (document.visibilityState === "visible") {
@@ -229,9 +171,6 @@ const enableAutoUpdates = (config = {}) => {
   }
 };
 
-/**
- * Disable automatic update checking and clean up listeners
- */
 const disableAutoUpdates = () => {
   if (updateCheckInterval) {
     clearInterval(updateCheckInterval);
@@ -243,14 +182,9 @@ const disableAutoUpdates = () => {
   }
 };
 
-/**
- * Set the SW registration reference (called from bootstrapper)
- * @param {ServiceWorkerRegistration} registration - SW registration
- */
 const setRegistration = (registration) => {
   swRegistration = registration;
 
-  // Listen for future updates
   registration.addEventListener("updatefound", () => {
     const newWorker = registration.installing;
     console.log("SW: Update found, new worker installing...");
@@ -259,44 +193,28 @@ const setRegistration = (registration) => {
     }
   });
 
-  // Check if there's already a waiting worker (update ready to apply)
   if (registration.waiting) {
     console.log("SW: Found waiting worker on registration");
     handleNewWorker(registration.waiting);
   }
 
-  // Check if there's an installing worker (update in progress)
   if (registration.installing) {
     console.log("SW: Found installing worker on registration");
     handleNewWorker(registration.installing);
   }
 };
 
-/**
- * Check if an update is available
- * @returns {boolean} True if a worker is waiting
- */
 const hasUpdate = () => !!waitingWorker;
 
-/**
- * Get the current registration
- * @returns {ServiceWorkerRegistration|null}
- */
 const getRegistration = () => swRegistration;
 
-/**
- * Initialize Service Worker frontend module
- * @param {Object} app - $APP instance
- */
 export function initSWFrontend(app) {
   $APP = app;
 
-  // Setup message listener
   if (navigator.serviceWorker) {
     navigator.serviceWorker.onmessage = handleSWMessage;
   }
 
-  // Register swEvents module for handling incoming SW events
   $APP.addModule({
     name: "swEvents",
     base: new Map([
@@ -317,11 +235,9 @@ export function initSWFrontend(app) {
     ]),
   });
 
-  // Register SW module
   const SW = {
     postMessage: postMessageToSW,
     request: requestToSW,
-    // Update management
     setRegistration,
     enableAutoUpdates,
     disableAutoUpdates,
@@ -329,7 +245,6 @@ export function initSWFrontend(app) {
     applyUpdate,
     hasUpdate,
     getRegistration,
-    // Build-time caching control
     enableLocalCaching: () => requestToSW("SW:ENABLE_LOCAL_CACHING"),
     disableLocalCaching: () => requestToSW("SW:DISABLE_LOCAL_CACHING"),
     clearLocalCache: () => requestToSW("SW:CLEAR_LOCAL_CACHE"),

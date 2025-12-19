@@ -1,30 +1,11 @@
-/**
- * @file Model System - ORM-like API for data access
- * @description Provides a proxy-based model API with automatic CRUD operations,
- * dynamic finders, relationships, and reactive data synchronization
- */
 import createEventHandler from "/$app/events/index.js";
 
 export class ModelType {}
 
-/**
- * Symbol used to store subscription callbacks on a row instance
- * without polluting the data properties.
- */
 const SUBSCRIPTION_SYMBOL = Symbol("subscriptions");
 
-/**
- * Symbol used to store relationship subscription unsubscribers on a row instance.
- */
 const RELATIONSHIP_SUBS_SYMBOL = Symbol("relationshipSubscriptions");
 
-/**
- * A simple helper to check if a row matches a 'where' clause.
- * This is naive and only supports exact, top-level key-value matches.
- * @param {object} row - The row object to check.
- * @param {object} where - The 'where' clause (e.g., { active: true }).
- * @returns {boolean} True if the row matches.
- */
 const simpleMatcher = (row, where) => {
   if (!where || Object.keys(where).length === 0) {
     return true; // No filter means all rows match.
@@ -38,12 +19,6 @@ const simpleMatcher = (row, where) => {
   });
 };
 
-/**
- * Create a reactive array prototype with subscription capabilities
- * @param {function} proxifyRow - Function to proxify individual rows
- * @param {object} $APP - App instance with SubscriptionManager
- * @returns {object} Reactive array prototype
- */
 function createReactiveArrayPrototype(proxifyRow, $APP) {
   const reactiveArrayPrototype = {
     // Pagination metadata (set by proxifyMultipleRows when available)
@@ -52,10 +27,6 @@ function createReactiveArrayPrototype(proxifyRow, $APP) {
     offset: 0,
     count: 0,
 
-    /**
-     * Subscribes to changes in the row set.
-     * @param {function(Array): void} callback - Fired with the new array.
-     */
     subscribe(callback) {
       if (typeof callback !== "function") {
         console.error("Subscription callback must be a function.");
@@ -69,10 +40,6 @@ function createReactiveArrayPrototype(proxifyRow, $APP) {
       return this;
     },
 
-    /**
-     * Unsubscribes from changes.
-     * @param {function} callback - The original callback to remove.
-     */
     unsubscribe(callback) {
       this.subscriptions.delete(callback);
       // If last subscription is gone, destroy all listeners
@@ -81,9 +48,6 @@ function createReactiveArrayPrototype(proxifyRow, $APP) {
       }
     },
 
-    /**
-     * Notifies all set-level subscribers with the current rows.
-     */
     notifySubscribers() {
       // Pass a shallow copy so subscribers can't mutate our internal array
       const rowsCopy = [...this];
@@ -96,11 +60,6 @@ function createReactiveArrayPrototype(proxifyRow, $APP) {
       });
     },
 
-    /**
-     * Handle query-level update notifications from SubscriptionManager
-     * @param {object} event - Event object { action, record, model }
-     * @private
-     */
     handleQueryUpdate(event) {
       const { action, record } = event;
 
@@ -122,11 +81,6 @@ function createReactiveArrayPrototype(proxifyRow, $APP) {
       }
     },
 
-    /**
-     * Handle a new record being added
-     * @param {object} newRecord - The new record
-     * @private
-     */
     handleRecordAdd(newRecord) {
       // Check if already in array
       if (this.some((r) => String(r.id) === String(newRecord.id))) {
@@ -139,11 +93,6 @@ function createReactiveArrayPrototype(proxifyRow, $APP) {
       this.notifySubscribers();
     },
 
-    /**
-     * Handle a record being updated
-     * @param {object} updatedRecord - The updated record
-     * @private
-     */
     handleRecordUpdate(updatedRecord) {
       const index = this.findIndex(
         (r) => String(r.id) === String(updatedRecord.id),
@@ -176,11 +125,6 @@ function createReactiveArrayPrototype(proxifyRow, $APP) {
       }
     },
 
-    /**
-     * Handle a record being deleted
-     * @param {object} deletedRecord - The deleted record (with at least { id })
-     * @private
-     */
     handleRecordDelete(deletedRecord) {
       const index = this.findIndex(
         (r) => String(r.id) === String(deletedRecord.id),
@@ -191,10 +135,6 @@ function createReactiveArrayPrototype(proxifyRow, $APP) {
       }
     },
 
-    /**
-     * Registers query-level listener via SubscriptionManager
-     * @private
-     */
     registerListeners() {
       // Subscribe to this specific query (model + where clause)
       $APP.SubscriptionManager.subscribe(
@@ -210,10 +150,6 @@ function createReactiveArrayPrototype(proxifyRow, $APP) {
         });
     },
 
-    /**
-     * Cleans up all listeners to prevent memory leaks.
-     * @private
-     */
     destroy() {
       if (
         this.queryUnsubscribe &&
@@ -229,12 +165,6 @@ function createReactiveArrayPrototype(proxifyRow, $APP) {
   return reactiveArrayPrototype;
 }
 
-/**
- * Create instance proxy handler for model rows
- * @param {object} Model - Model instance
- * @param {object} $APP - App instance
- * @returns {ProxyHandler} Instance proxy handler
- */
 function createInstanceProxyHandler(Model, $APP) {
   return {
     get(target, prop, receiver) {
@@ -291,10 +221,6 @@ function createInstanceProxyHandler(Model, $APP) {
         };
       }
 
-      /**
-       * Instance method: Subscribe to updates on this specific row instance.
-       * Uses SubscriptionManager under the hood with a single-row query.
-       */
       if (prop === "subscribe") {
         return (callback) => {
           if (typeof callback !== "function") {
@@ -341,10 +267,6 @@ function createInstanceProxyHandler(Model, $APP) {
         };
       }
 
-      /**
-       * Instance method: Unsubscribe from updates on this row instance.
-       * @deprecated Use query-level subscriptions instead
-       */
       if (prop === "unsubscribe") {
         return (callback) => {
           if (target[SUBSCRIPTION_SYMBOL]) {
@@ -376,22 +298,11 @@ function createInstanceProxyHandler(Model, $APP) {
   };
 }
 
-/**
- * Create the Model proxy system
- * @param {object} $APP - App instance with models, events, SubscriptionManager
- * @returns {Proxy} Model proxy
- */
 export function createModel($APP) {
   let Model;
   let instanceProxyHandler;
   let reactiveArrayPrototype;
 
-  /**
-   * Auto-subscribe to included relationships so changes propagate
-   * @param {object} row - The row with loaded relationships
-   * @param {string} modelName - Name of the model
-   * @param {Array<string>} includes - Relationship names that were included
-   */
   const autoSubscribeRelationships = (row, modelName, includes) => {
     if (!row || !includes?.length || !$APP.models?.[modelName]) return;
 
@@ -453,9 +364,6 @@ export function createModel($APP) {
     }
   };
 
-  /**
-   * Subscribe to a related model and update parent row when changes occur
-   */
   const subscribeToRelated = (
     targetModel,
     where,
@@ -486,9 +394,6 @@ export function createModel($APP) {
       });
   };
 
-  /**
-   * Update relationship data when a related record changes
-   */
   const updateRelationshipData = (parentRow, relationName, updatedRecord) => {
     const currentData = parentRow[relationName];
 
@@ -511,9 +416,6 @@ export function createModel($APP) {
     }
   };
 
-  /**
-   * Remove a deleted record from relationship array
-   */
   const removeFromRelationship = (parentRow, relationName, deletedRecord) => {
     const currentData = parentRow[relationName];
 
@@ -769,14 +671,6 @@ export function createModel($APP) {
     return proxified;
   };
 
-  /**
-   * Proxifies multiple rows and returns a ReactiveRowSet for query-level reactivity.
-   * @param {Array<object>} rows - The array of row data.
-   * @param {string} modelName - The name of the model.
-   * @param {object} [opts={}] - The original query options.
-   * @param {object} [paginationInfo=null] - Pagination metadata {total, limit, offset, count}.
-   * @returns {ReactiveRowSet | Array}
-   */
   const proxifyMultipleRows = (
     rows,
     modelName,

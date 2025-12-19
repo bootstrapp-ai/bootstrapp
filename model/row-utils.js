@@ -1,26 +1,7 @@
-/**
- * @file Row Utilities
- * @description Utilities for preparing, validating, and transforming database rows
- */
 
-/**
- * Type conversion maps for boolean values
- * Different databases may store booleans differently
- */
 export const BOOLEAN_TO_STORAGE = { true: 1, false: 0 };
 export const STORAGE_TO_BOOLEAN = { 1: true, 0: false, true: true, false: false };
 
-/**
- * Prepare a row for storage in the database
- * Handles type conversion, default values, and relationship fields
- * @param {Object} models - All model schemas
- * @param {string} modelName - Name of the model
- * @param {Object} row - Row data to prepare
- * @param {Object} [options={}] - Preparation options
- * @param {Object} [options.currentRow={}] - Existing row (for updates)
- * @param {boolean} [options.reverse=false] - Convert from storage format
- * @returns {Object} Prepared row
- */
 export function prepareRow(models, modelName, row, options = {}) {
   const { currentRow = {}, reverse = false } = options;
   const modelSchema = models[modelName];
@@ -80,15 +61,6 @@ export function prepareRow(models, modelName, row, options = {}) {
   return prepared;
 }
 
-/**
- * Validate a row against model schema
- * @param {Object} models - All model schemas
- * @param {string} modelName - Name of the model
- * @param {Object} row - Row data to validate
- * @param {Object} [options={}] - Validation options
- * @param {string} [options.operation] - Operation type (add, edit)
- * @returns {Object} {valid: boolean, errors: Object, data: Object}
- */
 export function validateRow(models, modelName, row, options = {}) {
   const modelSchema = models[modelName];
 
@@ -173,12 +145,6 @@ export function validateRow(models, modelName, row, options = {}) {
   };
 }
 
-/**
- * Extract relationship fields from a row
- * @param {Object} modelSchema - Model schema
- * @param {Object} row - Row data
- * @returns {Object} {belongs: Object, references: Object}
- */
 export function extractRelationships(modelSchema, row) {
   const belongs = {}; // Foreign keys (belongs relationships)
   const references = {}; // Data for many/one relationships
@@ -196,21 +162,11 @@ export function extractRelationships(modelSchema, row) {
   return { belongs, references };
 }
 
-/**
- * Generate a unique ID (for databases that don't auto-generate)
- * @param {boolean} [useStringId=false] - Return string ID instead of number
- * @returns {string|number} Unique ID
- */
 export function generateId(useStringId = false) {
   const id = `${Date.now()}${Math.random().toString(10).substr(2, 2)}`;
   return useStringId ? id : Number(id);
 }
 
-/**
- * Clone a row (deep copy)
- * @param {Object} row - Row to clone
- * @returns {Object} Cloned row
- */
 export function cloneRow(row) {
   if (!row || typeof row !== "object") return row;
 
@@ -222,12 +178,6 @@ export function cloneRow(row) {
   }
 }
 
-/**
- * Merge row updates (for partial updates)
- * @param {Object} currentRow - Current row data
- * @param {Object} updates - Updates to apply
- * @returns {Object} Merged row
- */
 export function mergeRowUpdates(currentRow, updates) {
   return {
     ...currentRow,

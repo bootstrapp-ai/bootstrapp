@@ -1,16 +1,4 @@
-/**
- * @file Query Builder Utilities
- * @description Common query building and filtering logic shared across adapters
- */
 
-/**
- * Parse order string into structured format
- * @param {string|Array} order - Order specification
- * @returns {Array<{field: string, direction: 'ASC'|'DESC'}>}
- * @example
- * parseOrder('name ASC') => [{field: 'name', direction: 'ASC'}]
- * parseOrder('age DESC, name ASC') => [{field: 'age', direction: 'DESC'}, {field: 'name', direction: 'ASC'}]
- */
 export function parseOrder(order) {
   if (!order) return [];
   if (Array.isArray(order)) return order;
@@ -21,15 +9,6 @@ export function parseOrder(order) {
   });
 }
 
-/**
- * Apply where filter to a record
- * @param {Object} record - Record to test
- * @param {Object} where - Filter conditions
- * @returns {boolean} True if record matches filter
- * @example
- * matchesWhere({age: 25}, {age: 25}) => true
- * matchesWhere({age: 30}, {age: {'>': 25}}) => true
- */
 export function matchesWhere(record, where) {
   if (!where || Object.keys(where).length === 0) return true;
 
@@ -80,12 +59,6 @@ export function matchesWhere(record, where) {
   });
 }
 
-/**
- * Apply sorting to an array of records
- * @param {Array<Object>} records - Records to sort
- * @param {string|Array} order - Sort specification
- * @returns {Array<Object>} Sorted records
- */
 export function applyOrder(records, order) {
   if (!order || !records || records.length === 0) return records;
 
@@ -106,13 +79,6 @@ export function applyOrder(records, order) {
   });
 }
 
-/**
- * Apply limit and offset to an array of records
- * @param {Array<Object>} records - Records to paginate
- * @param {number} [limit] - Maximum records to return
- * @param {number} [offset=0] - Records to skip
- * @returns {Array<Object>} Paginated records
- */
 export function applyPagination(records, limit, offset = 0) {
   if (!records) return [];
   if (!limit && !offset) return records;
@@ -123,16 +89,6 @@ export function applyPagination(records, limit, offset = 0) {
   return records.slice(start, end);
 }
 
-/**
- * Build a complete query result from options
- * @param {Array<Object>} allRecords - All available records
- * @param {Object} options - Query options
- * @param {Object} [options.where] - Filter conditions
- * @param {string|Array} [options.order] - Sort specification
- * @param {number} [options.limit] - Maximum records
- * @param {number} [options.offset] - Records to skip
- * @returns {Object} {items: Array, count: number, total: number}
- */
 export function buildQueryResult(allRecords, options = {}) {
   const { where, order, limit, offset } = options;
 
@@ -157,11 +113,6 @@ export function buildQueryResult(allRecords, options = {}) {
   };
 }
 
-/**
- * Validate query options
- * @param {Object} options - Query options to validate
- * @throws {Error} If options are invalid
- */
 export function validateQueryOptions(options = {}) {
   const { limit, offset, where } = options;
 

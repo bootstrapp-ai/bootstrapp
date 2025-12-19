@@ -1,9 +1,3 @@
-/**
- * @file Component Loader (Core)
- * @description Handles dynamic loading, caching, registration of components,
- * and DOM observation.
- */
-
 import View from "./index.js";
 
 const Loader = {
@@ -13,22 +7,12 @@ const Loader = {
     dev: false,
   },
 
-  // Tag prefix to ignore (Server Side Generated)
   ssgTag: "ce-",
 
-  /**
-   * Configure the loader with app settings
-   * @param {Object} config
-   */
   configure(config) {
     Object.assign(Loader.settings, config || {});
   },
 
-  /**
-   * Registers a module and its components into the View registry.
-   * Maps module component definitions to file paths.
-   * @param {Object} module - The module object containing definition and path
-   */
   addModule(module) {
     Loader.settings.modules[module.name] = module;
     if (!module.components) return;
@@ -71,9 +55,6 @@ const Loader = {
       .join("/");
   },
 
-  /**
-   * Loads the raw definition object from the file system
-   */
   async loadDefinition(tag) {
     const cached = View.components.get(tag);
     if (cached?.definition) return cached.definition;
@@ -94,10 +75,6 @@ const Loader = {
     return definition;
   },
 
-  /**
-   * Main orchestration method.
-   * Loads definition, resolves parent (extends), builds class, and defines element.
-   */
   async get(tag) {
     tag = tag.toLowerCase();
     if (customElements.get(tag)) {
@@ -183,9 +160,6 @@ const Loader = {
     }
   },
 
-  /**
-   * Scans a root element for undefined custom elements and loads them.
-   */
   async traverseDOM(rootElement = document.body) {
     if (!rootElement || typeof rootElement.querySelectorAll !== "function")
       return;
@@ -203,9 +177,6 @@ const Loader = {
     );
   },
 
-  /**
-   * Sets up a MutationObserver to detect new elements added to the DOM.
-   */
   observeDOMChanges() {
     const observer = new MutationObserver(async (mutationsList) => {
       const tagsToProcess = new Set();
@@ -237,9 +208,6 @@ const Loader = {
     observer.observe(document.body, { childList: true, subtree: true });
   },
 
-  /**
-   * Convenience initializer for the DOM
-   */
   initDOM() {
     Loader.traverseDOM(document.body);
     Loader.observeDOMChanges();

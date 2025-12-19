@@ -1,21 +1,9 @@
-/**
- * @bootstrapp/notifications
- * Notifications system for Bootstrapp framework
- *
- * Provides:
- * - Notifications schema
- * - Reusable UI components (item, list, drawer)
- * - Admin plugin for composing/sending notifications
- * - Helper methods for managing notifications
- */
 import $APP from "/$app.js";
 
-// Import admin plugin if admin module is available
 const loadPlugin = async () => {
   try {
     await import("./plugin.js");
   } catch (e) {
-    // Admin plugin not needed or admin module not loaded
   }
 };
 
@@ -23,11 +11,6 @@ $APP.addModule({
   name: "notifications",
   path: "/$app/notifications/views",
   base: {
-    /**
-     * Get unread notification count for a user
-     * @param {string} userId - The user ID
-     * @returns {Promise<number>} Unread count
-     */
     async getUnreadCount(userId) {
       if (!userId) return 0;
       const notifications = await $APP.Model.notifications.getAll({
@@ -36,10 +19,6 @@ $APP.addModule({
       return notifications?.length || 0;
     },
 
-    /**
-     * Mark a notification as read
-     * @param {string} notificationId - The notification ID
-     */
     async markAsRead(notificationId) {
       if (!notificationId) return;
       await $APP.Model.notifications.edit({
@@ -49,10 +28,6 @@ $APP.addModule({
       });
     },
 
-    /**
-     * Mark all notifications as read for a user
-     * @param {string} userId - The user ID
-     */
     async markAllAsRead(userId) {
       if (!userId) return;
       const unread = await $APP.Model.notifications.getAll({
@@ -61,18 +36,6 @@ $APP.addModule({
       await Promise.all(unread.map((n) => this.markAsRead(n.id)));
     },
 
-    /**
-     * Send notification to one or more users
-     * @param {Object} options
-     * @param {string|string[]} options.recipients - User ID(s) to send to
-     * @param {string} options.title - Notification title
-     * @param {string} options.message - Notification message
-     * @param {string} [options.type='system'] - Notification type
-     * @param {string} [options.contentType] - Content type (place, event, etc.)
-     * @param {string} [options.contentSlug] - Content slug for linking
-     * @param {string} [options.senderId] - Sender user ID
-     * @returns {Promise<Object[]>} Created notifications
-     */
     async send({
       recipients,
       title,
@@ -102,11 +65,6 @@ $APP.addModule({
       );
     },
 
-    /**
-     * Broadcast notification to all users
-     * @param {Object} options - Same as send(), but no recipients needed
-     * @returns {Promise<Object[]>} Created notifications
-     */
     async broadcast({ title, message, type = "system", contentType, contentSlug, senderId }) {
       const users = await $APP.Model.users.getAll();
       return this.send({
@@ -120,19 +78,11 @@ $APP.addModule({
       });
     },
 
-    /**
-     * Delete a notification
-     * @param {string} notificationId - The notification ID
-     */
     async remove(notificationId) {
       if (!notificationId) return;
       await $APP.Model.notifications.remove(notificationId);
     },
 
-    /**
-     * Delete all notifications for a user
-     * @param {string} userId - The user ID
-     */
     async removeAllForUser(userId) {
       if (!userId) return;
       const notifications = await $APP.Model.notifications.getAll({
@@ -143,7 +93,6 @@ $APP.addModule({
   },
 });
 
-// Load admin plugin after module is registered
 loadPlugin();
 
 export default $APP.notifications;

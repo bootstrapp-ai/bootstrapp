@@ -1,17 +1,7 @@
-/**
- * @file Frontend Model Module
- * @description Initializes Model system for frontend (browser) context
- */
 
 import { createModel } from "./index.js";
 import { SubscriptionManager } from "./subscription-manager.js";
 
-/**
- * Initialize Model module on frontend
- * @param {object} $APP - App instance with Backend, events
- * @param {object} [options={}] - Initialization options
- * @returns {object} Model instance
- */
 export function initModelFrontend($APP, options = {}) {
   const Model = createModel($APP);
 

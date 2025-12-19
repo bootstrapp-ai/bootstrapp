@@ -1,7 +1,3 @@
-/**
- * @bootstrapp/notifications - Admin Plugin
- * Registers admin routes and sidebar for notifications management
- */
 import { registerPlugin } from "/$app/admin/plugins.js";
 import { html } from "/npm/lit-html";
 

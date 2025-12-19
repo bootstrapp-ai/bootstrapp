@@ -1,19 +1,6 @@
-/**
- * @file Database Adapter Factory
- * @description Factory function to create database adapters with lazy loading
- */
 
-/**
- * Registry of available adapter types
- * @type {Map<string, Class>}
- */
 const ADAPTER_REGISTRY = new Map();
 
-/**
- * Register a database adapter
- * @param {string} type - Adapter type name
- * @param {Class} AdapterClass - Adapter class
- */
 export function registerAdapter(type, AdapterClass) {
   if (ADAPTER_REGISTRY.has(type)) {
     console.warn(`Database: Overwriting existing adapter type "${type}"`);
@@ -22,16 +9,6 @@ export function registerAdapter(type, AdapterClass) {
   console.info(`Database: Registered adapter type "${type}"`);
 }
 
-/**
- * Create a database adapter instance
- * @param {Object} config - Configuration object
- * @param {string} [config.type='indexeddb'] - Adapter type
- * @param {string} config.name - Database name
- * @param {number} [config.version=1] - Database version
- * @param {Object} config.models - Model schemas
- * @returns {Promise<Object>} Adapter instance
- *
- */
 export async function createDatabase(config) {
   if (typeof config === "string") {
     config = { type: config };
@@ -62,19 +39,10 @@ export async function createDatabase(config) {
   return adapter;
 }
 
-/**
- * Get list of registered adapter types
- * @returns {Array<string>} List of adapter type names
- */
 export function getAvailableAdapters() {
   return Array.from(ADAPTER_REGISTRY.keys());
 }
 
-/**
- * Check if an adapter type is registered
- * @param {string} type - Adapter type name
- * @returns {boolean} True if adapter is registered
- */
 export function hasAdapter(type) {
   return ADAPTER_REGISTRY.has(type);
 }

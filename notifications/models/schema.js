@@ -1,7 +1,3 @@
-/**
- * @bootstrapp/notifications - Schema
- * Notifications model schema for the Bootstrapp framework
- */
 import T from "/$app/types/index.js";
 
 export default {
@@ -24,17 +20,11 @@ export default {
     }),
     title: T.string({ required: true }),
     message: T.string({ required: true }),
-
-    // Link to related content
     contentType: T.string({
       enum: ["place", "event", "meetup", "group", "guide"],
     }),
     contentSlug: T.string({ index: true }),
-
-    // Status
     read: T.boolean({ defaultValue: false, index: true }),
-
-    // Timestamps
     createdAt: T.string({ required: true, index: true }),
     readAt: T.string(),
   },

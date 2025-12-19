@@ -1,9 +1,8 @@
 /**
- * Generated from @bootstrapp/model test file
+ * Generated from @bootstrapp/model
  * @generated
  */
 
-declare module "@bootstrapp/model" {
   export interface _DefaultExport {
     createModel($APP: Record<string, any>): Record<string, any>;
     ModelType?: any;
@@ -18,7 +17,7 @@ declare module "@bootstrapp/model" {
 
   export interface ModelApi {
     name?: string;
-    get(arg0: any, opts: Record<string, any>): any;
+    get(idOrOpts: string | number | Record<string, any>, opts: Record<string, any>): any;
     getAll(opts: { where?: Record<string, any>; limit?: number; offset?: number; order?: string; includes?: string }): any[];
     add(row: Record<string, any>, opts: Record<string, any>): any;
     addMany(rows: any[], opts: Record<string, any>): any[];
@@ -46,5 +45,3 @@ declare module "@bootstrapp/model" {
     subscribe(callback: () => void): any;
     unsubscribe(callback: () => void): any;
   }
-
-}

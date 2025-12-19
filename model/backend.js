@@ -1,15 +1,6 @@
-/**
- * @file Backend Model Module
- * @description Initializes Model system for worker context with database operations
- */
 
 import { createModel } from "./index.js";
 
-/**
- * Create model event handlers for worker context
- * @param {object} $APP - App instance with Database
- * @returns {object} Event handlers object
- */
 export function createModelEventHandlers($APP) {
   return {
     ADD: async ({ payload, respond }) => {
@@ -106,11 +97,6 @@ export function createModelEventHandlers($APP) {
   };
 }
 
-/**
- * Create relationship sync handlers
- * @param {object} $APP - App instance
- * @returns {object} Event handlers for relationship sync
- */
 export function createRelationshipSyncHandlers($APP) {
   return {
     onAddRecord({ model, row }) {
@@ -134,11 +120,6 @@ export function createRelationshipSyncHandlers($APP) {
   };
 }
 
-/**
- * Initialize Model backend in worker context
- * @param {object} $APP - App instance with Database, Backend
- * @returns {object} Model instance
- */
 export function initModelBackend($APP) {
   const Model = createModel($APP);
 

@@ -1,16 +1,3 @@
-/**
- * @file Filesystem Event Handlers
- * @description Service Worker filesystem operations for cache-based storage
- */
-
-/**
- * Create filesystem event handlers for Service Worker
- * @param {Object} deps - Dependencies
- * @param {Function} deps.getMimeType - Function to get MIME type from path
- * @param {Object} deps.fsCache - Cache helper object
- * @param {Function} deps.getLocalUrl - Function to get local URL from path
- * @returns {Object} Event handlers map
- */
 export default ({ getMimeType, fsCache, getLocalUrl }) => ({
   "FS:WRITE_FILES": async (data, { respond }) => {
     try {
@@ -155,7 +142,6 @@ export default ({ getMimeType, fsCache, getLocalUrl }) => ({
       const { path = "/", system } = data.payload;
 
       if (system) {
-        // List files from CDN cache
         const cdnCache = await fsCache.open("cdn");
         const keys = await cdnCache.keys();
         const pathPrefix =
@@ -202,7 +188,6 @@ export default ({ getMimeType, fsCache, getLocalUrl }) => ({
         return;
       }
 
-      // List local files
       const dirPath = path.endsWith("/") ? path : `${path}/`;
       const stgCache = await fsCache.open("staging");
       const globalCache = await fsCache.open("local");

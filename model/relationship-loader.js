@@ -1,18 +1,4 @@
-/**
- * @file Relationship Loader
- * @description Handles loading of relationships (belongs, many, one) for database records
- */
 
-/**
- * Load relationships for a single record
- * @param {Object} adapter - Database adapter instance
- * @param {Object} models - Model schemas
- * @param {string} modelName - Name of the model
- * @param {Object} record - Record to load relationships for
- * @param {Array<string>} includes - Relationship names to load
- * @param {boolean} [recursive=false] - Load nested relationships
- * @returns {Promise<Object>} Record with loaded relationships
- */
 export async function loadRelationships(
   adapter,
   models,
@@ -72,16 +58,6 @@ export async function loadRelationships(
   return enriched;
 }
 
-/**
- * Load relationships for multiple records
- * @param {Object} adapter - Database adapter instance
- * @param {Object} models - Model schemas
- * @param {string} modelName - Name of the model
- * @param {Array<Object>} records - Records to load relationships for
- * @param {Array<string>} includes - Relationship names to load
- * @param {boolean} [recursive=false] - Load nested relationships
- * @returns {Promise<Array<Object>>} Records with loaded relationships
- */
 export async function loadRelationshipsForMany(
   adapter,
   models,
@@ -101,10 +77,6 @@ export async function loadRelationshipsForMany(
   );
 }
 
-/**
- * Load a single relationship
- * @private
- */
 async function loadRelationship(
   adapter,
   models,
@@ -165,19 +137,6 @@ async function loadRelationship(
   return many ? [] : null;
 }
 
-/**
- * Parse nested includes syntax
- * Supports: ['posts', 'posts.comments', 'author']
- * @param {Array<string>} includes - Include specifications
- * @returns {Object} Structured includes with nested relationships
- * @example
- * parseIncludes(['posts', 'posts.comments', 'author'])
- * // Returns:
- * // {
- * //   posts: { nested: ['comments'] },
- * //   author: { nested: [] }
- * // }
- */
 export function parseIncludes(includes) {
   if (!includes || !Array.isArray(includes)) {
     return {};
@@ -202,15 +161,6 @@ export function parseIncludes(includes) {
   return parsed;
 }
 
-/**
- * Load nested relationships recursively
- * @param {Object} adapter - Database adapter instance
- * @param {Object} models - Model schemas
- * @param {string} modelName - Name of the model
- * @param {Object|Array} records - Record(s) to load relationships for
- * @param {Array<string>} includes - Include specifications
- * @returns {Promise<Object|Array>} Records with nested relationships loaded
- */
 export async function loadNestedRelationships(
   adapter,
   models,

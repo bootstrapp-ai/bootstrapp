@@ -47,9 +47,10 @@ export function extractType(typeDef, options = {}) {
     return extractRelationType(typeDef, options);
   }
 
-  // Handle enum values
+  // Handle enum values - use (string & {}) pattern for flexibility while keeping autocomplete
   if (typeDef.enum && Array.isArray(typeDef.enum)) {
-    return typeDef.enum.map((v) => JSON.stringify(v)).join(" | ");
+    const literals = typeDef.enum.map((v) => JSON.stringify(v)).join(" | ");
+    return `${literals} | (string & {})`;
   }
 
   // Handle basic types
@@ -404,9 +405,9 @@ export function generateTypesFromSchema(models, options = {}) {
   lines.push(
     "  getAll(opts?: { where?: Partial<T>; limit?: number; offset?: number; order?: string }): Promise<T[]>;"
   );
-  lines.push("  add(data: Partial<T>): Promise<T>;");
+  lines.push("  add(data: Partial<T>): Promise<[Error | null, T | null]>;");
   lines.push("  addMany(data: Partial<T>[]): Promise<T[]>;");
-  lines.push("  edit(data: Partial<T> & { id: string }): Promise<T>;");
+  lines.push("  edit(data: Partial<T> & { id: string }): Promise<[Error | null, T | null]>;");
   lines.push("  remove(id: string): Promise<void>;");
   lines.push("  subscribe(callback: (data: T[]) => void): () => void;");
   lines.push("}");
@@ -421,6 +422,56 @@ export function generateTypesFromSchema(models, options = {}) {
   lines.push("}");
   lines.push("");
 
+  // Define Router interface
+  lines.push("/** Router type */");
+  lines.push("interface RouterType {");
+  lines.push("  go(routeNameOrPath: string, params?: Record<string, any>): void;");
+  lines.push("  navigate(routeName: string, params?: Record<string, any>): void;");
+  lines.push("  replace(routeNameOrPath: string, params?: Record<string, any>): void;");
+  lines.push("  back(): void;");
+  lines.push("  forward(): void;");
+  lines.push("  home(): void;");
+  lines.push("  setTitle(title: string): void;");
+  lines.push("  current: { route: any; params: Record<string, any>; path: string; name?: string };");
+  lines.push("  stack: any[];");
+  lines.push("  routes: any[];");
+  lines.push("  isRoot(): boolean;");
+  lines.push("}");
+  lines.push("");
+
+  // Define Auth interface
+  lines.push("/** Auth type */");
+  lines.push("interface AuthType {");
+  lines.push("  user: any;");
+  lines.push("  isAuthenticated: boolean;");
+  lines.push("  isGuest: boolean;");
+  lines.push("  currentUserId: string | null;");
+  lines.push("  login(email: string, password: string): Promise<any>;");
+  lines.push("  logout(): Promise<void>;");
+  lines.push("  register(data: { name: string; email: string; password: string; passwordConfirm?: string; username?: string; [key: string]: any }): Promise<any>;");
+  lines.push("  loginWithOAuth(provider: string): Promise<any>;");
+  lines.push("  completeOAuth(params: Record<string, string>): Promise<any>;");
+  lines.push("  restore(): Promise<boolean>;");
+  lines.push("  on(event: string, callback: Function): () => void;");
+  lines.push("  convertGuest(data: { email: string; password: string; name?: string }): Promise<any>;");
+  lines.push("}");
+  lines.push("");
+
+  // Define i18n interface
+  lines.push("/** i18n type */");
+  lines.push("interface I18nType {");
+  lines.push("  t(key: string, params?: Record<string, any>): string;");
+  lines.push("  n(value: number, options?: Intl.NumberFormatOptions): string;");
+  lines.push("  d(date: Date | string | number, options?: Intl.DateTimeFormatOptions): string;");
+  lines.push("  r(date: Date | string | number, options?: Intl.RelativeTimeFormatOptions): string;");
+  lines.push("  setLanguage(locale: string): Promise<void>;");
+  lines.push("  getLanguage(): string;");
+  lines.push("  getAvailableLocales(): string[];");
+  lines.push("  registerLocale(locale: string, loader: () => Promise<any>): void;");
+  lines.push("  addTranslations(locale: string, translations: Record<string, any>): void;");
+  lines.push("}");
+  lines.push("");
+
   // Define the $APP type as a reusable interface
   lines.push("/** $APP type definition */");
   lines.push("interface $APPType {");
@@ -429,10 +480,15 @@ export function generateTypesFromSchema(models, options = {}) {
   lines.push("  data: Record<string, any[]>;");
   lines.push("  settings: Record<string, any>;");
   lines.push("  events: { on: Function; emit: Function; off: Function };");
-  lines.push("  Router: { go: Function; current: any };");
-  lines.push(
-    "  Auth: { user: any; isAuthenticated: boolean; login: Function; logout: Function };"
-  );
+  lines.push("  Router: RouterType;");
+  lines.push("  Auth: AuthType;");
+  lines.push("  i18n: I18nType;");
+  lines.push("  notifications: { getUnreadCount(userId: string): Promise<number>; markAsRead(id: string): Promise<void>; markAllAsRead(userId: string): Promise<void>; send(options: any): Promise<any[]>; broadcast(options: any): Promise<any[]>; remove(id: string): Promise<void>; removeAllForUser(userId: string): Promise<void> };");
+  lines.push("  sw: { postMessage(type: string, payload?: any): void; request(type: string, payload?: any, timeout?: number): Promise<any> };");
+  lines.push("  define(tag: string, component: Record<string, any>): void;");
+  lines.push("  addModule(config: { name: string; base?: any; path?: string; alias?: string; events?: Function }): void;");
+  lines.push("  routes: { set(routes: Record<string, any>): void; get(): Record<string, any> };");
+  lines.push("  databaseConfig: Record<string, any>;");
   lines.push("  log: (...args: any[]) => void;");
   lines.push("  error: (...args: any[]) => void;");
   lines.push("}");
@@ -654,37 +710,35 @@ export function generatePackageTypes(schema, options = {}) {
 
   const lines = [
     "/**",
-    ` * Generated from ${name} test file`,
+    ` * Generated from ${name}`,
     " * @generated",
     " */",
     "",
-    `declare module "${name}" {`,
   ];
 
   let exportCount = 0;
+  let hasDefaultExport = false;
 
   for (const [exportName, typeDef] of Object.entries(exportDefs)) {
+    const isDefault = exportName === "default";
+    if (isDefault) hasDefaultExport = true;
+
     const declaration = generateExportDeclaration(exportName, typeDef, {
-      indent: "  ",
+      indent: "",
     });
     lines.push(declaration);
     lines.push("");
     exportCount++;
   }
 
-  // Check for default export
-  if (exportDefs.default) {
-    // Already handled above
-  } else {
-    // Add default export if there's a main export matching package name
+  // Add default export if there's a main export matching package name
+  if (!hasDefaultExport) {
     const baseName = name.split("/").pop();
     if (exportDefs[baseName]) {
-      lines.push(`  export default ${baseName};`);
+      lines.push(`export default ${baseName};`);
+      lines.push("");
     }
   }
-
-  lines.push("}");
-  lines.push("");
 
   return {
     content: lines.join("\n"),

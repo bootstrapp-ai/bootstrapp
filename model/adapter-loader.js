@@ -1,25 +1,12 @@
-/**
- * @file Adapter Loader
- * @description Lazy loads database adapters based on configuration
- */
 
 import { registerAdapter } from "/$app/model/factory.js";
 
-/**
- * Adapter import paths mapped by type
- */
 const ADAPTER_PATHS = {
   indexeddb: "/$app/model-indexeddb/adapter.js",
   pocketbase: "/$app/model-pocketbase/adapter.js",
   hybrid: "/$app/model-hybrid/adapter.js",
 };
 
-/**
- * Create a configured adapter class with injected dependencies
- * @param {Class} BaseAdapter - Base adapter class
- * @param {Object} dependencies - Framework dependencies to inject
- * @returns {Class} Configured adapter class
- */
 function createConfiguredAdapter(BaseAdapter, dependencies) {
   return class ConfiguredAdapter extends BaseAdapter {
     constructor(cfg) {
@@ -31,12 +18,6 @@ function createConfiguredAdapter(BaseAdapter, dependencies) {
   };
 }
 
-/**
- * Load and register a database adapter by type
- * @param {string} type - Adapter type (indexeddb, pocketbase, hybrid)
- * @param {Object} dependencies - Framework dependencies to inject
- * @returns {Promise<void>}
- */
 export async function loadAdapter(type, dependencies) {
   const path = ADAPTER_PATHS[type];
   if (!path) {
@@ -77,12 +58,6 @@ export async function loadAdapter(type, dependencies) {
   }
 }
 
-/**
- * Load and register the hybrid adapter
- * Hybrid requires both IndexedDB and PocketBase adapter classes
- * @param {Object} dependencies - Framework dependencies to inject
- * @returns {Promise<void>}
- */
 async function loadHybridAdapter(dependencies) {
   try {
     // Load all adapter modules and PocketBase in parallel

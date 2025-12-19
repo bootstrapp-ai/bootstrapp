@@ -1,14 +1,6 @@
-/**
- * @file Subscription Manager
- * @description Manages query-level subscriptions for efficient data synchronization
- * Tracks unique queries (model + where clause) and routes notifications only to matching subscribers
- */
 
 import { matchesWhere } from "./query-builder.js";
 
-/**
- * Represents a single query subscription
- */
 export class QuerySubscription {
   constructor(model, where, filterString) {
     this.model = model; // Model name (e.g., "users")
@@ -19,25 +11,16 @@ export class QuerySubscription {
     this.refCount = 0; // Number of active subscribers
   }
 
-  /**
-   * Add a callback to this subscription
-   */
   addCallback(callback) {
     this.callbacks.add(callback);
     this.refCount++;
   }
 
-  /**
-   * Remove a callback from this subscription
-   */
   removeCallback(callback) {
     this.callbacks.delete(callback);
     this.refCount--;
   }
 
-  /**
-   * Notify all callbacks with an event
-   */
   notify(event) {
     this.callbacks.forEach((callback) => {
       try {
@@ -49,12 +32,6 @@ export class QuerySubscription {
   }
 }
 
-/**
- * Generate a stable hash for a query (model + where clause)
- * @param {string} model - Model name
- * @param {object} where - Where clause object
- * @returns {string} Query hash
- */
 export function hashQuery(model, where) {
   if (!where || Object.keys(where).length === 0) {
     return `${model}::*`; // All records
@@ -71,12 +48,6 @@ export function hashQuery(model, where) {
   return `${model}::${whereString}`;
 }
 
-/**
- * Default filter builder (identity function)
- * Can be replaced by adapter-specific builders (e.g., PocketBase filter syntax)
- * @param {object} where - Where clause object
- * @returns {string} Filter string
- */
 const defaultFilterBuilder = (where) => {
   if (!where || Object.keys(where).length === 0) {
     return "";
@@ -84,15 +55,7 @@ const defaultFilterBuilder = (where) => {
   return JSON.stringify(where);
 };
 
-/**
- * Centralized subscription manager for query-level subscriptions
- */
 export class SubscriptionManager {
-  /**
-   * @param {object} database - Database adapter instance (optional)
-   * @param {object} [options={}] - Configuration options
-   * @param {function} [options.buildFilterString] - Custom filter string builder
-   */
   constructor(database, options = {}) {
     this.database = database; // Database adapter instance
 
@@ -109,21 +72,10 @@ export class SubscriptionManager {
     this.adapterUnsubscribers = new Map();
   }
 
-  /**
-   * Set a custom filter builder function
-   * @param {function} builder - Filter builder function (where) => filterString
-   */
   setFilterBuilder(builder) {
     this.buildFilterString = builder;
   }
 
-  /**
-   * Subscribe to a query (model + where clause)
-   * @param {string} model - Model name
-   * @param {object} where - Where clause object
-   * @param {function} callback - Callback function (event) => void
-   * @returns {function} Unsubscribe function
-   */
   async subscribe(model, where, callback) {
     if (typeof callback !== "function") {
       console.error("Subscription callback must be a function");
@@ -163,11 +115,6 @@ export class SubscriptionManager {
     return () => this.unsubscribe(queryHash, callback);
   }
 
-  /**
-   * Unsubscribe a callback from a query
-   * @param {string} queryHash - Query hash
-   * @param {function} callback - Callback to remove
-   */
   unsubscribe(queryHash, callback) {
     const subscription = this.subscriptions.get(queryHash);
     if (!subscription) return;
@@ -180,11 +127,6 @@ export class SubscriptionManager {
     }
   }
 
-  /**
-   * Create adapter-specific subscription (PocketBase, IndexedDB, Hybrid)
-   * @param {QuerySubscription} subscription
-   * @private
-   */
   async createAdapterSubscription(subscription) {
     const { model, filterString } = subscription;
 
@@ -215,11 +157,6 @@ export class SubscriptionManager {
     // IndexedDB adapter uses event-based notifications (no native realtime)
   }
 
-  /**
-   * Cleanup a subscription when no more subscribers
-   * @param {string} queryHash
-   * @private
-   */
   cleanupSubscription(queryHash) {
     const subscription = this.subscriptions.get(queryHash);
     if (!subscription) return;
@@ -243,13 +180,6 @@ export class SubscriptionManager {
     }
   }
 
-  /**
-   * Notify all query subscriptions that match a record change
-   * Used by IndexedDB adapter and frontend event handler
-   * @param {string} model - Model name
-   * @param {string} action - Action type: 'add', 'update', 'delete'
-   * @param {object} record - Changed record
-   */
   notifyMatchingQueries(model, action, record) {
     const queryHashes = this.modelToQueries.get(model);
     if (!queryHashes) return;
@@ -276,18 +206,12 @@ export class SubscriptionManager {
     }
   }
 
-  /**
-   * Cleanup all subscriptions (called on app shutdown)
-   */
   cleanup() {
     for (const queryHash of this.subscriptions.keys()) {
       this.cleanupSubscription(queryHash);
     }
   }
 
-  /**
-   * Get subscription statistics (for debugging)
-   */
   getStats() {
     const stats = {
       totalSubscriptions: this.subscriptions.size,

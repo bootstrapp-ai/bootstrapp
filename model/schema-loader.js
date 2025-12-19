@@ -1,13 +1,4 @@
-/**
- * Schema Loader Utility
- * Discovers and loads module schemas from @bootstrapp/* dependencies
- */
 
-/**
- * Discover modules with bootstrapp.schema: true in their package.json
- * @param {object} projectPackageJson - The project's package.json content
- * @returns {Promise<Array<{name: string, packageName: string, namespace: boolean}>>}
- */
 export async function discoverSchemaModules(projectPackageJson) {
   const modules = [];
   const deps = {
@@ -40,12 +31,6 @@ export async function discoverSchemaModules(projectPackageJson) {
   return modules;
 }
 
-/**
- * Apply namespace prefix to model names
- * @param {object} models - Original models object
- * @param {string} namespace - Namespace prefix
- * @returns {object} Namespaced models
- */
 export function namespaceModels(models, namespace) {
   if (!namespace) return models;
 
@@ -64,12 +49,6 @@ export function namespaceModels(models, namespace) {
   return namespaced;
 }
 
-/**
- * Apply namespace prefix to seed data keys
- * @param {object} data - Original data object
- * @param {string} namespace - Namespace prefix
- * @returns {object} Namespaced data
- */
 export function namespaceData(data, namespace) {
   if (!namespace) return data;
 
@@ -83,13 +62,6 @@ export function namespaceData(data, namespace) {
   return namespaced;
 }
 
-/**
- * Update relationship references to use namespaced model names
- * @param {object} modelDef - Model definition
- * @param {string} namespace - Namespace prefix
- * @param {string[]} modelNames - List of model names in this module
- * @returns {object} Updated model definition
- */
 function updateRelationshipRefs(modelDef, namespace, modelNames) {
   const updated = { ...modelDef };
 

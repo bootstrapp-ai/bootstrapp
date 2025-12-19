@@ -33,7 +33,6 @@ const specialCases = {
   undefined: undefined,
   null: null,
   "": null,
-  [undefined]: undefined,
 };
 
 /**
@@ -438,14 +437,15 @@ const proxyHandler = {
     const type = prop.toLowerCase();
     if (relationshipTypes.includes(prop)) return createRelationType(prop);
 
-    // T.union(T.string(), T.number()) => "string | number"
+    // T.union({ types: [T.string(), T.number()] }) => "string | number"
     if (prop === "union") {
-      return (...types) => {
+      return (options = {}) => {
         const typeDef = {
           type: "union",
-          types, // Array of T.* type definitions
+          types: options.types || [], // Array of T.* type definitions
           persist: true,
           attribute: false,
+          ...options,
         };
         Object.setPrototypeOf(typeDef, TypeDefinitionPrototype);
         return typeDef;

@@ -1,9 +1,8 @@
 /**
- * Generated from @bootstrapp/view test file
+ * Generated from @bootstrapp/view
  * @generated
  */
 
-declare module "@bootstrapp/view" {
   export class _Default {
     properties?: Record<string, any>;
     components?: Record<string, any>;
@@ -24,5 +23,3 @@ declare module "@bootstrapp/view" {
   export default _Default;
 
   export const settings: Record<string, any>;
-
-}

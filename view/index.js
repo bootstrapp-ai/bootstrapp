@@ -1,9 +1,3 @@
-/**
- * @file View System - Web Components with and without Shadow DOM
- * @description Core component system for building reactive UI components using Custom Elements API
- * with lit-html for templating.
- */
-
 import T from "/$app/types/index.js";
 import { render } from "/npm/lit-html";
 
@@ -29,50 +23,20 @@ const KNOWN_DEFINITION_KEYS = new Set([
 ]);
 
 export const settings = {};
-/**
- * Base View class for all custom components
- * Extends HTMLElement to provide reactive properties, lifecycle hooks, and templating
- * @class View
- * @extends HTMLElement
- */
+
 class View extends HTMLElement {
-  /** @static {Object} Property definitions for the component */
   static properties = {};
-
   static components = new Map();
-  /** @static {Object} Internal attribute cache */
   static _attrs = {};
-
-  /** @static {Array} List of plugins to apply to components */
   static plugins = [];
-
-  /** @static {WeakMap} Track which styles have been injected into which shadowRoots */
   static shadowStylesInjected = new WeakMap();
 
-  /** @type {Object} Component state object */
   state = {};
-
-  /** @public {boolean} Whether component has completed first update */
   hasUpdated = false;
-
-  /** @private {boolean} Flag to prevent attribute change loops */
   _ignoreAttributeChange = false;
-
-  /** @private {Map} Map of properties that changed in current update cycle */
   _changedProps = new Map();
-
-  /** @private {Promise|null} The promise for the current update cycle */
   _updatePromise = null;
 
-  /**
-   * Packages a component definition object into a Web Component Class.
-   * Contains the logic for Mixins, Properties, and Lifecycle binding.
-   * @static
-   * @param {string} tag - The tag name
-   * @param {Object|Function} definition - The component definition
-   * @param {Class} BaseClass - The class to extend (View or other component)
-   * @returns {Class} The generated class
-   */
   static createClass(tag, definition, BaseClass) {
     BaseClass ||= View;
     if (typeof definition === "function") {
@@ -275,13 +239,7 @@ class View extends HTMLElement {
     if (!customElements.get(tag)) customElements.define(tag, component);
     return component;
   }
-  /**
-   * Adds an event listener to the component
-   * Supports event delegation with selector#eventType syntax
-   * @param {string} eventName - Event name or selector#eventType for delegation
-   * @param {Function} listener - Event handler function
-   * @returns {Function} The wrapper function (for removal)
-   */
+
   on(eventName, listener) {
     if (typeof listener !== "function")
       return console.error(
@@ -304,11 +262,6 @@ class View extends HTMLElement {
     return wrapper;
   }
 
-  /**
-   * Removes an event listener from the component
-   * @param {string} eventName - Event name or selector#eventType for delegation
-   * @param {Function} listener - The listener function to remove
-   */
   off(eventName, listener) {
     if (eventName.includes("#")) {
       const [, eventType] = eventName.split("#");
@@ -316,11 +269,6 @@ class View extends HTMLElement {
     } else this.removeEventListener(eventName, listener);
   }
 
-  /**
-   * Emits a custom event from the component
-   * @param {string} eventName - Name of the event to emit
-   * @param {*} data - Data to pass in event.detail
-   */
   emit(eventName, data) {
     const event = new CustomEvent(eventName, {
       detail: data,
@@ -418,13 +366,6 @@ class View extends HTMLElement {
     }
   }
 
-  /**
-   * Requests an update which will be processed in the next microtask.
-   * Returns a promise that resolves when the update is complete.
-   * @param {string} [key] - The property key that changed
-   * @param {*} [oldValue] - The old value of the property
-   * @returns {Promise}
-   */
   requestUpdate(key, oldValue) {
     if (key) this._changedProps.set(key, oldValue);
 
@@ -434,10 +375,6 @@ class View extends HTMLElement {
     return this._updatePromise;
   }
 
-  /**
-   * Performs the update after awaiting a microtask
-   * @private
-   */
   async enqueueUpdate() {
     await Promise.resolve();
     const result = this.performUpdate(false);
@@ -494,9 +431,6 @@ class View extends HTMLElement {
     return changedProps.size > 0;
   }
 
-  /**
-   * Ensure shadow root exists if component uses shadow DOM
-   */
   _ensureShadowRoot() {
     if (!this.shadowRoot) {
       const opts = { mode: "open" };
