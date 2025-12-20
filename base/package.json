@@ -5,6 +5,11 @@
   "main": "./index.js",
   "module": "./index.js",
   "type": "module",
+  "bootstrapp": {
+    "components": {
+      "app": "app/"
+    }
+  },
   "exports": {
     ".": "./index.js",
     "./app": "./app.js",

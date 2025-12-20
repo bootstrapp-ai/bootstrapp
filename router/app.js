@@ -30,7 +30,6 @@ export function initRouterApp($APP, Router, Controller = null) {
   // Register as framework module
   $APP.addModule({
     name: "router",
-    path: "/$app/router",
     exports: Router,
   });
 

@@ -20,7 +20,7 @@ import {
   loadRelationshipsForMany,
 } from "/$app/model/relationship-loader.js";
 import T from "/$app/types/index.js";
-import $APP from "/$app.js";
+import $APP, { createCollection } from "/$app.js";
 
 /**
  * Load the required database adapter based on config type
@@ -55,7 +55,7 @@ let SysModel;
 if ($APP.settings.runtime === "worker") {
   const SYSMODELS = { APP: "App", USER: "User", DEVICE: "Device" };
 
-  const SYSTEM = {
+  const SYSTEM = createCollection({
     export: async () => {
       if ($APP.Database?.exportData) {
         return await $APP.Database.exportData();
@@ -78,7 +78,7 @@ if ($APP.settings.runtime === "worker") {
       }
       throw new Error("Import not supported by current database adapter");
     },
-  };
+  });
 
   $APP.addModule({
     name: "sysmodels",

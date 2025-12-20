@@ -1,14 +1,13 @@
 import T from "/$app/types/index.js";
+import $APP from "/$app.js";
 import { html } from "/npm/lit-html";
 import { keyed } from "/npm/lit-html/directives/keyed.js";
 import { html as staticHTML, unsafeStatic } from "/npm/lit-html/static.js";
-import Router from "./index.js";
-
 export default {
   tag: "router-ui",
   properties: {
     currentRoute: T.object({
-      sync: Router,
+      sync: $APP.Router,
     }),
   },
   renderRoute(route, params) {
@@ -24,6 +23,7 @@ export default {
 
   render() {
     const { route, params } = this.currentRoute || {};
+    console.error(this.currentRoute, "current Route");
     return route
       ? keyed(
           route.name ?? route.path,

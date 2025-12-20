@@ -3,6 +3,11 @@
   "version": "0.1.0",
   "description": "Chrome extension for bidirectional communication between admin panel and browser tabs",
   "type": "module",
+  "bootstrapp": {
+    "components": {
+      "extension": "admin/"
+    }
+  },
   "exports": {
     ".": "./index.js",
     "./admin-bridge.js": "./admin-bridge.js"

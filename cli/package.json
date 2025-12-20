@@ -23,8 +23,7 @@
     "sharp": "^0.34.5",
     "ws": "^8.18.0",
     "electron": "^39.1.1",
-    "electron-builder": "^26.0.12",
-    "puppeteer": "^24.29.1"
+    "electron-builder": "^26.0.12"
   },
   "type": "module"
 }

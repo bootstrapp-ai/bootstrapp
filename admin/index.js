@@ -8,10 +8,7 @@ import "/$app/bundler/plugin.js";
 import "/$app/theme/plugin.js";
 import "/$app/extension/admin/plugin.js";
 
-$APP.addModule({
-  name: "admin",
-  path: "/$app/admin/views",
-});
+$APP.addModule({ name: "admin" });
 
 const coreRoutes = {
   "/admin": {

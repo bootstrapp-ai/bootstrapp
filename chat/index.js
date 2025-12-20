@@ -3,7 +3,6 @@ import T from "/$app/types/index.js";
 
 $APP.addModule({
   name: "chat",
-  path: "/$app/chat/views",
   root: true,
 });
 

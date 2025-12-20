@@ -6,7 +6,7 @@ import { registerPlugin } from "/$app/admin/plugins.js";
 import $APP from "/$app.js";
 import { html } from "/npm/lit-html";
 
-$APP.addModule({ name: "extension", path: "/$app/extension/admin" });
+$APP.addModule({ name: "extension" });
 registerPlugin("extension", {
   sidebar: [
     {

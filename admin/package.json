@@ -4,6 +4,11 @@
   "description": "Bootstrapp Admin Panel",
   "type": "module",
   "main": "index.js",
+  "bootstrapp": {
+    "components": {
+      "admin": "views/"
+    }
+  },
   "exports": {
     ".": "./index.js",
     "./cms/*": "./cms/*",

@@ -1,146 +1,123 @@
 /**
  * @file Browser Test Runner
- * @description Runs tests in headless Chrome via Puppeteer and reports results to CLI
+ * @description Runs tests in browser via WebSocket and reports results to CLI
+ * Uses HTTP endpoints instead of puppeteer for browser automation
  */
 
-import puppeteer from "puppeteer";
-
 /**
- * Run tests in headless browser
+ * Run tests in browser via WebSocket
  */
 export async function runBrowserTests(adapter, options = {}) {
   const {
     testFiles = [],
     suite = null,
-    headless = true,
-    projectPath = null, // Path to project directory for project tests
+    headless = true, // Kept for API compatibility, but browser always opens visibly now
+    projectPath = null,
     port = 1315,
   } = options;
 
-  // Use project-test.html for project tests, test.html for framework tests
-  const testPage = projectPath
-    ? `http://localhost:${port}/$app/base/test/project-test.html`
-    : `http://localhost:${port}/$app/base/test.html`;
-  const testUrl = options.testUrl || testPage;
-
   console.log("\x1b[1m\x1b[36mRunning Browser Tests\x1b[0m");
-  console.log("\x1b[90m(Headless Chrome - Full Browser APIs)\x1b[0m\n");
+  console.log("\x1b[90m(Via WebSocket - Full Browser APIs)\x1b[0m\n");
 
-  let browser;
-  let success = false;
+  const baseUrl = `http://localhost:${port}`;
 
   try {
-    // Launch browser
-    console.log("\x1b[90mLaunching headless Chrome...\x1b[0m\n");
-    browser = await puppeteer.launch({
-      headless: headless ? "new" : false,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    // Send test request to server
+    console.log("\x1b[90mSending test request to browser...\x1b[0m\n");
+
+    const response = await fetch(`${baseUrl}/tests/run`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        testFiles,
+        suite,
+        projectPath,
+      }),
     });
 
-    const page = await browser.newPage();
-
-    // Collect console messages
-    const consoleMessages = [];
-    page.on("console", (msg) => {
-      const type = msg.type();
-      const text = msg.text();
-
-      // Forward console messages to CLI with colors
-      if (type === "log") {
-        console.log(text);
-      } else if (type === "error") {
-        console.error(`\x1b[31m${text}\x1b[0m`);
-      } else if (type === "warn") {
-        console.warn(`\x1b[33m${text}\x1b[0m`);
-      } else if (type === "info") {
-        console.info(`\x1b[36m${text}\x1b[0m`);
-      }
-
-      consoleMessages.push({ type, text });
-    });
-
-    // Collect errors
-    page.on("pageerror", (error) => {
-      console.error("\x1b[31mPage Error:\x1b[0m", error.message);
-    });
-
-    // Build URL with parameters
-    let url = testUrl;
-    const params = new URLSearchParams();
-
-    if (testFiles.length > 0) {
-      params.set("run", "file");
-      // For project tests, convert absolute path to project-relative path
-      let filePath = testFiles[0];
-      if (projectPath && filePath.startsWith(projectPath)) {
-        filePath = filePath.slice(projectPath.length + 1); // Remove project path + /
-      }
-      params.set("filePath", filePath);
-      if (suite) {
-        params.set("suiteName", suite);
-      }
-    } else if (suite) {
-      params.set("run", "suite");
-      params.set("suiteName", suite);
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Failed to start tests: ${error}`);
     }
 
-    if (params.toString()) {
-      url += "?" + params.toString();
-    }
+    // Poll for results with long-polling
+    console.log("\x1b[90mWaiting for test results...\x1b[0m\n");
 
-    console.log(`\x1b[90mNavigating to: ${url}\x1b[0m\n`);
+    let lastConsoleIndex = 0;
+    let results = null;
+    const maxAttempts = 120; // 2 minutes max (each poll is ~30s timeout)
+    let attempts = 0;
 
-    // Navigate to test page
-    await page.goto(url, {
-      waitUntil: "networkidle0",
-      timeout: 30000,
-    });
+    while (!results && attempts < maxAttempts) {
+      attempts++;
 
-    // Wait for tests to complete
-    // The test.html should set window.testResults when done
-    await page.waitForFunction(() => window.testResults !== undefined, {
-      timeout: 60000,
-    });
+      const pollResponse = await fetch(`${baseUrl}/tests/results`);
+      const data = await pollResponse.json();
 
-    // Get test results
-    const results = await page.evaluate(() => window.testResults);
+      // Display any new console output
+      if (data.console && data.console.length > lastConsoleIndex) {
+        for (let i = lastConsoleIndex; i < data.console.length; i++) {
+          const entry = data.console[i];
+          const text = entry.args.join(" ");
 
-    if (results) {
-      console.log("\n" + "=".repeat(60));
-
-      if (results.failed === 0) {
-        console.log(`\x1b[32m✓ ${results.passed} tests passed\x1b[0m`);
-        success = true;
-      } else {
-        console.log(`\x1b[31m✗ ${results.failed} tests failed\x1b[0m`);
-        console.log(`\x1b[32m✓ ${results.passed} tests passed\x1b[0m`);
-        console.log(`\x1b[90m  ${results.total} total\x1b[0m`);
-
-        if (results.failures && results.failures.length > 0) {
-          console.log("\n\x1b[31mFailures:\x1b[0m\n");
-          results.failures.forEach((failure, i) => {
-            console.log(
-              `${i + 1}) ${failure.suite} > ${failure.describe} > ${failure.test}`,
-            );
-            console.log(`   ${failure.error}`);
-            console.log("");
-          });
+          switch (entry.level) {
+            case "error":
+              console.error(`\x1b[31m${text}\x1b[0m`);
+              break;
+            case "warn":
+              console.warn(`\x1b[33m${text}\x1b[0m`);
+              break;
+            case "info":
+              console.info(`\x1b[36m${text}\x1b[0m`);
+              break;
+            default:
+              console.log(text);
+          }
         }
+        lastConsoleIndex = data.console.length;
+      }
+
+      if (data.status === "complete") {
+        results = data.results;
+      }
+      // If pending, the long-poll will wait up to 30s before returning
+    }
+
+    if (!results) {
+      console.error("\x1b[31mTest timeout - no results received\x1b[0m");
+      return false;
+    }
+
+    // Display results
+    console.log("\n" + "=".repeat(60));
+
+    if (results.failed === 0) {
+      console.log(`\x1b[32m✓ ${results.passed} tests passed\x1b[0m`);
+      console.log("=".repeat(60) + "\n");
+      return true;
+    } else {
+      console.log(`\x1b[31m✗ ${results.failed} tests failed\x1b[0m`);
+      console.log(`\x1b[32m✓ ${results.passed} tests passed\x1b[0m`);
+      console.log(`\x1b[90m  ${results.total} total\x1b[0m`);
+
+      if (results.failures && results.failures.length > 0) {
+        console.log("\n\x1b[31mFailures:\x1b[0m\n");
+        results.failures.forEach((failure, i) => {
+          console.log(
+            `${i + 1}) ${failure.suite || ""} > ${failure.describe || ""} > ${failure.test || ""}`.trim(),
+          );
+          console.log(`   ${failure.error}`);
+          console.log("");
+        });
       }
 
       console.log("=".repeat(60) + "\n");
-    } else {
-      console.error("\x1b[31mNo test results received from browser\x1b[0m");
+      return false;
     }
   } catch (error) {
     console.error("\x1b[31mBrowser test error:\x1b[0m", error.message);
-  } finally {
-    if (browser) {
-      await browser.close();
-    }
+    return false;
   }
-
-  return success;
 }
 
 /**

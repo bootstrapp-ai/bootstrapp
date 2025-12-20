@@ -7,7 +7,7 @@ import { registerPlugin } from "/$app/admin/plugins.js";
 import $APP from "/$app.js";
 import { html } from "/npm/lit-html";
 
-$APP.addModule({ name: "cms", path: "/$app/cms/views" });
+$APP.addModule({ name: "cms" });
 registerPlugin("cms", {
   /**
    * Custom field type renderers

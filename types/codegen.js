@@ -554,6 +554,129 @@ export function generateJsConfig(options = {}) {
 }
 
 // =============================================================================
+// Component Type Generation (for lit-html autocomplete)
+// =============================================================================
+
+/**
+ * Converts a kebab-case tag name to PascalCase interface name
+ * @param {string} tag - Tag name (e.g., "uix-button", "view-place-detail")
+ * @returns {string} PascalCase name (e.g., "UixButton", "ViewPlaceDetail")
+ */
+export function tagToPascalCase(tag) {
+  return tag
+    .split("-")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join("");
+}
+
+/**
+ * Generates TypeScript interface for a component's properties
+ * @param {string} tag - Component tag name (e.g., "uix-button")
+ * @param {Object} properties - T.* property definitions
+ * @param {Object} [options={}] - Generation options
+ * @param {string} [options.extendsTag] - Parent tag if component extends another
+ * @returns {string} TypeScript interface declaration
+ */
+export function generateComponentInterface(tag, properties, options = {}) {
+  const interfaceName = tagToPascalCase(tag);
+  const { extendsTag } = options;
+
+  // Determine what to extend
+  let extendsClause = "HTMLElement";
+  if (extendsTag) {
+    extendsClause = tagToPascalCase(extendsTag);
+  }
+
+  const lines = [`  interface ${interfaceName} extends ${extendsClause} {`];
+
+  if (properties && typeof properties === "object") {
+    for (const [propName, propDef] of Object.entries(properties)) {
+      // Skip internal properties
+      if (propName.startsWith("$")) continue;
+      if (typeof propDef !== "object" || propDef === null) continue;
+
+      const tsType = extractType(propDef);
+      // All component properties are optional (can be set or not)
+      lines.push(`    ${propName}?: ${tsType};`);
+    }
+  }
+
+  lines.push("  }");
+  return lines.join("\n");
+}
+
+/**
+ * Generates complete html.d.ts content for component autocomplete
+ * @param {Array<{tag: string, properties: Object, extendsTag?: string}>} components - Component definitions
+ * @param {Object} [options={}] - Generation options
+ * @returns {{ content: string, componentCount: number }}
+ */
+export function generateHtmlTypes(components, options = {}) {
+  const lines = [
+    "/**",
+    " * Generated component types for lit-html autocomplete",
+    " * Provides tag name and attribute autocomplete in html`` templates",
+    " * @generated",
+    " */",
+    "",
+    "declare global {",
+    "  // Component interfaces",
+  ];
+
+  // Generate interfaces for each component
+  for (const comp of components) {
+    const { tag, properties, extendsTag } = comp;
+    const interfaceCode = generateComponentInterface(tag, properties, { extendsTag });
+    lines.push(interfaceCode);
+    lines.push("");
+  }
+
+  // Generate HTMLElementTagNameMap augmentation
+  lines.push("  // Tag name to element mapping");
+  lines.push("  interface HTMLElementTagNameMap {");
+
+  for (const comp of components) {
+    const { tag } = comp;
+    const interfaceName = tagToPascalCase(tag);
+    lines.push(`    "${tag}": ${interfaceName};`);
+  }
+
+  lines.push("  }");
+  lines.push("}");
+  lines.push("");
+  lines.push("export {};");
+  lines.push("");
+
+  return {
+    content: lines.join("\n"),
+    componentCount: components.length,
+  };
+}
+
+/**
+ * Extracts component metadata from a component definition object
+ * @param {Object} componentDef - Component definition (default export from component file)
+ * @param {string} [fallbackTag] - Fallback tag name if not defined in component
+ * @returns {{ tag: string, properties: Object, extendsTag?: string } | null}
+ */
+export function extractComponentMetadata(componentDef, fallbackTag) {
+  if (!componentDef || typeof componentDef !== "object") {
+    return null;
+  }
+
+  const tag = componentDef.tag || fallbackTag;
+  if (!tag) {
+    return null;
+  }
+
+  return {
+    tag,
+    properties: componentDef.properties || {},
+    extendsTag: componentDef.extends || undefined,
+  };
+}
+
+// =============================================================================
 // Package Type Generation (for framework packages)
 // =============================================================================
 

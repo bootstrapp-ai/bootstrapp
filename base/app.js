@@ -17,35 +17,92 @@ const runtime = (() => {
 
 globalThis.sleep = (ms = 0) =>
   new Promise((resolve) => setTimeout(resolve, ms));
-const ObjectStorageFunctions = {
-  set: function (...args) {
-    if (args.length === 1 && typeof args[0] === "object" && args[0] !== null)
-      Object.entries(args[0]).forEach(([k, v]) => {
-        this[k] =
-          !Array.isArray(this[k]) &&
-          typeof this[k] === "object" &&
-          typeof v === "object"
-            ? { ...this[k], ...v }
-            : v;
-      });
-    if (args.length === 2 && typeof args[0] === "string")
-      this[args[0]] = args[1];
-    return this;
-  },
-  get: function (...args) {
-    const [key1, key2] = args;
-    if (args.length === 0) return undefined;
-    if (args.length === 2) return this[key1]?.[key2];
-    return this[key1];
-  },
-  remove: function (...args) {
-    args.length === 2 ? delete this[args[0]][args[1]] : delete this[args[0]];
-    return this;
-  },
-  keys: function () {
-    return Object.keys(this);
-  },
-};
+
+/**
+ * Creates a collection with .set()/.get()/.remove()/.keys() methods
+ * while allowing direct property access via Proxy.
+ * Replaces the old prototype-based ObjectStorageFunctions approach.
+ */
+function createCollection(initial = {}) {
+  const data = { ...initial };
+
+  // Deep merge helper - merges objects, replaces arrays/primitives
+  const deepMerge = (target, source) => {
+    if (!target || typeof target !== "object" || Array.isArray(target))
+      return source;
+    if (!source || typeof source !== "object" || Array.isArray(source))
+      return source;
+    return { ...target, ...source };
+  };
+
+  const handler = {
+    get(target, prop) {
+      // Collection methods
+      if (prop === "set") {
+        return (...args) => {
+          if (
+            args.length === 1 &&
+            typeof args[0] === "object" &&
+            args[0] !== null
+          ) {
+            for (const [k, v] of Object.entries(args[0])) {
+              data[k] = deepMerge(data[k], v);
+            }
+          } else if (args.length === 2 && typeof args[0] === "string") {
+            data[args[0]] = args[1];
+          }
+          return proxy;
+        };
+      }
+      if (prop === "get")
+        return (k, n) => (n !== undefined ? data[k]?.[n] : data[k]);
+      if (prop === "remove") {
+        return (...args) => {
+          if (args.length === 2) delete data[args[0]]?.[args[1]];
+          else delete data[args[0]];
+          return proxy;
+        };
+      }
+      if (prop === "keys") return () => Object.keys(data);
+      if (prop === "values") return () => Object.values(data);
+      if (prop === "entries") return () => Object.entries(data);
+      if (prop === "has") return (k) => k in data;
+      if (prop === "_isCollection") return true;
+      if (prop === "_data") return data;
+
+      // Direct property access: $APP.models.users
+      return data[prop];
+    },
+
+    set(target, prop, value) {
+      data[prop] = value;
+      return true;
+    },
+
+    has(target, prop) {
+      return (
+        prop in data ||
+        ["set", "get", "remove", "keys", "values", "entries", "has"].includes(
+          prop,
+        )
+      );
+    },
+
+    ownKeys() {
+      return Reflect.ownKeys(data);
+    },
+
+    getOwnPropertyDescriptor(target, prop) {
+      if (prop in data) {
+        return { enumerable: true, configurable: true, value: data[prop] };
+      }
+      return undefined;
+    },
+  };
+
+  const proxy = new Proxy({}, handler);
+  return proxy;
+}
 const fs = {
   async fetchResource(path, handleResponse, extension) {
     try {
@@ -75,36 +132,27 @@ const fs = {
   },
 };
 
-const installModulePrototype = (base) => {
-  if (base instanceof Set || base instanceof Map || Array.isArray(base)) return;
-  if (!base) base = {};
-  const proto = Object.create(Object.getPrototypeOf(base));
-  Object.assign(proto, ObjectStorageFunctions);
-  Object.setPrototypeOf(base, proto);
-  return base;
-};
-
 const coreModules = {
   events: createEventHandler({}),
   app: {},
   assetFiles: new Set(),
-  components: {},
-  data: {},
+  components: createCollection(),
+  data: createCollection(),
   devFiles: new Set(),
   error: console.error,
   fs: fs,
   log: console.log,
-  models: {},
-  modules: {},
-  routes: {},
+  models: createCollection(),
+  modules: createCollection(),
+  routes: createCollection(),
   settings: {
-    base: {
+    base: createCollection({
       runtime,
       dev: true,
       backend: false,
       frontend: true,
       basePath: "",
-    },
+    }),
     events: ({ context }) => ({
       moduleAdded({ module }) {
         if (module.settings) context[module.name] = module.settings;
@@ -114,19 +162,18 @@ const coreModules = {
 };
 
 if (runtime === "frontend") {
-  coreModules.routes = {};
   coreModules.icons = {
     alias: "Icons",
     base: new Map(Object.entries(globalThis.__icons || {})),
   };
   coreModules.theme = {
-    base: {
+    base: createCollection({
       font: {
         icon: {
           family: "lucide",
         },
       },
-    },
+    }),
     events: ({ context }) => ({
       moduleAdded({ module }) {
         if (module.theme) context[module.name] = module.theme;
@@ -168,10 +215,8 @@ const prototypeAPP = {
     if (!backend && theme) this.theme.set(theme);
     try {
       await import("/index.js");
-      if (this.settings.dev) {
-        await this.loadModuleSchemas();
-        await this.loadModuleData();
-      }
+      await this.loadModuleSchemas();
+      await this.loadModuleData();
       await import(
         backend ? "/$app/base/backend/backend.js" : "/$app/base/frontend.js"
       );
@@ -182,7 +227,7 @@ const prototypeAPP = {
     return this;
   },
   async loadModuleSchemas() {
-    if (!this.settings.dev || !this._packageJson) return;
+    if (!this._packageJson) return;
 
     const { discoverSchemaModules, namespaceModels } = await import(
       "/$app/model/schema-loader.js"
@@ -224,7 +269,7 @@ const prototypeAPP = {
     }
   },
   async loadModuleData() {
-    if (!this.settings.dev || !this._packageJson) return;
+    if (!this._packageJson) return;
 
     const { discoverSchemaModules, namespaceData } = await import(
       "/$app/model/schema-loader.js"
@@ -269,27 +314,33 @@ const prototypeAPP = {
     }
   },
   addModule(module) {
-    if (
-      (module.dev && this.settings.dev !== true) ||
-      !!this?.modules?.[module.name]
-    )
-      return;
-    if (!module.base) module.base = {};
-    const { alias, name, events } = module;
-    const base = module.base ?? this[name];
-    if (this.modules && !this.modules[name]) this.modules.set(name, module);
-    installModulePrototype(base);
+    // Skip if dev-only module in production, or already registered
+    if (module.dev && !this.settings.dev) return;
+    if (this.modules?.has(module.name)) return;
+
+    const { alias, name, events, base = {} } = module;
+
+    // Register the module - no prototype manipulation!
+    this.modules?.set(name, module);
     this[name] = base;
     if (alias) this[alias] = base;
-    if (events)
-      Object.entries(
+
+    // Register event handlers
+    if (events) {
+      const handlers =
         typeof events === "function"
           ? events({ $APP: this, context: base })
-          : events,
-      ).map(([name, fn]) => this.events.on(name, fn));
-    this.events
-      .get("moduleAdded")
-      .map((fn) => fn.bind(this[module.name])({ module }));
+          : events;
+      for (const [eventName, fn] of Object.entries(handlers)) {
+        this.events.on(eventName, fn);
+      }
+    }
+
+    // Emit moduleAdded event
+    const moduleAddedHandlers = this.events.get("moduleAdded") || [];
+    for (const fn of moduleAddedHandlers) {
+      fn.call(base, { module });
+    }
 
     if (this.log) this.log(`Module '${module.name}' added successfully`);
     return base;
@@ -304,4 +355,5 @@ for (const [name, base = {}] of Object.entries(coreModules))
     ...(base.base ? base : { base }),
   });
 globalThis.$APP = $APP;
+export { createCollection };
 export default $APP;

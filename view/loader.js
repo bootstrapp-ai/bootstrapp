@@ -1,5 +1,13 @@
 import View from "./index.js";
 
+// Initialize from production component map if available
+// This is injected into index.html by the bundler at build time
+if (typeof window !== "undefined" && window.__COMPONENT_MAP__) {
+  for (const [tag, path] of Object.entries(window.__COMPONENT_MAP__)) {
+    View.components.set(tag, { path });
+  }
+}
+
 const Loader = {
   settings: {
     basePath: "/",
@@ -7,72 +15,154 @@ const Loader = {
     dev: false,
   },
 
+  // Component mappings from package.json discovery
+  // Format: { prefix: { folders: [...], base: "..." } }
+  componentMappings: {},
+
   ssgTag: "ce-",
 
   configure(config) {
     Object.assign(Loader.settings, config || {});
   },
 
+  /**
+   * Initialize component mappings from package.json discovery
+   * @param {Object} mappings - { prefix: { folders: [...], base: "..." } }
+   */
+  initMappings(mappings) {
+    Loader.componentMappings = mappings;
+  },
+
+  /**
+   * Register a module (for non-component features like i18n, events, base)
+   * Component paths now come from package.json discovery
+   */
   addModule(module) {
     Loader.settings.modules[module.name] = module;
-    if (!module.components) return;
-
-    Object.entries(module.components).forEach(([name, value]) => {
-      if (Array.isArray(value)) {
-        value.forEach((componentName) => {
-          const tag = `${module.name}-${componentName}`;
-          const entry = View.components.get(tag) || {};
-          entry.path = [module.path, module.name, name, componentName]
-            .filter(Boolean)
-            .join("/");
-          View.components.set(tag, entry);
-        });
-      } else {
-        const tag = `${module.name}-${name}`;
-        const entry = View.components.get(tag) || {};
-        const rootPath = module.root ? module.root.replace(/\/$/, "") : "";
-        entry.path = [rootPath, module.path, module.name, name]
-          .filter(Boolean)
-          .join("/");
-        View.components.set(tag, entry);
-      }
-    });
+    // Component paths come from package.json discovery now
+    // addModule only handles module-level config (i18n, base, events, etc.)
   },
 
+  /**
+   * Resolve tag name to component path using package.json mappings
+   */
   resolvePath(tagName) {
+    // Check cache first
     const cached = View.components.get(tagName);
     if (cached?.path) return cached.path;
+
+    // Extract prefix and component name
     const parts = tagName.split("-");
-    const moduleName = parts[0];
-    const module = Loader.settings.modules[moduleName];
+    const prefix = parts[0];
     const componentName = parts.slice(1).join("-");
-    return (
-      module
-        ? [module.path ?? moduleName, componentName]
-        : [Loader.settings.basePath, tagName]
-    )
-      .filter(Boolean)
-      .join("/");
+
+    // Look up in componentMappings
+    const mapping = Loader.componentMappings[prefix];
+    if (!mapping) {
+      console.warn(`[Loader] No component mapping for prefix: ${prefix}`);
+      return null;
+    }
+
+    // New format: direct path lookup
+    if (mapping.paths) {
+      const relativePath = mapping.paths[componentName];
+      if (relativePath) {
+        return `${mapping.base}${relativePath}`;
+      }
+      console.warn(`[Loader] Component '${componentName}' not found in ${prefix} mappings`);
+      return null;
+    }
+
+    // Legacy format: return first folder (loadDefinition will try others)
+    if (mapping.folders) {
+      const folder = mapping.folders[0];
+      return `${mapping.base}${folder}${componentName}`;
+    }
+
+    return null;
   },
 
+  /**
+   * Load component definition
+   */
   async loadDefinition(tag) {
     const cached = View.components.get(tag);
     if (cached?.definition) return cached.definition;
 
-    const path = Loader.resolvePath(tag);
-    if (tag === "app-template") console.trace();
-    const { default: definition } = await import(`${path}.js`);
+    // If we have a cached path (from production map or previous load), use it directly
+    if (cached?.path) {
+      try {
+        const { default: definition } = await import(`${cached.path}.js`);
+        if (definition) {
+          cached.definition = definition;
+          View.components.set(tag, cached);
+          return definition;
+        }
+      } catch (err) {
+        console.error(`[Loader] Failed to load ${tag} from cached path:`, cached.path, err);
+        throw err;
+      }
+    }
 
-    if (!definition)
-      return console.warn(
-        `[Loader] No default export found for component ${tag} at ${path}.js`,
-      );
+    // Extract prefix and component name
+    const parts = tag.split("-");
+    const prefix = parts[0];
+    const componentName = parts.slice(1).join("-");
+    const mapping = Loader.componentMappings[prefix];
 
-    const entry = View.components.get(tag) || {};
-    entry.path = path;
-    entry.definition = definition;
-    View.components.set(tag, entry);
-    return definition;
+    if (!mapping) {
+      console.error(`[Loader] No mapping for prefix: ${prefix}`);
+      return null;
+    }
+
+    // New format: direct path lookup (single fetch, no 404s)
+    if (mapping.paths) {
+      const relativePath = mapping.paths[componentName];
+      if (!relativePath) {
+        console.error(`[Loader] Component '${componentName}' not found in ${prefix} mappings`);
+        return null;
+      }
+
+      const path = `${mapping.base}${relativePath}`;
+      try {
+        const { default: definition } = await import(`${path}.js`);
+        if (definition) {
+          const entry = View.components.get(tag) || {};
+          entry.path = path;
+          entry.definition = definition;
+          View.components.set(tag, entry);
+          return definition;
+        }
+      } catch (err) {
+        console.error(`[Loader] Failed to load ${tag} from ${path}:`, err);
+        throw err;
+      }
+    }
+
+    // Legacy format: try each folder until we find the component
+    if (mapping.folders) {
+      let lastError;
+      for (const folder of mapping.folders) {
+        const path = `${mapping.base}${folder}${componentName}`;
+        try {
+          const { default: definition } = await import(`${path}.js`);
+          if (definition) {
+            const entry = View.components.get(tag) || {};
+            entry.path = path;
+            entry.definition = definition;
+            View.components.set(tag, entry);
+            return definition;
+          }
+        } catch (err) {
+          lastError = err;
+          // Try next folder
+        }
+      }
+      console.error(`[Loader] Component ${tag} not found in any folder:`, mapping.folders);
+      if (lastError) throw lastError;
+    }
+
+    return null;
   },
 
   async get(tag) {

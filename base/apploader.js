@@ -1,14 +1,7 @@
-/**
- * @file Component Loader Integration
- * @description Bridges the $APP framework events to the Core Loader.
- */
-
+import View from "/$app/view/index.js";
 import Loader from "/$app/view/loader.js";
 import $APP from "/$app.js";
 
-/**
- * Initialize Loader with App settings and start DOM observation
- */
 const init = () => {
   Loader.configure({
     basePath: $APP.settings.basePath || "/",
@@ -27,3 +20,4 @@ $APP.events.set({
 });
 
 $APP.define = Loader.define;
+$APP.View = View;

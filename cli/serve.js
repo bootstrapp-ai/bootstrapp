@@ -9,6 +9,49 @@ import mime from "mime";
 import WebSocket, { WebSocketServer } from "ws";
 import { generateTypes } from "./commands/types.js";
 
+// --- Browser-based Type Generation ---
+// Debounce timer for component type generation (60 seconds)
+let componentTypeGenTimeout = null;
+const COMPONENT_TYPE_GEN_DEBOUNCE = 60000; // 60 seconds
+
+// --- Browser Opening Helper ---
+const openBrowser = (url, adapter) => {
+  let command;
+  const flags = `--auto-open-devtools-for-tabs --undocked --force-dark-mode`;
+
+  switch (process.platform) {
+    case "darwin":
+      command = `open -a "Google Chrome" "${url}" --args ${flags}`;
+      break;
+    case "win32":
+      command = `start chrome "${url}" ${flags}`;
+      break;
+    case "linux":
+      command = `chromium "${url}" ${flags} || google-chrome "${url}" ${flags} || google-chrome-stable "${url}" ${flags}`;
+      break;
+    default:
+      adapter.warn(`Platform "${process.platform}" not recognized, cannot auto-open browser.`);
+      return;
+  }
+
+  adapter.log(`Opening browser: ${url}`);
+  exec(command, (err) => {
+    if (err) {
+      adapter.error("Failed to open browser:", err);
+      adapter.warn("You may need to install Google Chrome or add it to your PATH.");
+    } else {
+      adapter.log("Browser opened.");
+    }
+  });
+};
+
+// --- Browser Test Runner State ---
+// Stores pending test request and results for CLI polling
+let pendingTestRequest = null;
+let testConsoleBuffer = [];
+let testResults = null;
+let testResultsResolve = null;
+
 // --- Build Versioning Helpers ---
 
 const MAX_BUILDS_TO_KEEP = 5;
@@ -329,13 +372,14 @@ const loadServerModules = async (adapter, projectDir) => {
 
 // --- Request Handler Factory (MODIFIED) ---
 
-// **MODIFIED**: Now accepts host and port
+// **MODIFIED**: Now accepts host, port, and getWss callback
 const createRequestHandler = (
   adapter,
   projectDir,
   getServerModules,
   host,
   port,
+  getWss,
 ) => {
   const serveFile = async (filePath, res, urlHasExtension) => {
     // This function is now back to just serving the file
@@ -736,6 +780,182 @@ CADDYFILE_EOF`);
       }
     }
 
+    // POST /types/generate - receive generated component types from browser
+    if (req.method === "POST" && pathname === "/types/generate") {
+      try {
+        const chunks = [];
+        for await (const chunk of req) {
+          chunks.push(chunk);
+        }
+        const body = JSON.parse(Buffer.concat(chunks).toString());
+        const { content, componentCount } = body;
+
+        if (!content) {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ success: false, error: "Missing content" }));
+          return;
+        }
+
+        // Write to types/html.d.ts
+        const typesDir = adapter.join(projectDir, "types");
+        await ensureDir(typesDir);
+        const outputPath = adapter.join(typesDir, "html.d.ts");
+        await fs.writeFile(outputPath, content);
+
+        adapter.log(`\x1b[32m✓ Generated ${componentCount} component types → types/html.d.ts\x1b[0m`);
+
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: true, componentCount }));
+        return;
+      } catch (err) {
+        adapter.error("Type generation error:", err);
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+        return;
+      }
+    }
+
+    // POST /tests/run - trigger browser tests from CLI
+    if (req.method === "POST" && pathname === "/tests/run") {
+      try {
+        const chunks = [];
+        for await (const chunk of req) {
+          chunks.push(chunk);
+        }
+        const options = JSON.parse(Buffer.concat(chunks).toString());
+
+        // Reset state
+        testConsoleBuffer = [];
+        testResults = null;
+        pendingTestRequest = options;
+
+        // Get WebSocket server
+        const wss = getWss();
+        if (!wss) {
+          res.writeHead(503, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ success: false, error: "WebSocket server not ready" }));
+          return;
+        }
+
+        // Get first available browser client
+        const clients = Array.from(wss.clients).filter(
+          (c) => c.readyState === WebSocket.OPEN
+        );
+
+        if (clients.length > 0) {
+          // Send to first browser client
+          clients[0].send(JSON.stringify({ type: "TESTS:RUN", options }));
+          adapter.log("Test request sent to browser");
+        } else {
+          // No browser connected - open one
+          adapter.log("No browser connected, opening one for tests...");
+          openBrowser(`http://${host}:${port}`, adapter);
+
+          // Wait for connection, then send
+          const onConnection = (client) => {
+            setTimeout(() => {
+              client.send(JSON.stringify({ type: "TESTS:RUN", options }));
+              adapter.log("Test request sent to browser");
+            }, 2000);
+            wss.off("connection", onConnection);
+          };
+          wss.on("connection", onConnection);
+        }
+
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: true, message: "Test request sent" }));
+        return;
+      } catch (err) {
+        adapter.error("Test run error:", err);
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+        return;
+      }
+    }
+
+    // GET /tests/results - poll for test results (long-polling)
+    if (req.method === "GET" && pathname === "/tests/results") {
+      const timeout = 30000; // 30 second timeout
+
+      // If results already available, return immediately
+      if (testResults !== null) {
+        const results = testResults;
+        const console = [...testConsoleBuffer];
+        // Reset for next run
+        testResults = null;
+        testConsoleBuffer = [];
+        pendingTestRequest = null;
+
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ status: "complete", results, console }));
+        return;
+      }
+
+      // Long-poll: wait for results
+      const startTime = Date.now();
+      const checkResults = () => {
+        if (testResults !== null) {
+          const results = testResults;
+          const console = [...testConsoleBuffer];
+          testResults = null;
+          testConsoleBuffer = [];
+          pendingTestRequest = null;
+
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ status: "complete", results, console }));
+        } else if (Date.now() - startTime > timeout) {
+          // Timeout - return pending status with console so far
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ status: "pending", console: [...testConsoleBuffer] }));
+        } else {
+          setTimeout(checkResults, 100);
+        }
+      };
+      checkResults();
+      return;
+    }
+
+    // POST /tests/console - receive console output from browser
+    if (req.method === "POST" && pathname === "/tests/console") {
+      try {
+        const chunks = [];
+        for await (const chunk of req) {
+          chunks.push(chunk);
+        }
+        const { level, args } = JSON.parse(Buffer.concat(chunks).toString());
+        testConsoleBuffer.push({ level, args, timestamp: Date.now() });
+
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: true }));
+        return;
+      } catch (err) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+        return;
+      }
+    }
+
+    // POST /tests/results - receive test results from browser
+    if (req.method === "POST" && pathname === "/tests/results") {
+      try {
+        const chunks = [];
+        for await (const chunk of req) {
+          chunks.push(chunk);
+        }
+        const results = JSON.parse(Buffer.concat(chunks).toString());
+        testResults = results;
+        adapter.log(`Test results received: ${results.passed} passed, ${results.failed} failed`);
+
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: true }));
+        return;
+      } catch (err) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+        return;
+      }
+    }
+
     // GET /_deployed/* - serve from .deployed/current/
     if (pathname.startsWith("/_deployed")) {
       const currentDir = adapter.join(projectDir, ".deployed", "current");
@@ -928,13 +1148,14 @@ export const serve = async (adapter, args = []) => {
     // Load server plugins
     let serverModules = await loadServerModules(adapter, projectDir);
 
-    // **MODIFIED**: Pass host and port to the handler
+    // **MODIFIED**: Pass host, port, and getWss to the handler
     const requestHandler = createRequestHandler(
       adapter,
       projectDir,
       () => serverModules,
-      host, // <-- Pass host
-      port, // <-- Pass port
+      host,
+      port,
+      () => wss, // getWss callback - returns wss when it's ready
     );
 
     const server = await adapter.createServer(requestHandler);
@@ -1033,6 +1254,51 @@ export const serve = async (adapter, args = []) => {
               }
             }
 
+            // Debounced component type generation for view/component files
+            const isComponentFile =
+              filePath.includes("/views/") ||
+              filePath.includes("\\views\\") ||
+              filePath.includes("/uix/") ||
+              filePath.includes("\\uix\\") ||
+              filePath.includes("/components/") ||
+              filePath.includes("\\components\\");
+
+            if (isComponentFile && filePath.endsWith(".js")) {
+              // Clear previous timer and set new one
+              if (componentTypeGenTimeout) {
+                clearTimeout(componentTypeGenTimeout);
+              }
+              componentTypeGenTimeout = setTimeout(() => {
+                adapter.log("Triggering browser-based component type generation...");
+
+                // Get first available client
+                const clients = Array.from(wss.clients).filter(
+                  (c) => c.readyState === WebSocket.OPEN
+                );
+
+                if (clients.length > 0) {
+                  // Send to ONLY the first client
+                  clients[0].send("TYPES:GENERATE");
+                } else {
+                  // No browser connected - open one
+                  adapter.log("No browser connected, opening one...");
+                  openBrowser(`http://${host}:${port}`, adapter);
+
+                  // Wait for connection, then send
+                  const onConnection = (client) => {
+                    // Give browser time to initialize before sending
+                    setTimeout(() => {
+                      client.send("TYPES:GENERATE");
+                    }, 2000);
+                    wss.off("connection", onConnection);
+                  };
+                  wss.on("connection", onConnection);
+                }
+
+                componentTypeGenTimeout = null;
+              }, COMPONENT_TYPE_GEN_DEBOUNCE);
+            }
+
             wss.clients.forEach((client) => {
               if (client.readyState === WebSocket.OPEN) {
                 client.send("APP:REFRESH");
@@ -1048,50 +1314,10 @@ export const serve = async (adapter, args = []) => {
         adapter.log("Watching for changes...");
       }
 
-      // --- NEW CODE: Launch browser if --open is used ---
+      // Launch browser if --open is used
       if (shouldOpen) {
-        const url = `http://${host}:${port}`;
-        let command;
-        // The flags for auto-opening devtools
-        const flags = `--auto-open-devtools-for-tabs --undocked --force-dark-mode`;
-
-        switch (process.platform) {
-          case "darwin": // macOS
-            // 'open' is used to launch apps, --args passes flags to the app
-            command = `open -a "Google Chrome" "${url}" --args ${flags}`;
-            break;
-          case "win32": // Windows
-            // 'start' is the shell command, URL first
-            command = `start chrome "${url}" ${flags}`;
-            break;
-          case "linux": // Linux
-            // Try common chrome executables.
-            command = `chromium "${url}" ${flags} || google-chrome "${url}" ${flags} || google-chrome-stable "${url}" ${flags}`;
-            break;
-          default:
-            adapter.warn(
-              `Platform "${process.platform}" not recognized, cannot auto-open browser.`,
-            );
-        }
-
-        if (command) {
-          adapter.log(`Attempting to open browser: ${command}`);
-          exec(command, (err) => {
-            if (err) {
-              adapter.error(
-                "Failed to open browser. Please open it manually.",
-                err,
-              );
-              adapter.warn(
-                `You may need to install Google Chrome or add it to your PATH.`,
-              );
-            } else {
-              adapter.log("Browser opened.");
-            }
-          });
-        }
+        openBrowser(`http://${host}:${port}`, adapter);
       }
-      // --- END NEW CODE ---
     });
   };
 

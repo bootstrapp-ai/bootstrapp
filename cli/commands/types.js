@@ -275,4 +275,291 @@ export function parseTypesGenerateArgs(args) {
   return options;
 }
 
+/**
+ * Scan a directory for component files and extract metadata
+ * @param {string} dir - Directory to scan
+ * @param {string} tagPrefix - Tag prefix to derive tag names (e.g., "uix", "view")
+ * @param {Object} options - Scan options
+ * @returns {Promise<Array<{tag: string, properties: Object, extendsTag?: string}>>}
+ */
+async function scanComponentDirectory(dir, tagPrefix, options = {}) {
+  const { verbose = false, extractMetadata } = options;
+  const components = [];
+
+  if (!fs.existsSync(dir)) {
+    if (verbose) {
+      console.log(`\x1b[90m  Directory not found: ${dir}\x1b[0m`);
+    }
+    return components;
+  }
+
+  const files = fs.readdirSync(dir).filter((f) => f.endsWith(".js"));
+
+  for (const file of files) {
+    // Skip utility files
+    if (file === "utils.js" || file === "index.js" || file === "types.js") {
+      continue;
+    }
+
+    const filePath = path.join(dir, file);
+
+    try {
+      // Import the component file
+      const fileUrl = pathToFileURL(filePath).href;
+      const importUrl = `${fileUrl}?t=${Date.now()}`;
+      const componentModule = await import(importUrl);
+
+      const componentDef = componentModule.default;
+      if (!componentDef || typeof componentDef !== "object") {
+        continue;
+      }
+
+      // Derive tag name if not specified
+      const baseName = file.replace(".js", "");
+      const fallbackTag = `${tagPrefix}-${baseName}`;
+
+      const metadata = extractMetadata(componentDef, fallbackTag);
+      if (metadata) {
+        components.push(metadata);
+        if (verbose) {
+          console.log(`\x1b[90m    ✓ ${metadata.tag}\x1b[0m`);
+        }
+      }
+    } catch (error) {
+      if (verbose) {
+        console.log(`\x1b[33m    ⚠ ${file}: ${error.message}\x1b[0m`);
+      }
+    }
+  }
+
+  return components;
+}
+
+/**
+ * Load components from explicit path mappings (new object format)
+ * @param {string} baseDir - Base directory for resolving paths
+ * @param {string} prefix - Tag prefix (e.g., "uix")
+ * @param {Object} pathMappings - Object mapping component names to paths
+ * @param {Object} options - Options including extractMetadata function
+ * @returns {Promise<Array>} Array of component metadata
+ */
+async function loadComponentsFromPaths(baseDir, prefix, pathMappings, options = {}) {
+  const { verbose = false, extractMetadata } = options;
+  const components = [];
+
+  for (const [componentName, relativePath] of Object.entries(pathMappings)) {
+    const filePath = path.join(baseDir, relativePath + ".js");
+
+    if (!fs.existsSync(filePath)) {
+      if (verbose) {
+        console.log(`\x1b[33m    ⚠ ${prefix}-${componentName}: file not found at ${relativePath}.js\x1b[0m`);
+      }
+      continue;
+    }
+
+    try {
+      const fileUrl = pathToFileURL(filePath).href;
+      const importUrl = `${fileUrl}?t=${Date.now()}`;
+      const componentModule = await import(importUrl);
+
+      const componentDef = componentModule.default;
+      if (!componentDef || typeof componentDef !== "object") {
+        continue;
+      }
+
+      // Use prefix-componentName as fallback tag
+      const fallbackTag = `${prefix}-${componentName}`;
+      const metadata = extractMetadata(componentDef, fallbackTag);
+
+      if (metadata) {
+        components.push(metadata);
+        if (verbose) {
+          console.log(`\x1b[90m    ✓ ${metadata.tag}\x1b[0m`);
+        }
+      }
+    } catch (error) {
+      if (verbose) {
+        console.log(`\x1b[33m    ⚠ ${prefix}-${componentName}: ${error.message}\x1b[0m`);
+      }
+    }
+  }
+
+  return components;
+}
+
+/**
+ * Read bootstrapp.components from a package.json file
+ * @param {string} packageJsonPath - Path to package.json
+ * @returns {Object|null} Components mapping or null
+ */
+function readComponentMappings(packageJsonPath) {
+  try {
+    const content = fs.readFileSync(packageJsonPath, "utf-8");
+    const pkg = JSON.parse(content);
+    return pkg.bootstrapp?.components || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Discover all packages with bootstrapp.components in node_modules
+ * @param {string} nodeModulesDir - Path to node_modules
+ * @returns {Array<{packageDir: string, components: Object}>}
+ */
+function discoverPackageComponents(nodeModulesDir) {
+  const results = [];
+
+  if (!fs.existsSync(nodeModulesDir)) {
+    return results;
+  }
+
+  // Check @bootstrapp/* packages
+  const scopeDir = path.join(nodeModulesDir, "@bootstrapp");
+  if (fs.existsSync(scopeDir)) {
+    const packages = fs.readdirSync(scopeDir);
+    for (const pkg of packages) {
+      const pkgDir = path.join(scopeDir, pkg);
+      const pkgJsonPath = path.join(pkgDir, "package.json");
+      const components = readComponentMappings(pkgJsonPath);
+      if (components) {
+        results.push({ packageDir: pkgDir, components });
+      }
+    }
+  }
+
+  return results;
+}
+
+/**
+ * Generate html.d.ts for component autocomplete
+ * Uses bootstrapp.components from package.json for discovery
+ * @param {Object} adapter - CLI adapter
+ * @param {Object} options - Command options
+ */
+export async function generateComponentTypes(adapter, options = {}) {
+  const { output = "./types/html.d.ts", verbose = false } = options;
+
+  console.log(
+    "\x1b[1m\x1b[35m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m"
+  );
+  console.log("\x1b[1m\x1b[35m            GENERATE COMPONENT TYPES (html.d.ts)\x1b[0m");
+  console.log(
+    "\x1b[1m\x1b[35m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1b[0m\n"
+  );
+
+  // Load codegen functions
+  const { generateHtmlTypes, extractComponentMetadata } = await import(
+    "../../types/codegen.js"
+  );
+
+  // Register /$app/ loader for virtual path resolution
+  const { register } = await import("node:module");
+  register("../loader-hooks.js", import.meta.url);
+
+  const allComponents = [];
+  const projectDir = process.cwd();
+
+  // 1. Read project's package.json for component mappings
+  const projectPkgPath = path.join(projectDir, "package.json");
+  const projectComponents = readComponentMappings(projectPkgPath);
+
+  if (projectComponents) {
+    console.log("\x1b[36mScanning project components...\x1b[0m");
+    for (const [prefix, config] of Object.entries(projectComponents)) {
+      // New object format: { "button": "display/button", ... }
+      if (typeof config === "object" && !Array.isArray(config)) {
+        if (verbose) {
+          console.log(`\x1b[90m  ${prefix}-* (${Object.keys(config).length} components)\x1b[0m`);
+        }
+        const scanned = await loadComponentsFromPaths(projectDir, prefix, config, {
+          verbose,
+          extractMetadata: extractComponentMetadata,
+        });
+        allComponents.push(...scanned);
+      } else {
+        // Legacy array format: ["views/", "components/", ...]
+        const folderList = Array.isArray(config) ? config : [config];
+        for (const folder of folderList) {
+          const dir = path.join(projectDir, folder);
+          if (verbose) {
+            console.log(`\x1b[90m  ${folder} → ${prefix}-*\x1b[0m`);
+          }
+          const components = await scanComponentDirectory(dir, prefix, {
+            verbose,
+            extractMetadata: extractComponentMetadata,
+          });
+          allComponents.push(...components);
+        }
+      }
+    }
+  }
+
+  // 2. Scan node_modules for packages with bootstrapp.components
+  const nodeModulesDir = path.join(projectDir, "node_modules");
+  const packageMappings = discoverPackageComponents(nodeModulesDir);
+
+  for (const { packageDir, components } of packageMappings) {
+    const pkgName = path.basename(path.dirname(packageDir)) === "@bootstrapp"
+      ? `@bootstrapp/${path.basename(packageDir)}`
+      : path.basename(packageDir);
+
+    console.log(`\x1b[36mScanning ${pkgName}...\x1b[0m`);
+
+    for (const [prefix, config] of Object.entries(components)) {
+      // New object format: { "button": "display/button", ... }
+      if (typeof config === "object" && !Array.isArray(config)) {
+        if (verbose) {
+          console.log(`\x1b[90m  ${prefix}-* (${Object.keys(config).length} components)\x1b[0m`);
+        }
+        const scanned = await loadComponentsFromPaths(packageDir, prefix, config, {
+          verbose,
+          extractMetadata: extractComponentMetadata,
+        });
+        allComponents.push(...scanned);
+      } else {
+        // Legacy array format: ["display/", "form/", ...]
+        const folderList = Array.isArray(config) ? config : [config];
+        for (const folder of folderList) {
+          const dir = path.join(packageDir, folder);
+          if (verbose) {
+            console.log(`\x1b[90m  ${folder} → ${prefix}-*\x1b[0m`);
+          }
+          const scanned = await scanComponentDirectory(dir, prefix, {
+            verbose,
+            extractMetadata: extractComponentMetadata,
+          });
+          allComponents.push(...scanned);
+        }
+      }
+    }
+  }
+
+  if (allComponents.length === 0) {
+    console.log("\x1b[33mNo components found.\x1b[0m");
+    console.log("\x1b[90mHint: Add bootstrapp.components to your package.json\x1b[0m");
+    return false;
+  }
+
+  // Generate html.d.ts content
+  const { content, componentCount } = generateHtmlTypes(allComponents);
+
+  // Write output
+  const outputPath = path.resolve(process.cwd(), output);
+  const outputDir = path.dirname(outputPath);
+
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
+
+  fs.writeFileSync(outputPath, content);
+
+  console.log("");
+  console.log(
+    `\x1b[32mGenerated ${componentCount} component types → ${path.relative(process.cwd(), outputPath)}\x1b[0m`
+  );
+
+  return true;
+}
+
 export default generateTypes;

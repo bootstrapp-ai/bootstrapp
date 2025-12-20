@@ -126,6 +126,7 @@ export const createRouterCore = (adapter) => {
 
       // Initial route setup using adapter
       const location = this.adapter.getLocation();
+      console.error({ href: location.href });
       this.setCurrentRoute(location.href, false);
     },
 
@@ -189,7 +190,7 @@ export const createRouterCore = (adapter) => {
       const url = new URL(path, location.origin);
       const normalizedPathname = this.normalizePath(url.pathname);
       const matched = this._matchRoute(normalizedPathname);
-
+      console.error({ matched, routes: JSON.stringify(this.routes) });
       if (!matched) {
         console.warn(
           `Router: No route found for path "${normalizedPathname}".`,
@@ -460,8 +461,6 @@ export const createRouterCore = (adapter) => {
      */
     handleLinkClick(e, options = {}) {
       const { external = false } = options;
-
-      // Let browser handle modifier keys (new tab, download, etc.)
       if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) {
         return false;
       }

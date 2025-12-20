@@ -9,7 +9,10 @@
   },
   "bootstrapp": {
     "schema": true,
-    "namespace": true
+    "namespace": true,
+    "components": {
+      "bundler": "views/"
+    }
   },
   "dependencies": {
     "@bootstrapp/base": "^0.2.0",

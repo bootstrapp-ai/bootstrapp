@@ -75,9 +75,19 @@ const main = async () => {
       }
 
       case "types": {
-        const { generateTypes, parseTypesArgs } = await import("./commands/types.js");
+        const { generateTypes, generateComponentTypes, parseTypesArgs } = await import("./commands/types.js");
         const typesOptions = parseTypesArgs(args.slice(1));
         const success = await generateTypes(adapter, typesOptions);
+        // Also generate component types (html.d.ts)
+        await generateComponentTypes(adapter, { verbose: typesOptions.verbose });
+        process.exit(success ? 0 : 1);
+        break;
+      }
+
+      case "types:html": {
+        const { generateComponentTypes } = await import("./commands/types.js");
+        const verbose = args.includes("--verbose") || args.includes("-v");
+        const success = await generateComponentTypes(adapter, { verbose });
         process.exit(success ? 0 : 1);
         break;
       }

@@ -297,15 +297,18 @@ const bundler = {
       // Small delay to ensure all async resources are cached
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      console.log("📦 Step 6: Extracting CSS from iframe...");
+      console.log("📦 Step 6: Collecting component map from iframe...");
+      const componentMap = this._collectComponentMap(buildContext.iframe.contentWindow);
+
+      console.log("📦 Step 7: Extracting CSS from iframe...");
       const iframeDoc = buildContext.iframe.contentWindow.document;
       const { globalCSS, componentPaths } = await this.extractCSS(iframeDoc);
 
-      console.log("📦 Step 7: Retrieving cached files...");
+      console.log("📦 Step 8: Retrieving cached files...");
       const filesForSW = await $APP.SW.request("SW:GET_CACHED_FILES");
 
       // Process the bundle
-      return await this._processBundleFiles({ filesForSW, pages, mode, globalCSS, componentPaths });
+      return await this._processBundleFiles({ filesForSW, pages, mode, globalCSS, componentPaths, componentMap });
     } finally {
       // Cleanup iframe
       if (buildContext?.cleanup) {
@@ -338,10 +341,28 @@ const bundler = {
   },
 
   /**
+   * Collect component paths from iframe's $APP.View.components for production bundle
+   * @private
+   */
+  _collectComponentMap(iframeWindow) {
+    const componentMap = {};
+    const components = iframeWindow.$APP?.View?.components;
+    if (components) {
+      for (const [tag, entry] of components.entries()) {
+        if (entry.path) {
+          componentMap[tag] = entry.path;
+        }
+      }
+    }
+    console.log(`📦 Collected ${Object.keys(componentMap).length} component paths for production`);
+    return componentMap;
+  },
+
+  /**
    * Process collected files into deployment bundle
    * @private
    */
-  async _processBundleFiles({ filesForSW, pages, mode, globalCSS, componentPaths }) {
+  async _processBundleFiles({ filesForSW, pages, mode, globalCSS, componentPaths, componentMap }) {
     const filesForDeployment = {};
     const addFilePromises = [];
     const addFile = async ({ path, content, mimeType, skipSW = false }) => {
@@ -384,7 +405,7 @@ const bundler = {
         };
       }
     };
-    const indexHTML = this._createIndexHTML($APP.settings);
+    const indexHTML = this._createIndexHTML($APP.settings, { componentMap });
     if (mode === "hybrid") {
       pages.forEach((file) => {
         if (file.ssg)
@@ -448,7 +469,7 @@ const bundler = {
       console.log("📦 Admin excluded from bundle (bundleAdmin: false)");
     } else {
       // Generate admin/index.html when bundleAdmin is true
-      const adminHTML = this._createIndexHTML($APP.settings, { isAdmin: true });
+      const adminHTML = this._createIndexHTML($APP.settings, { isAdmin: true, componentMap });
       filesForDeployment["admin/index.html"] = { content: adminHTML };
       filesForSW["/admin/index.html"] = {
         content: adminHTML,
@@ -699,7 +720,6 @@ const createStaticPage = ({ headContent, content }) => {
 $APP.devFiles.add(new URL(import.meta.url).pathname);
 $APP.addModule({
   name: "bundler",
-  path: "/$app/bundler/views",
   dev: true,
   base: bundler,
 });

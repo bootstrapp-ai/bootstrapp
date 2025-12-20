@@ -4,6 +4,11 @@
   "description": "Content Management System for Bootstrapp - rich text, media library, SEO, publishing workflow",
   "type": "module",
   "main": "index.js",
+  "bootstrapp": {
+    "components": {
+      "cms": "views/"
+    }
+  },
   "exports": {
     ".": "./index.js",
     "./schema.js": "./schema.js",

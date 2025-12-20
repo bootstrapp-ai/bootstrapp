@@ -8,6 +8,13 @@ import T from "/$app/types/index.js";
 import View, { settings } from "/$app/view/index.js";
 import Loader from "/$app/view/loader.js";
 
+// Load component mappings - skip if production map already loaded (injected into index.html)
+if (!window.__COMPONENT_MAP__) {
+  const { loadComponentMappings } = await import("/$app/view/component-discovery.js");
+  const componentMappings = await loadComponentMappings();
+  Loader.initMappings(componentMappings);
+}
+
 // Initialize SW frontend with $APP injection
 initSWFrontend($APP);
 
@@ -40,9 +47,6 @@ $APP.events.on("APP:INIT", () => {
       },
     });
 });
-
-$APP.addModule({ name: "template", path: "/views/templates" });
-$APP.addModule({ name: "view", path: "/views" });
 
 const getComponentPath = (tag) => {
   return View.components.get(tag)?.path || Loader.resolvePath(tag);

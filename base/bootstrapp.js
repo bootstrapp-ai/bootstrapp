@@ -42,6 +42,18 @@ try {
   }
 }
 if ($APP.settings.dev) {
+  // Expose type generation method for manual triggering in dev mode
+  $APP.generateTypes = async () => {
+    console.log("Generating component types...");
+    try {
+      const { generateTypes } = await import("/$app/types/browser-generator.js");
+      return await generateTypes();
+    } catch (e) {
+      console.error("Failed to generate types:", e);
+      return { success: false, error: e.message };
+    }
+  };
+
   try {
     const currentPort = window.location.port;
     const debugPort = config.devServer.getWsPort(currentPort);
@@ -50,10 +62,33 @@ if ($APP.settings.dev) {
     }:${debugPort}`;
     const ws = new WebSocket(wsUrl);
 
-    ws.addEventListener("message", (event) => {
-      if (event.data === "APP:REFRESH") {
+    ws.addEventListener("message", async (event) => {
+      const data = event.data;
+
+      // Handle simple string messages
+      if (data === "APP:REFRESH") {
         console.log("Received refresh request from dev server");
         window.location.reload();
+        return;
+      }
+
+      if (data === "TYPES:GENERATE") {
+        console.log("Received type generation request from dev server");
+        await $APP.generateTypes();
+        return;
+      }
+
+      // Handle JSON messages
+      try {
+        const msg = JSON.parse(data);
+
+        if (msg.type === "TESTS:RUN") {
+          console.log("Received test run request from dev server");
+          const { runTests } = await import("/$app/base/test/browser-runner.js");
+          await runTests(msg.options || {});
+        }
+      } catch (e) {
+        // Not JSON, ignore
       }
     });
   } catch (e) {
